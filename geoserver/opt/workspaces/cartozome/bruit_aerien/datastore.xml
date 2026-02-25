@@ -1,0 +1,33 @@
+<dataStore>
+  <id>DataStoreInfoImpl--11320b8a:19c94ef6cfa:-7f6a</id>
+  <name>bruit_aerien</name>
+  <type>Web Feature Server (NG)</type>
+  <enabled>true</enabled>
+  <workspace>
+    <id>WorkspaceInfoImpl--11320b8a:19c94ef6cfa:-7ffc</id>
+  </workspace>
+  <connectionParameters>
+    <entry key="WFSDataStoreFactory:TRY_GZIP">true</entry>
+    <entry key="usedefaultsrs">false</entry>
+    <entry key="WFSDataStoreFactory:AXIS_ORDER">Compliant</entry>
+    <entry key="WFSDataStoreFactory:PROTOCOL">false</entry>
+    <entry key="WFSDataStoreFactory:GET_CAPABILITIES_URL">https://data.grandlyon.com/geoserver/metropole-de-lyon/ows?SERVICE=WFS&amp;VERSION=2.0.0&amp;request=GetFeature&amp;typename=metropole-de-lyon:noi_carto_bruit.noiaerien2022_lden&amp;SRSNAME=EPSG:2154&amp;outputFormat=application/json&amp;startIndex=0&amp;sortby=gid</entry>
+    <entry key="WFSDataStoreFactory:MAXFEATURES">0</entry>
+    <entry key="WFSDataStoreFactory:FILTER_COMPLIANCE">0</entry>
+    <entry key="WFSDataStoreFactory:TIMEOUT">3000</entry>
+    <entry key="WFSDataStoreFactory:WFS_STRATEGY">auto</entry>
+    <entry key="WFSDataStoreFactory:AXIS_ORDER_FILTER">Compliant</entry>
+    <entry key="WFSDataStoreFactory:ENCODING">UTF-8</entry>
+    <entry key="WFSDataStoreFactory:GML_COMPATIBLE_TYPENAMES">false</entry>
+    <entry key="WFSDataStoreFactory:LENIENT">false</entry>
+    <entry key="WFSDataStoreFactory:GML_COMPLIANCE_LEVEL">0</entry>
+    <entry key="WFSDataStoreFactory:MAX_CONNECTION_POOL_SIZE">6</entry>
+    <entry key="WFSDataStoreFactory:BUFFER_SIZE">10</entry>
+    <entry key="namespace">cartozome</entry>
+    <entry key="WFSDataStoreFactory:USE_HTTP_CONNECTION_POOLING">true</entry>
+  </connectionParameters>
+  <__default>false</__default>
+  <dateCreated>2026-02-25 15:23:46.577 UTC</dateCreated>
+  <dateModified>2026-02-25 15:23:52.701 UTC</dateModified>
+  <disableOnConnFailure>false</disableOnConnFailure>
+</dataStore>

@@ -1,0 +1,42 @@
+<GeoServerTileLayer>
+  <id>LayerInfoImpl--11320b8a:19c94ef6cfa:-7ff8</id>
+  <enabled>true</enabled>
+  <inMemoryCached>true</inMemoryCached>
+  <name>cartozome:mod_aura_2024_no2_moyan</name>
+  <mimeFormats>
+    <string>image/png</string>
+    <string>image/jpeg</string>
+  </mimeFormats>
+  <gridSubsets>
+    <gridSubset>
+      <gridSetName>EPSG:4326</gridSetName>
+    </gridSubset>
+    <gridSubset>
+      <gridSetName>EPSG:900913</gridSetName>
+    </gridSubset>
+  </gridSubsets>
+  <metaWidthHeight>
+    <int>4</int>
+    <int>4</int>
+  </metaWidthHeight>
+  <expireCache>0</expireCache>
+  <expireClients>0</expireClients>
+  <parameterFilters>
+    <styleParameterFilter>
+      <key>STYLES</key>
+      <defaultValue></defaultValue>
+      <availableStyles class="sorted-set">
+        <string>Style_no2_dep_oms</string>
+        <string>Style_no2_dep_oms_lineaire</string>
+        <string>moyan_no2</string>
+        <string>moyan_no2_boolean</string>
+        <string>moyan_no2_oms_boolean</string>
+        <string>moyan_no2_vl2030</string>
+        <string>moyan_no2_vl2030_boolean</string>
+      </availableStyles>
+      <defaultStyle></defaultStyle>
+    </styleParameterFilter>
+  </parameterFilters>
+  <gutter>0</gutter>
+  <cacheWarningSkips/>
+</GeoServerTileLayer>

@@ -1,0 +1,16 @@
+<layer>
+  <name>mod_aura_2024_pm25_moyan</name>
+  <id>LayerInfoImpl--11320b8a:19c94ef6cfa:-7ff6</id>
+  <type>WMS</type>
+  <defaultStyle>
+    <name></name>
+  </defaultStyle>
+  <resource class="wmsLayer">
+    <id>WMSLayerInfoImpl--11320b8a:19c94ef6cfa:-7ff7</id>
+  </resource>
+  <attribution>
+    <logoWidth>0</logoWidth>
+    <logoHeight>0</logoHeight>
+  </attribution>
+  <dateCreated>2026-02-25 13:37:39.603 UTC</dateCreated>
+</layer>

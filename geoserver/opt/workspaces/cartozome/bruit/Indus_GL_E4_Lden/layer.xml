@@ -1,0 +1,16 @@
+<layer>
+  <name>Indus_GL_E4_Lden</name>
+  <id>LayerInfoImpl--11320b8a:19c94ef6cfa:-7f6f</id>
+  <type>WMS</type>
+  <defaultStyle>
+    <name></name>
+  </defaultStyle>
+  <resource class="wmsLayer">
+    <id>WMSLayerInfoImpl--11320b8a:19c94ef6cfa:-7f70</id>
+  </resource>
+  <attribution>
+    <logoWidth>0</logoWidth>
+    <logoHeight>0</logoHeight>
+  </attribution>
+  <dateCreated>2026-02-25 15:21:25.399 UTC</dateCreated>
+</layer>

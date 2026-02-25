@@ -1,0 +1,70 @@
+<featureType>
+  <id>FeatureTypeInfoImpl--11320b8a:19c94ef6cfa:-7f67</id>
+  <name>metropole-de-lyon_noi_carto_bruit.noiaerien2022_ln</name>
+  <nativeName>metropole-de-lyon_noi_carto_bruit.noiaerien2022_ln</nativeName>
+  <namespace>
+    <id>NamespaceInfoImpl--11320b8a:19c94ef6cfa:-7ffb</id>
+  </namespace>
+  <title>Bruit aérien 2022 LN de la Métropole de Lyon</title>
+  <keywords>
+    <string>features</string>
+    <string>noiaerien2022_ln</string>
+  </keywords>
+  <nativeCRS class="projected">PROJCS[&quot;RGF93 / Lambert-93&quot;, 
+  GEOGCS[&quot;RGF93&quot;, 
+    DATUM[&quot;Reseau Geodesique Francais 1993&quot;, 
+      SPHEROID[&quot;GRS 1980&quot;, 6378137.0, 298.257222101, AUTHORITY[&quot;EPSG&quot;,&quot;7019&quot;]], 
+      TOWGS84[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], 
+      AUTHORITY[&quot;EPSG&quot;,&quot;6171&quot;]], 
+    PRIMEM[&quot;Greenwich&quot;, 0.0, AUTHORITY[&quot;EPSG&quot;,&quot;8901&quot;]], 
+    UNIT[&quot;degree&quot;, 0.017453292519943295], 
+    AXIS[&quot;Geodetic latitude&quot;, NORTH], 
+    AXIS[&quot;Geodetic longitude&quot;, EAST], 
+    AUTHORITY[&quot;EPSG&quot;,&quot;4171&quot;]], 
+  PROJECTION[&quot;Lambert_Conformal_Conic_2SP&quot;, AUTHORITY[&quot;EPSG&quot;,&quot;9802&quot;]], 
+  PARAMETER[&quot;central_meridian&quot;, 3.0], 
+  PARAMETER[&quot;latitude_of_origin&quot;, 46.5], 
+  PARAMETER[&quot;standard_parallel_1&quot;, 49.0], 
+  PARAMETER[&quot;false_easting&quot;, 700000.0], 
+  PARAMETER[&quot;false_northing&quot;, 6600000.0], 
+  PARAMETER[&quot;scale_factor&quot;, 1.0], 
+  PARAMETER[&quot;standard_parallel_2&quot;, 44.0], 
+  UNIT[&quot;m&quot;, 1.0], 
+  AXIS[&quot;Easting&quot;, EAST], 
+  AXIS[&quot;Northing&quot;, NORTH], 
+  AUTHORITY[&quot;EPSG&quot;,&quot;2154&quot;]]</nativeCRS>
+  <srs>EPSG:2154</srs>
+  <nativeBoundingBox>
+    <minx>-378305.8099675195</minx>
+    <maxx>1320649.571233652</maxx>
+    <miny>6008151.219241469</miny>
+    <maxy>7235612.7247730335</maxy>
+    <crs class="projected">EPSG:2154</crs>
+  </nativeBoundingBox>
+  <latLonBoundingBox>
+    <minx>-12.507059845686852</minx>
+    <maxx>12.002857384957794</maxx>
+    <miny>40.39635820978022</miny>
+    <maxy>52.208464444442946</maxy>
+    <crs>EPSG:4326</crs>
+  </latLonBoundingBox>
+  <projectionPolicy>FORCE_DECLARED</projectionPolicy>
+  <enabled>true</enabled>
+  <metadata>
+    <entry key="OTHER_SRS">urn:ogc:def:crs:EPSG::4326,urn:ogc:def:crs:EPSG::2154,urn:ogc:def:crs:EPSG::27572,urn:ogc:def:crs:EPSG::27562,urn:ogc:def:crs:EPSG::3946,urn:ogc:def:crs:EPSG::3857,urn:ogc:def:crs:EPSG::4258</entry>
+  </metadata>
+  <store class="dataStore">
+    <id>DataStoreInfoImpl--11320b8a:19c94ef6cfa:-7f6a</id>
+  </store>
+  <serviceConfiguration>false</serviceConfiguration>
+  <simpleConversionEnabled>false</simpleConversionEnabled>
+  <internationalTitle/>
+  <internationalAbstract/>
+  <maxFeatures>0</maxFeatures>
+  <numDecimals>0</numDecimals>
+  <padWithZeros>false</padWithZeros>
+  <forcedDecimal>false</forcedDecimal>
+  <overridingServiceSRS>false</overridingServiceSRS>
+  <skipNumberMatched>false</skipNumberMatched>
+  <circularArcPresent>false</circularArcPresent>
+</featureType>

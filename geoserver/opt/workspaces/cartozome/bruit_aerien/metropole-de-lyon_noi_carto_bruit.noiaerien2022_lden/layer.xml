@@ -1,0 +1,16 @@
+<layer>
+  <name>metropole-de-lyon_noi_carto_bruit.noiaerien2022_lden</name>
+  <id>LayerInfoImpl--11320b8a:19c94ef6cfa:-7f68</id>
+  <type>VECTOR</type>
+  <defaultStyle>
+    <id>StyleInfoImpl--6a77b788:19ab5d15586:-7ffe</id>
+  </defaultStyle>
+  <resource class="featureType">
+    <id>FeatureTypeInfoImpl--11320b8a:19c94ef6cfa:-7f69</id>
+  </resource>
+  <attribution>
+    <logoWidth>0</logoWidth>
+    <logoHeight>0</logoHeight>
+  </attribution>
+  <dateCreated>2026-02-25 15:26:08.605 UTC</dateCreated>
+</layer>

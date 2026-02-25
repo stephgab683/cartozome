@@ -1,0 +1,39 @@
+<layer>
+  <name>mod_aura_2024_no2_moyan</name>
+  <id>LayerInfoImpl--11320b8a:19c94ef6cfa:-7ff8</id>
+  <type>WMS</type>
+  <defaultStyle>
+    <name></name>
+  </defaultStyle>
+  <styles class="linked-hash-set">
+    <style>
+      <name>Style_no2_dep_oms</name>
+    </style>
+    <style>
+      <name>moyan_no2_vl2030</name>
+    </style>
+    <style>
+      <name>moyan_no2_oms_boolean</name>
+    </style>
+    <style>
+      <name>moyan_no2_vl2030_boolean</name>
+    </style>
+    <style>
+      <name>Style_no2_dep_oms_lineaire</name>
+    </style>
+    <style>
+      <name>moyan_no2</name>
+    </style>
+    <style>
+      <name>moyan_no2_boolean</name>
+    </style>
+  </styles>
+  <resource class="wmsLayer">
+    <id>WMSLayerInfoImpl--11320b8a:19c94ef6cfa:-7ff9</id>
+  </resource>
+  <attribution>
+    <logoWidth>0</logoWidth>
+    <logoHeight>0</logoHeight>
+  </attribution>
+  <dateCreated>2026-02-25 13:36:14.417 UTC</dateCreated>
+</layer>

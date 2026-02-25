@@ -1,0 +1,16 @@
+<layer>
+  <name>GL_Rte_Ln</name>
+  <id>LayerInfoImpl--11320b8a:19c94ef6cfa:-7f71</id>
+  <type>WMS</type>
+  <defaultStyle>
+    <name></name>
+  </defaultStyle>
+  <resource class="wmsLayer">
+    <id>WMSLayerInfoImpl--11320b8a:19c94ef6cfa:-7f72</id>
+  </resource>
+  <attribution>
+    <logoWidth>0</logoWidth>
+    <logoHeight>0</logoHeight>
+  </attribution>
+  <dateCreated>2026-02-25 15:20:49.311 UTC</dateCreated>
+</layer>

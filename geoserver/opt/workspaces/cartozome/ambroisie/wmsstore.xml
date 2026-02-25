@@ -1,0 +1,19 @@
+<wmsStore>
+  <id>WMSStoreInfoImpl--11320b8a:19c94ef6cfa:-7fa0</id>
+  <name>ambroisie</name>
+  <type>WMS</type>
+  <enabled>true</enabled>
+  <workspace>
+    <id>WorkspaceInfoImpl--11320b8a:19c94ef6cfa:-7ffc</id>
+  </workspace>
+  <metadata>
+    <entry key="useConnectionPooling">true</entry>
+  </metadata>
+  <__default>false</__default>
+  <dateCreated>2026-02-25 14:59:51.610 UTC</dateCreated>
+  <disableOnConnFailure>false</disableOnConnFailure>
+  <capabilitiesURL>https://sig.atmo-auvergnerhonealpes.fr/geoserver/ambroisie/wms?</capabilitiesURL>
+  <maxConnections>6</maxConnections>
+  <readTimeout>60</readTimeout>
+  <connectTimeout>30</connectTimeout>
+</wmsStore>
