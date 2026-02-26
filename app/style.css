@@ -1,109 +1,242 @@
-/* -------------------- */
-/* Polices locales  */
-/* -------------------- */
-@font-face {
-  font-family: 'Jost';
-  src: url('./fonts/Jost-VariableFont_wght.woff2') format('woff2');
-  font-weight: 100 900;
-  font-style: normal;
-  font-display: swap;
-}
+/* =============================================
+   POLICES LOCALES
+   ============================================= */
+   @font-face {
+    font-family: 'Jost';
+    src: url('./fonts/Jost-VariableFont_wght.woff2') format('woff2');
+    font-weight: 100 900;
+    font-style: normal;
+    font-display: swap;
+  }
+  
+  @font-face {
+    font-family: 'Jost';
+    src: url('./fonts/Jost-Italic-VariableFont_wght.woff2') format('woff2');
+    font-weight: 100 900;
+    font-style: italic;
+    font-display: swap;
+  }
+  
+  /* =============================================
+     BASE
+     ============================================= */
+  html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    font-family: 'Jost', sans-serif;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  /* =============================================
+     BANDEAU HAUT
+     ============================================= */
+  #top-banner {
+    display: flex;
+    align-items: center;
+    padding: 15px 20px;
+    background-color: #FFFFFF;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    flex: 0 0 70px;
+  }
+  
+  #banner-logo {
+    height: 50px;
+    margin-right: 20px;
+  }
+  
+  #top-banner h1 {
+    margin: 0;
+    font-size: 1.8rem;
+    color: #1A4E72;
+    text-transform: uppercase;
+  }
+  
+  /* =============================================
+     CONTENEUR PRINCIPAL
+     ============================================= */
+  #main-container {
+    display: flex;
+    flex: 1;
+    min-height: 0;
+  }
+  
+  /* =============================================
+     CARTE
+     ============================================= */
+  #map {
+    flex: 1;
+    min-height: 0;
+    position: relative;
+  }
+  
+  /* =============================================
+     PANNEAU LATÉRAL
+     ============================================= */
+  #side-panel {
+    width: 280px;
+    background-color: #f8f8f8;
+    padding: 12px;
+    box-sizing: border-box;
+    border-right: 1px solid #ddd;
+    overflow-y: auto;
+  }
+  
+  /* =============================================
+     CATÉGORIES (accordéon)
+     ============================================= */
+  .category {
+    margin-bottom: 6px;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #dde4ea;
+  }
+  
+  .category-toggle {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 12px;
+    background-color: #1A4E72;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    font-family: 'Jost', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    text-align: left;
+    transition: background 0.15s;
+  }
+  
+  .category-toggle:hover {
+    background-color: #15405e;
+  }
+  
+  .category-toggle .cat-icon {
+    font-size: 1rem;
+  }
+  
+  .category-toggle .chevron {
+    margin-left: auto;
+    font-size: 0.85rem;
+    transition: transform 0.2s;
+  }
+  
+  .category-toggle.closed .chevron {
+    transform: rotate(-90deg);
+  }
+  
+  .category-layers {
+    background: #fff;
+    padding: 4px 0;
+  }
+  
+  .category-layers.hidden {
+    display: none;
+  }
+  
+  /* =============================================
+     ITEMS DE COUCHE
+     ============================================= */
+  .layer-item {
+    padding: 8px 12px;
+    border-bottom: 1px solid #f0f0f0;
+  }
+  
+  .layer-item:last-child {
+    border-bottom: none;
+  }
+  
+  .layer-item label {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    cursor: pointer;
+    font-size: 0.84rem;
+    color: #333;
+    user-select: none;
+  }
+  
+  .layer-item label:hover {
+    color: #1A4E72;
+  }
+  
+  .layer-item input[type="checkbox"] {
+    width: 15px;
+    height: 15px;
+    accent-color: #1A4E72;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  
+  .layer-color {
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+    flex-shrink: 0;
+    opacity: 0.85;
+  }
+  
+  /* =============================================
+     BOUTONS ZOOM
+     ============================================= */
+  /* Conteneur des contrôles */
+  .leaflet-control-zoom,
+  .leaflet-control {
+    border: none !important;
+    box-shadow: none !important;
+  }
 
-@font-face {
-  font-family: 'Jost';
-  src: url('./fonts/Jost-Italic-VariableFont_wght.woff2') format('woff2');
-  font-weight: 100 900;
-  font-style: italic;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Bebas Neue';
-  src: url('./fonts/BebasNeue-Regular.woff2') format('woff2');
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-
-/* -------------------- */
-/* Style général de la page */
-/* -------------------- */
-html, body {
-  margin: 0;
-  padding: 0;
-  height: 100%;
-  font-family: 'Jost', sans-serif;
-  display: flex;
-  flex-direction: column;
-}
-
-/* -------------------- */
-/* Bandeau en haut */
-/* -------------------- */
-#top-banner {
-  display: flex;
-  align-items: center;
-  padding: 15px 20px;
-  background-color: #FFFFFF;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  flex: 0 0 70px; /* hauteur fixe */
-}
-
-/* Logo et titre dans le bandeau */
-#banner-logo {
-  height: 50px;
-  margin-right: 20px;
-}
-
-#top-banner h1 {
-  margin: 0;
-  font-family: 'Bebas Neue', sans-serif;
-  font-weight: 400;
-  font-size: 2.5rem;
-  color: #155880; /* bleu foncé */
-  text-transform: uppercase;
-  letter-spacing: 0.02em; /* espace entre les lettres */
-}
-
-/* -------------------- */
-/* Conteneur principal : panneau + carte */
-/* -------------------- */
-#main-container {
-  display: flex; /* ligne horizontale */
-  flex: 1; /* prend tout l'espace restant sous le bandeau */
-  min-height: 0; /* nécessaire pour flex children */
-}
-
-/* Bouton hamburger */
-#hamburger {
-  font-size: 1.8rem;
-  background: none;
-  border: none;
-  cursor: pointer;
-  margin-right: 15px;
-  color: #1A4E72;
-}
-
-/* Panneau latéral */
-#side-panel {
-  width: 300px; /* largeur quand ouvert */
-  transition: width 0.3s ease;
-  overflow-y: auto;
-  background-color: #f8f8f8;
-  padding: 10px;
-  box-sizing: border-box;
-}
-
-/* Panneau rétracté */
-#side-panel.collapsed {
-  width: 0;
-  padding: 0;
-  overflow: hidden;
-  background-color: transparent;
-}
-
-/* Carte Leaflet à droite */
-#map {
-  flex: 1; /* prend tout l'espace restant */
-  min-height: 0; /* empêche le scroll vertical */
-}
+  .leaflet-bottom.leaflet-right {
+    bottom: 20px;
+    right: 20px;
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 10px;
+    position: absolute !important;
+  }
+  .leaflet-control-zoom a {
+    background: white !important;
+    color: #333 !important;
+    border: none !important;
+    width: 36px;
+    height: 36px;
+    line-height: 36px;
+    font-size: 18px;
+    font-weight: 500;
+    border-radius: 12px !important;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    margin-bottom: 6px;
+    transition: all 0.2s ease;
+  }
+  
+  /* Hover zoom */
+  .leaflet-control-zoom a:hover {
+    background: #f5f5f5 !important;
+  }
+  
+  /* Supprimer séparation interne du zoom */
+  .leaflet-control-zoom-in {
+    border-bottom: none !important;
+  }
+  
+  /* 
+  /* =============================================
+     ÉCHELLE LEAFLET
+     =============================================
+  .leaflet-control-scale {
+    font-family: 'Jost', sans-serif;
+    font-weight: 400;
+    font-size: 0.8rem;
+    color: #155880;
+  }
+  
+  .leaflet-control-scale-line {
+    border: 2px solid #155880;
+    border-top: none;
+    color: #155880;
+  }  */
