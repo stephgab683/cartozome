@@ -1,12 +1,53 @@
-@import "node_modules/ol/ol.css";
-
+/* Style général et page full height */
 html, body {
   margin: 0;
+  padding: 0;
   height: 100%;
+  font-family: 'Jost', sans-serif;
+  display: flex;
+  flex-direction: column;
 }
+
+/* Bandeau en haut */
+#top-banner {
+  display: flex;
+  align-items: center;
+  padding: 15px 20px;
+  background-color: #FFFFFF;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  flex: 0 0 70px; /* hauteur fixe */
+}
+
+/* Logo et titre dans le bandeau */
+#banner-logo {
+  height: 50px;
+  margin-right: 20px;
+}
+#top-banner h1 {
+  margin: 0;
+  font-size: 1.8rem;
+  color: #1A4E72; /* bleu foncé */
+  text-transform: uppercase;
+}
+
+/* Conteneur principal : carte + panneau */
+#main-container {
+  display: flex; /* ligne horizontale : carte + panneau */
+  flex: 1; /* prend tout l'espace restant sous le bandeau */
+  min-height: 0; /* important pour que flex children respectent la hauteur */
+}
+
+/* Carte Leaflet */
 #map {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  width: 100%;
+  flex: 1; /* prend tout l'espace disponible */
+  min-height: 0; /* important pour empêcher overflow et scroll vertical */
+}
+
+/* Panneau latéral (exemple) */
+#side-panel {
+  width: 300px; /* largeur fixe ou adaptative */
+  background-color: #f8f8f8;
+  /*border-left: 1px solid #ddd; */
+  padding: 10px;
+  box-sizing: border-box;
 }
