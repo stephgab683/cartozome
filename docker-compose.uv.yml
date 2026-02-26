@@ -1,0 +1,8 @@
+services:
+  uv_fetcher:
+    container_name: cartozome_uv_fetcher
+    build:
+      context: ./uv_fetcher
+    volumes:
+      - ./DATA_API:/app/DATA_API
+    restart: unless-stopped
