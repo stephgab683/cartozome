@@ -17,7 +17,7 @@
   <body>
     <header id="top-banner">
       <img src="https://www.cancept.org/app/uploads/2024/03/CLB-222x120-1.png" alt="Logo Centre Léon Bérard" id="banner-logo">
-      <h1>CARTOZONE</h1>
+      <h1>CARTOZOME</h1>
     </header>
   
     <div id="main-container">
@@ -28,18 +28,21 @@
              CATÉGORIE : POLLUTION DE L'AIR
              ================================ -->
         <div class="category">
-          <button class="category-toggle" data-target="cat-air">
-            <span class="cat-icon">💨</span>
-            <span>Pollution de l'air</span>
-            <span class="chevron">▾</span>
-          </button>
+          <div class="category-header">
+            <button class="category-toggle" data-target="cat-air">
+              <span class="cat-icon">💨</span>
+              <span class="cat-title">Pollution de l'air</span>
+              <span class="chevron">▾</span>
+            </button>
+            <button class="category-info-btn" data-cat="cat-air" title="En savoir plus">ℹ️</button>
+          </div>
           <div class="category-layers" id="cat-air">
 
             <div class="layer-item">
               <label>
-                <input type="checkbox" class="layer-checkbox" data-layer="cartozome:mod_aura_2024_pm10_moyan" checked>
+                <input type="checkbox" class="layer-checkbox" data-layer="cartozome:mod_aura_2024_pm10_moyan">
                 <span class="layer-color" style="background:#e8a020;"></span>
-                Pollution PM10 
+                PM10 moyen 2024
               </label>
             </div>
 
@@ -47,7 +50,7 @@
               <label>
                 <input type="checkbox" class="layer-checkbox" data-layer="cartozome:mod_aura_2024_pm25_moyan">
                 <span class="layer-color" style="background:#c0392b;"></span>
-                Pollution PM2.5 
+                PM2.5 moyen 2024
               </label>
             </div>
 
@@ -55,7 +58,7 @@
               <label>
                 <input type="checkbox" class="layer-checkbox" data-layer="cartozome:mod_aura_2024_o3_somo35">
                 <span class="layer-color" style="background:#8e44ad;"></span>
-                Pollution O3 
+                O3 SOMO35 2024
               </label>
             </div>
 
@@ -63,7 +66,7 @@
               <label>
                 <input type="checkbox" class="layer-checkbox" data-layer="cartozome:mod_aura_2024_no2_moyan">
                 <span class="layer-color" style="background:#2980b9;"></span>
-                Pollution NO2 
+                NO2 moyen 2024
               </label>
             </div>
 
@@ -74,18 +77,21 @@
              CATÉGORIE : POLLEN
              ================================ -->
         <div class="category">
-          <button class="category-toggle" data-target="cat-pollen">
-            <span class="cat-icon">🌿</span>
-            <span>Pollen</span>
-            <span class="chevron">▾</span>
-          </button>
+          <div class="category-header">
+            <button class="category-toggle" data-target="cat-pollen">
+              <span class="cat-icon">🌿</span>
+              <span class="cat-title">Pollen</span>
+              <span class="chevron">▾</span>
+            </button>
+            <button class="category-info-btn" data-cat="cat-pollen" title="En savoir plus">ℹ️</button>
+          </div>
           <div class="category-layers" id="cat-pollen">
 
             <div class="layer-item">
               <label>
                 <input type="checkbox" class="layer-checkbox" data-layer="cartozome:Ambroisie_2024_AURA">
                 <span class="layer-color" style="background:#27ae60;"></span>
-                Ambroisie 
+                Ambroisie 2024
               </label>
             </div>
 
@@ -96,18 +102,21 @@
              CATÉGORIE : BRUIT
              ================================ -->
         <div class="category">
-          <button class="category-toggle" data-target="cat-bruit">
-            <span class="cat-icon">🔊</span>
-            <span>Bruit</span>
-            <span class="chevron">▾</span>
-          </button>
+          <div class="category-header">
+            <button class="category-toggle" data-target="cat-bruit">
+              <span class="cat-icon">🔊</span>
+              <span class="cat-title">Bruit</span>
+              <span class="chevron">▾</span>
+            </button>
+            <button class="category-info-btn" data-cat="cat-bruit" title="En savoir plus">ℹ️</button>
+          </div>
           <div class="category-layers" id="cat-bruit">
 
             <div class="layer-item">
               <label>
                 <input type="checkbox" class="layer-checkbox" data-layer="cartozome:GL_Fer_Lden">
                 <span class="layer-color" style="background:#e74c3c;"></span>
-                Bruit ferroviaire la journée
+                Bruit ferroviaire 2022 LDEN
               </label>
             </div>
 
@@ -115,7 +124,7 @@
               <label>
                 <input type="checkbox" class="layer-checkbox" data-layer="cartozome:GL_Fer_Ln">
                 <span class="layer-color" style="background:#c0392b;"></span>
-                Bruit ferroviaire la nuit
+                Bruit ferroviaire 2022 LN
               </label>
             </div>
 
@@ -123,7 +132,7 @@
               <label>
                 <input type="checkbox" class="layer-checkbox" data-layer="cartozome:GL_Rte_Lden">
                 <span class="layer-color" style="background:#e67e22;"></span>
-                Bruit routier la journée
+                Bruit routier 2022 LDEN
               </label>
             </div>
 
@@ -131,7 +140,7 @@
               <label>
                 <input type="checkbox" class="layer-checkbox" data-layer="cartozome:GL_Rte_Ln">
                 <span class="layer-color" style="background:#d35400;"></span>
-                Bruit routier la nuit
+                Bruit routier 2022 LN
               </label>
             </div>
 
@@ -139,23 +148,23 @@
               <label>
                 <input type="checkbox" class="layer-checkbox" data-layer="cartozome:Indus_GL_E4_Lden">
                 <span class="layer-color" style="background:#f39c12;"></span>
-                Bruit industriel la journée
+                Bruit industriel 2022 LDEN
               </label>
             </div>
 
             <div class="layer-item">
               <label>
-                <input type="checkbox" class="layer-checkbox" data-layer="cartozome:metropole-de-lyon-noi_carto_bruit.noiaerien2022_lden">
+                <input type="checkbox" class="layer-checkbox" data-layer="cartozome:metropole-de-lyon-noi_carto_bruit.noiaerien2022_lden" data-type="wfs">
                 <span class="layer-color" style="background:#95a5a6;"></span>
-                Bruit aérien la journée
+                Bruit aérien 2022 LDEN
               </label>
             </div>
 
             <div class="layer-item">
               <label>
-                <input type="checkbox" class="layer-checkbox" data-layer="cartozome:metropole-de-lyon-noi_carto_bruit.noiaerien2022_ln">
+                <input type="checkbox" class="layer-checkbox" data-layer="cartozome:metropole-de-lyon-noi_carto_bruit.noiaerien2022_ln" data-type="wfs">
                 <span class="layer-color" style="background:#7f8c8d;"></span>
-                Bruit aérien la nuit
+                Bruit aérien 2022 LN
               </label>
             </div>
 

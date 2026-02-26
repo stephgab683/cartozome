@@ -7,99 +7,105 @@
     font-weight: 100 900;
     font-style: normal;
     font-display: swap;
-  }
-  
-  @font-face {
+}
+
+@font-face {
     font-family: 'Jost';
     src: url('./fonts/Jost-Italic-VariableFont_wght.woff2') format('woff2');
     font-weight: 100 900;
     font-style: italic;
     font-display: swap;
-  }
-  
-  /* =============================================
-     BASE
-     ============================================= */
-  html, body {
+}
+
+/* =============================================
+   BASE
+   ============================================= */
+html, body {
     margin: 0;
     padding: 0;
     height: 100%;
     font-family: 'Jost', sans-serif;
     display: flex;
     flex-direction: column;
-  }
-  
-  /* =============================================
-     BANDEAU HAUT
-     ============================================= */
-  #top-banner {
+}
+
+/* =============================================
+   BANDEAU HAUT
+   ============================================= */
+#top-banner {
     display: flex;
     align-items: center;
     padding: 15px 20px;
     background-color: #FFFFFF;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     flex: 0 0 70px;
-  }
-  
-  #banner-logo {
+}
+
+#banner-logo {
     height: 50px;
     margin-right: 20px;
-  }
-  
-  #top-banner h1 {
+}
+
+#top-banner h1 {
     margin: 0;
     font-size: 1.8rem;
     color: #1A4E72;
     text-transform: uppercase;
-  }
-  
-  /* =============================================
-     CONTENEUR PRINCIPAL
-     ============================================= */
-  #main-container {
+}
+
+/* =============================================
+   CONTENEUR PRINCIPAL
+   ============================================= */
+#main-container {
     display: flex;
     flex: 1;
     min-height: 0;
-  }
-  
-  /* =============================================
-     CARTE
-     ============================================= */
-  #map {
+}
+
+/* =============================================
+   CARTE
+   ============================================= */
+#map {
     flex: 1;
     min-height: 0;
     position: relative;
-  }
-  
-  /* =============================================
-     PANNEAU LATÉRAL
-     ============================================= */
-  #side-panel {
+}
+
+/* =============================================
+   PANNEAU LATÉRAL
+   ============================================= */
+#side-panel {
     width: 280px;
     background-color: #f8f8f8;
     padding: 12px;
     box-sizing: border-box;
     border-right: 1px solid #ddd;
     overflow-y: auto;
-  }
-  
-  /* =============================================
-     CATÉGORIES (accordéon)
-     ============================================= */
-  .category {
+}
+
+/* =============================================
+   CATÉGORIES (accordéon)
+   ============================================= */
+.category {
     margin-bottom: 6px;
     border-radius: 8px;
     overflow: hidden;
     border: 1px solid #dde4ea;
-  }
-  
-  .category-toggle {
-    width: 100%;
+}
+
+.category-header {
+    display: flex;
+    align-items: stretch;
+    background-color: #1A4E72;
+}
+
+.category-toggle {
+    flex: 1;
     display: flex;
     align-items: center;
     gap: 8px;
     padding: 10px 12px;
-    background-color: #1A4E72;
+    background: none;
     color: #fff;
     border: none;
     cursor: pointer;
@@ -110,48 +116,64 @@
     letter-spacing: 0.06em;
     text-align: left;
     transition: background 0.15s;
-  }
-  
-  .category-toggle:hover {
-    background-color: #15405e;
-  }
-  
-  .category-toggle .cat-icon {
+}
+
+.category-toggle:hover {
+    background-color: rgba(255,255,255,0.1);
+}
+
+.category-toggle .cat-icon {
     font-size: 1rem;
-  }
-  
-  .category-toggle .chevron {
+}
+
+.category-toggle .chevron {
     margin-left: auto;
     font-size: 0.85rem;
     transition: transform 0.2s;
-  }
-  
-  .category-toggle.closed .chevron {
+}
+
+.category-toggle.closed .chevron {
     transform: rotate(-90deg);
-  }
-  
-  .category-layers {
+}
+
+.category-info-btn {
+    background: none;
+    border: none;
+    border-left: 1px solid rgba(255,255,255,0.2);
+    color: #fff;
+    cursor: pointer;
+    padding: 0 12px;
+    font-size: 1rem;
+    transition: background 0.15s;
+    flex-shrink: 0;
+}
+
+.category-info-btn:hover {
+    background-color: rgba(255,255,255,0.15);
+}
+
+.category-layers {
     background: #fff;
     padding: 4px 0;
-  }
-  
-  .category-layers.hidden {
+}
+
+.category-layers.hidden {
     display: none;
-  }
-  
-  /* =============================================
-     ITEMS DE COUCHE
-     ============================================= */
-  .layer-item {
+}
+
+/* =============================================
+   ITEMS DE COUCHE
+   ============================================= */
+.layer-item {
     padding: 8px 12px;
     border-bottom: 1px solid #f0f0f0;
-  }
-  
-  .layer-item:last-child {
+}
+
+.layer-item:last-child {
     border-bottom: none;
-  }
-  
-  .layer-item label {
+}
+
+.layer-item label {
     display: flex;
     align-items: center;
     gap: 9px;
@@ -159,47 +181,47 @@
     font-size: 0.84rem;
     color: #333;
     user-select: none;
-  }
-  
-  .layer-item label:hover {
+}
+
+.layer-item label:hover {
     color: #1A4E72;
-  }
-  
-  .layer-item input[type="checkbox"] {
+}
+
+.layer-item input[type="checkbox"] {
     width: 15px;
     height: 15px;
     accent-color: #1A4E72;
     cursor: pointer;
     flex-shrink: 0;
-  }
-  
-  .layer-color {
+}
+
+.layer-color {
     width: 12px;
     height: 12px;
     border-radius: 3px;
     flex-shrink: 0;
     opacity: 0.85;
-  }
-  
-  /* =============================================
-     BOUTONS ZOOM
-     ============================================= */
-  /* Conteneur des contrôles */
-  .leaflet-control-zoom,
-  .leaflet-control {
+}
+
+/* =============================================
+   BOUTONS ZOOM
+   ============================================= */
+.leaflet-control-zoom,
+.leaflet-control {
     border: none !important;
     box-shadow: none !important;
-  }
+}
 
-  .leaflet-bottom.leaflet-right {
+.leaflet-bottom.leaflet-right {
     bottom: 20px;
     right: 20px;
     display: flex;
     flex-direction: column-reverse;
     gap: 10px;
     position: absolute !important;
-  }
-  .leaflet-control-zoom a {
+}
+
+.leaflet-control-zoom a {
     background: white !important;
     color: #333 !important;
     border: none !important;
@@ -212,31 +234,70 @@
     box-shadow: 0 2px 6px rgba(0,0,0,0.2);
     margin-bottom: 6px;
     transition: all 0.2s ease;
-  }
-  
-  /* Hover zoom */
-  .leaflet-control-zoom a:hover {
+}
+
+.leaflet-control-zoom a:hover {
     background: #f5f5f5 !important;
-  }
-  
-  /* Supprimer séparation interne du zoom */
-  .leaflet-control-zoom-in {
+}
+
+.leaflet-control-zoom-in {
     border-bottom: none !important;
-  }
-  
-  /* 
-  /* =============================================
-     ÉCHELLE LEAFLET
-     =============================================
-  .leaflet-control-scale {
-    font-family: 'Jost', sans-serif;
-    font-weight: 400;
-    font-size: 0.8rem;
-    color: #155880;
-  }
-  
-  .leaflet-control-scale-line {
-    border: 2px solid #155880;
-    border-top: none;
-    color: #155880;
-  }  */
+}
+
+/* =============================================
+   POPUP D'INFORMATION
+   ============================================= */
+#info-popup {
+    display: none;
+    position: fixed;
+    top: 90px;
+    right: 16px;
+    z-index: 1000;
+    width: 320px;
+    max-width: 90vw;
+    background: #fff;
+    border-radius: 12px;
+    padding: 20px 24px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.15);
+    border-left: 4px solid #1A4E72;
+    animation: slideIn 0.2s ease;
+}
+
+@keyframes slideIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+#info-popup.visible {
+    display: block;
+}
+
+#popup-box h3 {
+    margin: 0 0 12px 0;
+    font-size: 1rem;
+    color: #1A4E72;
+    padding-right: 24px;
+}
+
+#popup-box p {
+    margin: 0;
+    font-size: 0.85rem;
+    line-height: 1.8;
+    color: #444;
+}
+
+#popup-close {
+    position: absolute;
+    top: 12px;
+    right: 14px;
+    background: none;
+    border: none;
+    font-size: 1rem;
+    cursor: pointer;
+    color: #888;
+    line-height: 1;
+}
+
+#popup-close:hover {
+    color: #1A4E72;
+}

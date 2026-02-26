@@ -74,3 +74,50 @@ document.querySelectorAll('.category-toggle').forEach(button => {
 // ÉCHELLE LEAFLET
 // =============================================
 L.control.scale({ position: 'bottomleft', imperial: false }).addTo(map);
+
+// =============================================
+// POPUPS D'INFORMATION — haut à droite, sans overlay
+// =============================================
+const categoryInfo = {
+  'cat-air': {
+    titre:   "Pollution de l'air",
+    icone:   "💨",
+    contenu: `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.`
+  },
+  'cat-pollen': {
+    titre:   "Pollen",
+    icone:   "🌿",
+    contenu: `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.`
+  },
+  'cat-bruit': {
+    titre:   "Bruit",
+    icone:   "🔊",
+    contenu: `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.`
+  }
+};
+
+// Créer le popup (sans overlay)
+const popup = document.createElement('div');
+popup.id = 'info-popup';
+popup.innerHTML = `
+  <div id="popup-box">
+    <button id="popup-close">✕</button>
+    <h3 id="popup-title"></h3>
+    <p id="popup-content"></p>
+  </div>
+`;
+document.body.appendChild(popup);
+
+// Ouvrir au clic sur ℹ️
+document.querySelectorAll('.category-info-btn').forEach(btn => {
+  btn.addEventListener('click', function (e) {
+    e.stopPropagation();
+    const cat = categoryInfo[this.dataset.cat];
+    document.getElementById('popup-title').textContent   = `${cat.icone} ${cat.titre}`;
+    document.getElementById('popup-content').textContent = cat.contenu;
+    popup.classList.add('visible');
+  });
+});
+
+// Fermer uniquement avec le ✕
+document.getElementById('popup-close').addEventListener('click', () => popup.classList.remove('visible'));
