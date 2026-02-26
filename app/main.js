@@ -1,19 +1,8 @@
-import './style.css';
-import {Map, View} from 'ol';
-import TileLayer from 'ol/layer/Tile';
-import OSM from 'ol/source/OSM';
-import { fromLonLat } from 'ol/proj';
+import 'leaflet/dist/leaflet.css';
+import L from 'leaflet';
 
-const map = new Map({
-  target: 'map',
-  layers: [ new TileLayer({ source: new OSM()})],
-  view: new View({
-    center: fromLonLat([4.832391,45.757295]),
-    zoom: 15,
-  }),
-});
+const map = L.map('map').setView([45.757295, 4.832391], 15);
 
-
-
-
-
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  attribution: '&copy; OpenStreetMap contributors'
+}).addTo(map);
