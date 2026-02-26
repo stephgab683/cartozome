@@ -9,11 +9,6 @@
     <!-- Permet à la page et à la carte de s’adapter aux écrans mobiles -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <!-- Chargement des polices Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;600;700&display=swap" rel="stylesheet">
-
     <!-- Chargement des feuilles de style CSS -->
     <link rel="stylesheet" href="./style.css" />
   </head>
@@ -21,8 +16,9 @@
   <body>
     <!-- Bandeau en haut -->
     <header id="top-banner">
+      <button id="hamburger">&#9776;</button>
       <img src="https://www.cancept.org/app/uploads/2024/03/CLB-222x120-1.png" alt="Logo Centre Léon Bérard" id="banner-logo">
-      <h1>CARTOZONE</h1>
+      <h1>CARTOZOME</h1>
     </header>
   
     <!-- Conteneur principal : carte + panneau latéral -->
@@ -31,6 +27,7 @@
         <!-- Contenu du panneau -->
         <p>Panneau latéral</p>
       </aside>
+      <!-- Carte -->
       <div id="map"></div>
 
     </div>

@@ -1,4 +1,33 @@
-/* Style général et page full height */
+/* -------------------- */
+/* Polices locales  */
+/* -------------------- */
+@font-face {
+  font-family: 'Jost';
+  src: url('./fonts/Jost-VariableFont_wght.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Jost';
+  src: url('./fonts/Jost-Italic-VariableFont_wght.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Bebas Neue';
+  src: url('./fonts/BebasNeue-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* -------------------- */
+/* Style général de la page */
+/* -------------------- */
 html, body {
   margin: 0;
   padding: 0;
@@ -8,7 +37,9 @@ html, body {
   flex-direction: column;
 }
 
+/* -------------------- */
 /* Bandeau en haut */
+/* -------------------- */
 #top-banner {
   display: flex;
   align-items: center;
@@ -23,31 +54,56 @@ html, body {
   height: 50px;
   margin-right: 20px;
 }
+
 #top-banner h1 {
   margin: 0;
-  font-size: 1.8rem;
-  color: #1A4E72; /* bleu foncé */
+  font-family: 'Bebas Neue', sans-serif;
+  font-weight: 400;
+  font-size: 2.5rem;
+  color: #155880; /* bleu foncé */
   text-transform: uppercase;
+  letter-spacing: 0.02em; /* espace entre les lettres */
 }
 
-/* Conteneur principal : carte + panneau */
+/* -------------------- */
+/* Conteneur principal : panneau + carte */
+/* -------------------- */
 #main-container {
-  display: flex; /* ligne horizontale : carte + panneau */
+  display: flex; /* ligne horizontale */
   flex: 1; /* prend tout l'espace restant sous le bandeau */
-  min-height: 0; /* important pour que flex children respectent la hauteur */
+  min-height: 0; /* nécessaire pour flex children */
 }
 
-/* Carte Leaflet */
-#map {
-  flex: 1; /* prend tout l'espace disponible */
-  min-height: 0; /* important pour empêcher overflow et scroll vertical */
+/* Bouton hamburger */
+#hamburger {
+  font-size: 1.8rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  margin-right: 15px;
+  color: #1A4E72;
 }
 
-/* Panneau latéral (exemple) */
+/* Panneau latéral */
 #side-panel {
-  width: 300px; /* largeur fixe ou adaptative */
+  width: 300px; /* largeur quand ouvert */
+  transition: width 0.3s ease;
+  overflow-y: auto;
   background-color: #f8f8f8;
-  /*border-left: 1px solid #ddd; */
   padding: 10px;
   box-sizing: border-box;
+}
+
+/* Panneau rétracté */
+#side-panel.collapsed {
+  width: 0;
+  padding: 0;
+  overflow: hidden;
+  background-color: transparent;
+}
+
+/* Carte Leaflet à droite */
+#map {
+  flex: 1; /* prend tout l'espace restant */
+  min-height: 0; /* empêche le scroll vertical */
 }
