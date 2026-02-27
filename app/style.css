@@ -557,8 +557,12 @@ html, body {
 
 .leaflet-control-attribution a:hover {
     text-decoration: underline !important;
+}
+
+/* =============================================
    ADRESSES ET BOUTON EXPOSOME
    ============================================= */
+
 #address-start, #address-end {
     width: 100%;
     padding: 6px 10px;
