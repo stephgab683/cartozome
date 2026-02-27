@@ -4,7 +4,7 @@ WORKDIR /app
 
 # Installer cron (daemon) dans l'image
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends cron \
+    && apt-get install -y --no-install-recommends cron procps \
     && rm -rf /var/lib/apt/lists/*
 
 # (Optionnel) Si tu as des dépendances Python à installer, décommente ces lignes
