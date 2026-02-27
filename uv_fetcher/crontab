@@ -1,0 +1,5 @@
+SHELL=/bin/sh
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+# Récupère les prévisions UV 4 fois par jour, volontairement à :50 pour éviter la frontière d'update du modèle
+50 5,11,15,19 * * * python /app/openmeteo_request_uv_general.py >> /proc/1/fd/1 2>> /proc/1/fd/2
