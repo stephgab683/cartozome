@@ -3,13 +3,13 @@
   <head>
     <meta charset="UTF-8" />
     <title>Cartozome</title>
-  
+
     <!-- Icône -->
     <link rel="icon" type="image/x-icon" href="https://www.cancept.org/app/uploads/2024/03/CLB-222x120-1.png" />
-  
+
     <!-- Adaptation aux écrans mobiles -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
+
     <!-- Feuille de style principale -->
     <link rel="stylesheet" href="./style.css" />
   </head>
@@ -19,7 +19,7 @@
       <img src="https://www.cancept.org/app/uploads/2024/03/CLB-222x120-1.png" alt="Logo Centre Léon Bérard" id="banner-logo">
       <h1>CARTOZOME</h1>
     </header>
-  
+
     <div id="main-container">
 
       <aside id="side-panel">
@@ -105,55 +105,82 @@
             </button>
             <button class="category-info-btn" data-cat="cat-bruit" title="En savoir plus">ℹ️</button>
           </div>
+
           <div class="category-layers" id="cat-bruit">
 
-            <div class="layer-item">
-              <label>
-                <input type="checkbox" class="layer-checkbox" data-layer="cartozome:GL_Fer_Lden">
-                Bruit ferroviaire - Journée entière
-              </label>
+            <!-- Sous-catégorie Journée -->
+            <div class="subcategory">
+              <div class="subcategory-header">
+                <button class="subcategory-toggle" data-target="bruit-jour">
+                  Journée
+                  <span class="chevron">▾</span>
+                </button>
+              </div>
+              <div class="subcategory-layers" id="bruit-jour">
+
+                <div class="layer-item">
+                  <label>
+                    <input type="checkbox" class="layer-checkbox" data-layer="cartozome:GL_Rte_Lden">
+                    Routier
+                  </label>
+                </div>
+
+                <div class="layer-item">
+                  <label>
+                    <input type="checkbox" class="layer-checkbox" data-layer="cartozome:GL_Fer_Lden">
+                    Ferroviaire
+                  </label>
+                </div>
+
+                <div class="layer-item">
+                  <label>
+                    <input type="checkbox" class="layer-checkbox" data-layer="cartozome:Indus_GL_E4_Lden">
+                    Industriel
+                  </label>
+                </div>
+
+                <div class="layer-item">
+                  <label>
+                    <input type="checkbox" class="layer-checkbox" data-layer="cartozome:metropole-de-lyon-noi_carto_bruit.noiaerien2022_lden" data-type="wfs">
+                    Aérien
+                  </label>
+                </div>
+
+              </div>
             </div>
 
-            <div class="layer-item">
-              <label>
-                <input type="checkbox" class="layer-checkbox" data-layer="cartozome:GL_Fer_Ln">
-                Bruit ferroviaire - Nuit
-              </label>
-            </div>
+            <!-- Sous-catégorie Nuit -->
+            <div class="subcategory">
+              <div class="subcategory-header">
+                <button class="subcategory-toggle" data-target="bruit-nuit">
+                  Nuit
+                  <span class="chevron">▾</span>
+                </button>
+              </div>
+              <div class="subcategory-layers hidden" id="bruit-nuit">
 
-            <div class="layer-item">
-              <label>
-                <input type="checkbox" class="layer-checkbox" data-layer="cartozome:GL_Rte_Lden">
-                Bruit routier - Journée entière
-              </label>
-            </div>
+                <div class="layer-item">
+                  <label>
+                    <input type="checkbox" class="layer-checkbox" data-layer="cartozome:GL_Rte_Ln">
+                    Routier
+                  </label>
+                </div>
 
-            <div class="layer-item">
-              <label>
-                <input type="checkbox" class="layer-checkbox" data-layer="cartozome:GL_Rte_Ln">
-                Bruit routier - Nuit
-              </label>
-            </div>
+                <div class="layer-item">
+                  <label>
+                    <input type="checkbox" class="layer-checkbox" data-layer="cartozome:GL_Fer_Ln">
+                    Ferroviaire
+                  </label>
+                </div>
 
-            <div class="layer-item">
-              <label>
-                <input type="checkbox" class="layer-checkbox" data-layer="cartozome:Indus_GL_E4_Lden">
-                Bruit industriel - Journée entière
-              </label>
-            </div>
+                <div class="layer-item">
+                  <label>
+                    <input type="checkbox" class="layer-checkbox" data-layer="cartozome:metropole-de-lyon_noi_carto_bruit.noiaerien2022_ln" data-type="wfs">
+                    Aérien
+                  </label>
+                </div>
 
-            <div class="layer-item">
-              <label>
-                <input type="checkbox" class="layer-checkbox" data-layer="cartozome:metropole-de-lyon-noi_carto_bruit.noiaerien2022_lden" data-type="wfs">
-                Bruit aérien - Journée entière
-              </label>
-            </div>
-
-            <div class="layer-item">
-              <label>
-                <input type="checkbox" class="layer-checkbox" data-layer="cartozome:metropole-de-lyon-noi_carto_bruit.noiaerien2022_ln" data-type="wfs">
-                Bruit aérien - Nuit
-              </label>
+              </div>
             </div>
 
           </div>
@@ -163,7 +190,7 @@
 
       <div id="map"></div>
     </div>
-  
+
     <script type="module" src="./main.js"></script>
   </body>
 </html>
