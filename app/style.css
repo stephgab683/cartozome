@@ -1,7 +1,7 @@
 /* =============================================
    POLICES LOCALES
    ============================================= */
-   @font-face {
+@font-face {
     font-family: 'Jost';
     src: url('./fonts/Jost-VariableFont_wght.woff2') format('woff2');
     font-weight: 100 900;
@@ -250,7 +250,7 @@ html, body {
 #info-popup {
     display: none;
     position: fixed;
-    top: 90px;
+    top: 110px;
     right: 16px;
     z-index: 1000;
     width: 320px;
