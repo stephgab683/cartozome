@@ -1,41 +1,169 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
   <head>
     <meta charset="UTF-8" />
     <title>Cartozome</title>
-    <!-- Chargement de l'icone' -->
+  
+    <!-- Icône -->
     <link rel="icon" type="image/x-icon" href="https://www.cancept.org/app/uploads/2024/03/CLB-222x120-1.png" />
-
-    <!-- Permet à la page et à la carte de s’adapter aux écrans mobiles -->
+  
+    <!-- Adaptation aux écrans mobiles -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-    <!-- Chargement des polices Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;600;700&display=swap" rel="stylesheet">
-
-    <!-- Chargement des feuilles de style CSS -->
+  
+    <!-- Feuille de style principale -->
     <link rel="stylesheet" href="./style.css" />
   </head>
 
   <body>
-    <!-- Bandeau en haut -->
     <header id="top-banner">
       <img src="https://www.cancept.org/app/uploads/2024/03/CLB-222x120-1.png" alt="Logo Centre Léon Bérard" id="banner-logo">
-      <h1>CARTOZONE</h1>
+      <h1>CARTOZOME</h1>
     </header>
   
-    <!-- Conteneur principal : carte + panneau latéral -->
     <div id="main-container">
-      <aside id="side-panel">
-        <!-- Contenu du panneau -->
-        <p>Panneau latéral</p>
-      </aside>
-      <div id="map"></div>
 
+      <aside id="side-panel">
+
+        <!-- ================================
+             CATÉGORIE : POLLUTION DE L'AIR
+             ================================ -->
+        <div class="category">
+          <div class="category-header">
+            <button class="category-toggle" data-target="cat-air">
+              <span class="cat-icon">💨</span>
+              <span class="cat-title">Pollution de l'air</span>
+              <span class="chevron">▾</span>
+            </button>
+            <button class="category-info-btn" data-cat="cat-air" title="En savoir plus">ℹ️</button>
+          </div>
+          <div class="category-layers" id="cat-air">
+
+            <div class="layer-item">
+              <label>
+                <input type="checkbox" class="layer-checkbox" data-layer="cartozome:mod_aura_2024_pm10_moyan">
+                PM10
+              </label>
+            </div>
+
+            <div class="layer-item">
+              <label>
+                <input type="checkbox" class="layer-checkbox" data-layer="cartozome:mod_aura_2024_pm25_moyan">
+                PM2,5
+              </label>
+            </div>
+
+            <div class="layer-item">
+              <label>
+                <input type="checkbox" class="layer-checkbox" data-layer="cartozome:mod_aura_2024_o3_somo35">
+                O3
+              </label>
+            </div>
+
+            <div class="layer-item">
+              <label>
+                <input type="checkbox" class="layer-checkbox" data-layer="cartozome:mod_aura_2024_no2_moyan">
+                NO2
+              </label>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- ================================
+             CATÉGORIE : POLLEN
+             ================================ -->
+        <div class="category">
+          <div class="category-header">
+            <button class="category-toggle" data-target="cat-pollen">
+              <span class="cat-icon">🌿</span>
+              <span class="cat-title">Pollen</span>
+              <span class="chevron">▾</span>
+            </button>
+            <button class="category-info-btn" data-cat="cat-pollen" title="En savoir plus">ℹ️</button>
+          </div>
+          <div class="category-layers" id="cat-pollen">
+
+            <div class="layer-item">
+              <label>
+                <input type="checkbox" class="layer-checkbox" data-layer="cartozome:Ambroisie_2024_AURA">
+                Ambroisie
+              </label>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- ================================
+             CATÉGORIE : BRUIT
+             ================================ -->
+        <div class="category">
+          <div class="category-header">
+            <button class="category-toggle" data-target="cat-bruit">
+              <span class="cat-icon">🔊</span>
+              <span class="cat-title">Bruit</span>
+              <span class="chevron">▾</span>
+            </button>
+            <button class="category-info-btn" data-cat="cat-bruit" title="En savoir plus">ℹ️</button>
+          </div>
+          <div class="category-layers" id="cat-bruit">
+
+            <div class="layer-item">
+              <label>
+                <input type="checkbox" class="layer-checkbox" data-layer="cartozome:GL_Fer_Lden">
+                Bruit ferroviaire - Journée entière
+              </label>
+            </div>
+
+            <div class="layer-item">
+              <label>
+                <input type="checkbox" class="layer-checkbox" data-layer="cartozome:GL_Fer_Ln">
+                Bruit ferroviaire - Nuit
+              </label>
+            </div>
+
+            <div class="layer-item">
+              <label>
+                <input type="checkbox" class="layer-checkbox" data-layer="cartozome:GL_Rte_Lden">
+                Bruit routier - Journée entière
+              </label>
+            </div>
+
+            <div class="layer-item">
+              <label>
+                <input type="checkbox" class="layer-checkbox" data-layer="cartozome:GL_Rte_Ln">
+                Bruit routier - Nuit
+              </label>
+            </div>
+
+            <div class="layer-item">
+              <label>
+                <input type="checkbox" class="layer-checkbox" data-layer="cartozome:Indus_GL_E4_Lden">
+                Bruit industriel - Journée entière
+              </label>
+            </div>
+
+            <div class="layer-item">
+              <label>
+                <input type="checkbox" class="layer-checkbox" data-layer="cartozome:metropole-de-lyon-noi_carto_bruit.noiaerien2022_lden" data-type="wfs">
+                Bruit aérien - Journée entière
+              </label>
+            </div>
+
+            <div class="layer-item">
+              <label>
+                <input type="checkbox" class="layer-checkbox" data-layer="cartozome:metropole-de-lyon-noi_carto_bruit.noiaerien2022_ln" data-type="wfs">
+                Bruit aérien - Nuit
+              </label>
+            </div>
+
+          </div>
+        </div>
+
+      </aside>
+
+      <div id="map"></div>
     </div>
   
     <script type="module" src="./main.js"></script>
   </body>
-
 </html>
