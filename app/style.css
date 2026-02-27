@@ -204,6 +204,69 @@ html, body {
 }
 
 /* =============================================
+   SOUS-CATÉGORIES DANS BRUIT
+   ============================================= */
+.subcategory {
+    margin: 2px 0 6px 0;
+    overflow: hidden;
+}
+
+.subcategory-header {
+    display: flex;
+    align-items: center;
+    background-color: #5dade2; /* bleu plus clair que le bleu principal */
+}
+
+.subcategory-toggle {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 10px;
+    background: none;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    font-family: 'Jost', sans-serif;
+    font-size: 0.78rem;
+    font-weight: 600;
+    text-align: left;
+    transition: background 0.15s;
+}
+
+.subcategory-toggle:hover {
+    background-color: rgba(255,255,255,0.15);
+}
+
+.subcategory-toggle .chevron {
+    margin-left: auto;
+    font-size: 0.75rem;
+    transition: transform 0.2s;
+}
+
+.subcategory-toggle.closed .chevron {
+    transform: rotate(-90deg);
+}
+
+.subcategory-layers {
+    background: #fefefe;
+    padding: 3px 0 3px 12px;
+}
+
+.subcategory-layers.hidden {
+    display: none;
+}
+
+.subcategory-layers .layer-item {
+    padding: 6px 12px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.subcategory-layers .layer-item:last-child {
+    border-bottom: none;
+}
+
+/* =============================================
    BOUTONS ZOOM
    ============================================= */
 .leaflet-control-zoom,

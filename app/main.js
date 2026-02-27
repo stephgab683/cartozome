@@ -249,7 +249,24 @@ document.querySelectorAll('.category-toggle').forEach(button => {
 });
 
 // =============================================
-// POPUPS D'INFORMATION CATÉGORIES
+// ACCORDÉON DES SOUS-CATÉGORIES
+// =============================================
+document.querySelectorAll('.subcategory-toggle').forEach(button => {
+  button.addEventListener('click', function () {
+    const targetId = this.dataset.target;
+    const layersDiv = document.getElementById(targetId);
+    layersDiv.classList.toggle('hidden');
+    this.classList.toggle('closed');
+  });
+});
+
+// =============================================
+// ÉCHELLE LEAFLET
+// =============================================
+L.control.scale({ position: 'bottomleft', imperial: false }).addTo(map);
+
+// =============================================
+// POPUPS D'INFORMATION — haut à droite, sans overlay
 // =============================================
 const categoryInfo = {
   'cat-air': {
