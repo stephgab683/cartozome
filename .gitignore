@@ -1,2 +1,5 @@
 # GeoServer security
 /geoserver/opt/security
+
+# Generated API data (uv_fetcher)
+DATA_API/
