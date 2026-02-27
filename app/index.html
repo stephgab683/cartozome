@@ -24,6 +24,31 @@
 
       <aside id="side-panel">
 
+      <!-- ================================
+          ADRESSES DE DÉPART/ARRIVÉE
+          ================================ -->
+      <div class="category">
+        <div class="category-header">
+          <button class="category-toggle">
+            <span class="cat-icon">📍</span>
+            <span class="cat-title">Adresses</span>
+          </button>
+        </div>
+        <div class="category-layers">
+
+          <div class="layer-item">
+            <label for="address-start">Adresse de départ :</label>
+            <input type="text" id="address-start" placeholder="Ex: 10 rue de la République, Lyon">
+          </div>
+
+          <div class="layer-item">
+            <label for="address-end">Adresse d’arrivée :</label>
+            <input type="text" id="address-end" placeholder="Ex: 25 rue Victor Hugo, Lyon">
+          </div>
+
+        </div>
+      </div>
+
         <!-- ================================
              CATÉGORIE : POLLUTION DE L'AIR
              ================================ -->
@@ -186,7 +211,15 @@
           </div>
         </div>
 
-      </aside>
+
+          <!-- ================================
+              BOUTON CALCUL EXPOSOME
+              ================================ -->
+          <div class="category">
+                <button id="calc-exposome-btn">Calculer l'exposome</button>
+          </div>
+
+  </aside>
 
       <div id="map"></div>
     </div>
