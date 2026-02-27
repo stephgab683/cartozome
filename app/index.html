@@ -4,102 +4,131 @@
     <meta charset="UTF-8" />
     <title>Cartozome</title>
 
-    <!-- Icône -->
-    <link rel="icon" type="image/x-icon" href="https://www.cancept.org/app/uploads/2024/03/CLB-222x120-1.png" />
+    <!-- =============================================
+         ICÔNE ONGLET
+         ============================================= -->
+    <link rel="icon" type="image/png" href="./img/logo.png" />
 
-    <!-- Adaptation aux écrans mobiles -->
+    <!-- =============================================
+         ADAPTATION AUX ÉCRANS MOBILES
+         ============================================= -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <!-- Feuille de style principale -->
+    <!-- =============================================
+         FEUILLE DE STYLE
+         ============================================= -->
     <link rel="stylesheet" href="./style.css" />
   </head>
 
   <body>
+    <!-- =============================================
+         BANDEAU HAUT
+         ============================================= -->
     <header id="top-banner">
-      <img src="https://www.cancept.org/app/uploads/2024/03/CLB-222x120-1.png" alt="Logo Centre Léon Bérard" id="banner-logo">
-      <h1>CARTOZOME</h1>
+
+      <!-- Conteneur gauche : logo Cartozome + titre -->
+      <div id="banner-left">
+        <!-- Logo Cartozome -->
+        <img src="./img/logo.png" alt="Logo Cartozome" id="banner-logo">
+
+        <!-- Titre Cartozome -->
+        <h1>CARTOZOME</h1>
+      </div>
+
+      <!-- Logo Centre Léon Bérard (droite) -->
+      <img src="./img/leonberard.png" alt="Logo Centre Léon Bérard" id="banner-logo-right">
     </header>
 
+    <!-- =============================================
+         CONTENEUR PRINCIPAL
+         ============================================= -->
     <div id="main-container">
 
+      <!-- =============================================
+           PANNEAU LATÉRAL
+           ============================================= -->
       <aside id="side-panel">
 
-        <!-- ================================
+        <!-- =============================================
              CATÉGORIE : POLLUTION DE L'AIR
-             ================================ -->
+             ============================================= -->
         <div class="category">
+
+          <!-- Header de la catégorie -->
           <div class="category-header">
             <button class="category-toggle" data-target="cat-air">
-              <span class="cat-icon">💨</span>
+              <span class="cat-icon">
+                <img src="./img/air.png" alt="Logo Air">
+              </span>
               <span class="cat-title">Pollution de l'air</span>
               <span class="chevron">▾</span>
             </button>
             <button class="category-info-btn" data-cat="cat-air" title="En savoir plus">ℹ️</button>
           </div>
-          <div class="category-layers" id="cat-air">
 
+          <!-- Conteneur des couches -->
+          <div class="category-layers" id="cat-air">
             <div class="layer-item">
               <label>
                 <input type="checkbox" class="layer-checkbox" data-layer="cartozome:mod_aura_2024_pm10_moyan">
                 PM10
               </label>
             </div>
-
             <div class="layer-item">
               <label>
                 <input type="checkbox" class="layer-checkbox" data-layer="cartozome:mod_aura_2024_pm25_moyan">
                 PM2,5
               </label>
             </div>
-
             <div class="layer-item">
               <label>
                 <input type="checkbox" class="layer-checkbox" data-layer="cartozome:mod_aura_2024_o3_somo35">
                 O3
               </label>
             </div>
-
             <div class="layer-item">
               <label>
                 <input type="checkbox" class="layer-checkbox" data-layer="cartozome:mod_aura_2024_no2_moyan">
                 NO2
               </label>
             </div>
-
           </div>
         </div>
 
-        <!-- ================================
+        <!-- =============================================
              CATÉGORIE : POLLEN
-             ================================ -->
+             ============================================= -->
         <div class="category">
           <div class="category-header">
             <button class="category-toggle" data-target="cat-pollen">
-              <span class="cat-icon">🌿</span>
+              <span class="cat-icon">
+                <img src="./img/pollen.png" alt="Logo Pollen">
+              </span>
               <span class="cat-title">Pollen</span>
               <span class="chevron">▾</span>
             </button>
             <button class="category-info-btn" data-cat="cat-pollen" title="En savoir plus">ℹ️</button>
           </div>
-          <div class="category-layers" id="cat-pollen">
 
+          <div class="category-layers" id="cat-pollen">
             <div class="layer-item">
               <label>
                 <input type="checkbox" class="layer-checkbox" data-layer="cartozome:Ambroisie_2024_AURA">
                 Ambroisie
               </label>
             </div>
-
           </div>
         </div>
 
-        <!-- ================================
+        <!-- =============================================
              CATÉGORIE : BRUIT
-             ================================ -->
+             ============================================= -->
         <div class="category">
           <div class="category-header">
             <button class="category-toggle" data-target="cat-bruit">
-              <span class="cat-icon">🔊</span>
+              <span class="cat-icon">
+                <img src="./img/bruit.png" alt="Logo Bruit">
+              </span>
               <span class="cat-title">Bruit</span>
               <span class="chevron">▾</span>
             </button>
@@ -108,7 +137,7 @@
 
           <div class="category-layers" id="cat-bruit">
 
-            <!-- Sous-catégorie Journée -->
+            <!-- Sous-catégorie : Journée -->
             <div class="subcategory">
               <div class="subcategory-header">
                 <button class="subcategory-toggle" data-target="bruit-jour">
@@ -116,40 +145,36 @@
                   <span class="chevron">▾</span>
                 </button>
               </div>
-              <div class="subcategory-layers" id="bruit-jour">
 
+              <div class="subcategory-layers" id="bruit-jour">
                 <div class="layer-item">
                   <label>
                     <input type="checkbox" class="layer-checkbox" data-layer="cartozome:GL_Rte_Lden">
                     Routier
                   </label>
                 </div>
-
                 <div class="layer-item">
                   <label>
                     <input type="checkbox" class="layer-checkbox" data-layer="cartozome:GL_Fer_Lden">
                     Ferroviaire
                   </label>
                 </div>
-
                 <div class="layer-item">
                   <label>
                     <input type="checkbox" class="layer-checkbox" data-layer="cartozome:Indus_GL_E4_Lden">
                     Industriel
                   </label>
                 </div>
-
                 <div class="layer-item">
                   <label>
                     <input type="checkbox" class="layer-checkbox" data-layer="cartozome:metropole-de-lyon_noi_carto_bruit.noiaerien2022_lden" data-type="wfs">
                     Aérien
                   </label>
                 </div>
-
               </div>
             </div>
 
-            <!-- Sous-catégorie Nuit -->
+            <!-- Sous-catégorie : Nuit -->
             <div class="subcategory">
               <div class="subcategory-header">
                 <button class="subcategory-toggle" data-target="bruit-nuit">
@@ -157,40 +182,79 @@
                   <span class="chevron">▾</span>
                 </button>
               </div>
-              <div class="subcategory-layers hidden" id="bruit-nuit">
 
+              <div class="subcategory-layers hidden" id="bruit-nuit">
                 <div class="layer-item">
                   <label>
                     <input type="checkbox" class="layer-checkbox" data-layer="cartozome:GL_Rte_Ln">
                     Routier
                   </label>
                 </div>
-
                 <div class="layer-item">
                   <label>
                     <input type="checkbox" class="layer-checkbox" data-layer="cartozome:GL_Fer_Ln">
                     Ferroviaire
                   </label>
                 </div>
-
                 <div class="layer-item">
                   <label>
                     <input type="checkbox" class="layer-checkbox" data-layer="cartozome:metropole-de-lyon_noi_carto_bruit.noiaerien2022_ln" data-type="wfs">
                     Aérien
                   </label>
                 </div>
-
               </div>
             </div>
 
           </div>
         </div>
 
+        <!-- =============================================
+             CATÉGORIE : UV
+             ============================================= -->
+        <div class="category">
+          <div class="category-header">
+            <button class="category-toggle" data-target="cat-uv">
+              <span class="cat-icon">
+                <img src="./img/uv.png" alt="Logo UV">
+              </span>
+              <span class="cat-title">UV</span>
+              <span class="chevron">▾</span>
+            </button>
+            <button class="category-info-btn" data-cat="cat-uv" title="En savoir plus">ℹ️</button>
+          </div>
+
+          <div class="category-layers" id="cat-uv">
+            <div class="layer-item">
+              <label>
+                <input type="checkbox" class="layer-checkbox" data-layer="cartozome:uv_index">
+                Index UV
+              </label>
+            </div>
+          </div>
+        </div>
+
       </aside>
 
+      <!-- =============================================
+           CARTE
+           ============================================= -->
       <div id="map"></div>
     </div>
 
+    <!-- =============================================
+         POP-UP DE BIENVENUE
+         ============================================= -->
+    <div id="welcome-overlay" class="visible">
+      <div id="welcome-popup">
+        <button id="welcome-close">✖</button>
+        <h2>Bienvenue sur Cartozome</h2>
+        <p>Cette carte vous permet de visualiser la pollution de l'air, le pollen et le bruit dans votre région.</p>
+      </div>
+    </div>
+
+    <!-- =============================================
+         SCRIPT PRINCIPAL
+         ============================================= -->
     <script type="module" src="./main.js"></script>
   </body>
 </html>

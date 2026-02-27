@@ -1,7 +1,7 @@
 /* =============================================
    POLICES LOCALES
    ============================================= */
-@font-face {
+   @font-face {
     font-family: 'Jost';
     src: url('./fonts/Jost-VariableFont_wght.woff2') format('woff2');
     font-weight: 100 900;
@@ -20,6 +20,7 @@
 /* =============================================
    BASE
    ============================================= */
+/* HTML et BODY : flex colonne pour la page */
 html, body {
     margin: 0;
     padding: 0;
@@ -30,27 +31,102 @@ html, body {
 }
 
 /* =============================================
+   POP-UP DE BIENVENUE
+   ============================================= */
+
+/* Overlay semi-transparent */
+#welcome-overlay {
+    display: none; /* caché par défaut, JS le rend visible */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    z-index: 2000;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Pop-up centrale */
+#welcome-popup {
+    background: #fff;
+    border-radius: 12px;
+    padding: 30px 40px;
+    max-width: 500px;
+    width: 90%;
+    text-align: center;
+    position: relative;
+    box-shadow: 0 6px 30px rgba(0,0,0,0.25);
+}
+
+/* Bouton de fermeture */
+#welcome-close {
+    position: absolute;
+    top: 12px;
+    right: 14px;
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    color: #888;
+}
+
+#welcome-close:hover {
+    color: #1A4E72;
+}
+
+/* Titre pop-up */
+#welcome-popup h2 {
+    margin: 0 0 15px 0;
+    font-size: 1.5rem;
+    color: #1A4E72;
+}
+
+/* Texte pop-up */
+#welcome-popup p {
+    font-size: 1rem;
+    line-height: 1.6;
+    color: #444;
+}
+
+/* =============================================
    BANDEAU HAUT
    ============================================= */
+/* Conteneur principal de la bannière */
 #top-banner {
     display: flex;
     align-items: center;
+    justify-content: space-between; 
     padding: 15px 20px;
     background-color: #FFFFFF;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     flex: 0 0 70px;
 }
 
-#banner-logo {
-    height: 50px;
-    margin-right: 20px;
+/* Conteneur gauche : logo Cartozome + texte */
+#banner-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
-#top-banner h1 {
+/* Logo Cartozome (gauche) */
+#banner-logo {
+    height: 50px;
+}
+
+/* Texte Cartozome */
+#banner-left h1 {
     margin: 0;
     font-size: 1.8rem;
     color: #1A4E72;
     text-transform: uppercase;
+}
+
+/* Logo Centre Léon Bérard (droite) */
+#banner-logo-right {
+    height: 50px;
 }
 
 /* =============================================
@@ -65,6 +141,7 @@ html, body {
 /* =============================================
    CARTE
    ============================================= */
+/* Carte principale Leaflet */
 #map {
     flex: 1;
     min-height: 0;
@@ -74,6 +151,7 @@ html, body {
 /* =============================================
    PANNEAU LATÉRAL
    ============================================= */
+/* Conteneur du panneau des couches */
 #side-panel {
     width: 280px;
     background-color: #f8f8f8;
@@ -86,6 +164,7 @@ html, body {
 /* =============================================
    CATÉGORIES (accordéon)
    ============================================= */
+/* Conteneur d’une catégorie */
 .category {
     margin-bottom: 6px;
     border-radius: 8px;
@@ -93,12 +172,14 @@ html, body {
     border: 1px solid #dde4ea;
 }
 
+/* Header de la catégorie : bouton + info */
 .category-header {
     display: flex;
     align-items: stretch;
     background-color: #1A4E72;
 }
 
+/* Bouton principal pour ouvrir/fermer la catégorie */
 .category-toggle {
     flex: 1;
     display: flex;
@@ -118,24 +199,31 @@ html, body {
     transition: background 0.15s;
 }
 
+/* Hover sur le bouton de catégorie */
 .category-toggle:hover {
     background-color: rgba(255,255,255,0.1);
 }
 
-.category-toggle .cat-icon {
-    font-size: 1rem;
+/* Icone dans le bouton catégorie */
+.category-toggle .cat-icon img {
+    width: 24px;  /* ou la taille que tu veux */
+    height: 24px;
+    object-fit: contain;
 }
 
+/* Chevron de la catégorie */
 .category-toggle .chevron {
     margin-left: auto;
     font-size: 0.85rem;
     transition: transform 0.2s;
 }
 
+/* Rotation du chevron quand fermé */
 .category-toggle.closed .chevron {
     transform: rotate(-90deg);
 }
 
+/* Bouton d’info ℹ️ */
 .category-info-btn {
     background: none;
     border: none;
@@ -152,6 +240,7 @@ html, body {
     background-color: rgba(255,255,255,0.15);
 }
 
+/* Conteneur des couches dans la catégorie */
 .category-layers {
     background: #fff;
     padding: 4px 0;
@@ -164,6 +253,7 @@ html, body {
 /* =============================================
    ITEMS DE COUCHE
    ============================================= */
+/* Conteneur d’un item de couche */
 .layer-item {
     padding: 8px 12px;
     border-bottom: 1px solid #f0f0f0;
@@ -173,6 +263,7 @@ html, body {
     border-bottom: none;
 }
 
+/* Label et checkbox */
 .layer-item label {
     display: flex;
     align-items: center;
@@ -183,18 +274,12 @@ html, body {
     user-select: none;
 }
 
+/* Hover sur le label */
 .layer-item label:hover {
     color: #1A4E72;
 }
 
-.layer-item input[type="checkbox"] {
-    width: 15px;
-    height: 15px;
-    accent-color: #1A4E72;
-    cursor: pointer;
-    flex-shrink: 0;
-}
-
+/* Petite couleur associée à la couche */
 .layer-color {
     width: 12px;
     height: 12px;
@@ -204,19 +289,63 @@ html, body {
 }
 
 /* =============================================
+   TOGGLE SWITCH MODERNE (remplace checkbox)
+   ============================================= */
+
+.layer-item input[type="checkbox"] {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 38px;
+    height: 20px;
+    background-color: #ddd;
+    border-radius: 20px;
+    position: relative;
+    cursor: pointer;
+    transition: background-color 0.25s ease;
+    flex-shrink: 0;
+}
+
+/* Le petit rond */
+.layer-item input[type="checkbox"]::before {
+    content: "";
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    top: 2px;
+    left: 2px;
+    background-color: white;
+    border-radius: 50%;
+    transition: transform 0.25s ease;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+}
+
+/* Quand activé */
+.layer-item input[type="checkbox"]:checked {
+    background-color: #1A4E72;
+}
+
+/* Déplacement du rond */
+.layer-item input[type="checkbox"]:checked::before {
+    transform: translateX(18px);
+}
+
+/* =============================================
    SOUS-CATÉGORIES DANS BRUIT
    ============================================= */
+/* Conteneur sous-catégorie */
 .subcategory {
     margin: 2px 0 6px 0;
     overflow: hidden;
 }
 
+/* Header sous-catégorie : bouton */
 .subcategory-header {
     display: flex;
     align-items: center;
     background-color: #5dade2; /* bleu plus clair que le bleu principal */
 }
 
+/* Bouton sous-catégorie */
 .subcategory-toggle {
     flex: 1;
     display: flex;
@@ -238,6 +367,7 @@ html, body {
     background-color: rgba(255,255,255,0.15);
 }
 
+/* Chevron sous-catégorie */
 .subcategory-toggle .chevron {
     margin-left: auto;
     font-size: 0.75rem;
@@ -248,6 +378,7 @@ html, body {
     transform: rotate(-90deg);
 }
 
+/* Conteneur des couches dans sous-catégorie */
 .subcategory-layers {
     background: #fefefe;
     padding: 3px 0 3px 12px;
@@ -257,6 +388,7 @@ html, body {
     display: none;
 }
 
+/* Items dans sous-catégorie */
 .subcategory-layers .layer-item {
     padding: 6px 12px;
     border-bottom: 1px solid #f0f0f0;
@@ -269,12 +401,14 @@ html, body {
 /* =============================================
    BOUTONS ZOOM
    ============================================= */
+/* Zoom Leaflet */
 .leaflet-control-zoom,
 .leaflet-control {
     border: none !important;
     box-shadow: none !important;
 }
 
+/* Position des boutons */
 .leaflet-bottom.leaflet-right {
     bottom: 20px;
     right: 20px;
@@ -284,6 +418,7 @@ html, body {
     position: absolute !important;
 }
 
+/* Boutons + et - */
 .leaflet-control-zoom a {
     background: white !important;
     color: #333 !important;
@@ -310,6 +445,7 @@ html, body {
 /* =============================================
    POPUP D'INFORMATION
    ============================================= */
+/* Conteneur popup */
 #info-popup {
     display: none;
     position: fixed;
@@ -326,6 +462,7 @@ html, body {
     animation: slideIn 0.2s ease;
 }
 
+/* Animation popup */
 @keyframes slideIn {
     from { opacity: 0; transform: translateY(-10px); }
     to { opacity: 1; transform: translateY(0); }
@@ -335,6 +472,7 @@ html, body {
     display: block;
 }
 
+/* Titre du popup */
 #popup-box h3 {
     margin: 0 0 12px 0;
     font-size: 1rem;
@@ -342,6 +480,7 @@ html, body {
     padding-right: 24px;
 }
 
+/* Texte du popup */
 #popup-box p {
     margin: 0;
     font-size: 0.85rem;
@@ -349,6 +488,7 @@ html, body {
     color: #444;
 }
 
+/* Bouton fermeture */
 #popup-close {
     position: absolute;
     top: 12px;
@@ -363,4 +503,58 @@ html, body {
 
 #popup-close:hover {
     color: #1A4E72;
+}
+
+/* =============================================
+   ÉCHELLE
+   ============================================= */
+
+.leaflet-control-scale {
+    background: rgba(255,255,255,0.9) !important;
+    padding: 4px 8px !important;
+    border-radius: 10px !important;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15) !important;
+    font-family: 'Jost', sans-serif !important;
+    font-size: 0.75rem !important;
+    font-weight: 500 !important;
+    color: #1A4E72 !important; 
+}
+
+.leaflet-bottom.leaflet-right {
+    bottom: 5px !important;
+    right: 5px !important;
+}
+
+/* Texte */
+.leaflet-control-scale-line {
+    background: none !important;
+    color: #1A4E72 !important;
+    font-family: 'Jost', sans-serif !important;
+    font-weight: 500 !important;
+}
+
+/* =============================================
+   CREDITS
+   ============================================= */
+
+.leaflet-control-attribution {
+    background: rgba(255,255,255,0.9) !important;
+    padding: 6px 10px !important;
+    border-radius: 10px !important;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15) !important;
+    font-family: 'Jost', sans-serif !important;
+    font-size: 0.75rem !important;
+    font-weight: 500 !important;
+    color: #1A4E72 !important;
+}
+
+/* Liens dans les crédits */
+.leaflet-control-attribution a {
+    color: #1A4E72 !important;
+    text-decoration: none !important;
+    font-weight: 600 !important;
+}
+
+.leaflet-control-attribution a:hover {
+    text-decoration: underline !important;
 }
