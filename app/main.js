@@ -306,3 +306,17 @@ document.querySelectorAll('.category-info-btn').forEach(btn => {
 });
 
 document.getElementById('popup-close').addEventListener('click', () => popup.classList.remove('visible'));
+
+// =============================================
+// POP-UP DE BIENVENUE
+// =============================================
+window.addEventListener('load', () => {
+  const overlay = document.getElementById('welcome-overlay');
+  const closeBtn = document.getElementById('welcome-close');
+
+  overlay.style.display = 'flex'; // rend visible et centre grâce à flex
+
+  closeBtn.addEventListener('click', () => {
+      overlay.style.display = 'none';
+  });
+});
