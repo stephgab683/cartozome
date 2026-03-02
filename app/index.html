@@ -98,13 +98,13 @@
               <label><input type="checkbox" class="layer-checkbox" data-layer="cartozome:mod_aura_2024_pm10_moyan">PM10</label>
             </div>
             <div class="layer-item">
-              <label><input type="checkbox" class="layer-checkbox" data-layer="cartozome:mod_aura_2024_pm25_moyan">PM2,5</label>
+              <label><input type="checkbox" class="layer-checkbox" data-layer="cartozome:mod_aura_2024_pm25_moyan">PM2.5</label>
             </div>
             <div class="layer-item">
-              <label><input type="checkbox" class="layer-checkbox" data-layer="cartozome:mod_aura_2024_o3_somo35">O3</label>
+              <label><input type="checkbox" class="layer-checkbox" data-layer="cartozome:mod_aura_2024_o3_somo35">O₃</label>
             </div>
             <div class="layer-item">
-              <label><input type="checkbox" class="layer-checkbox" data-layer="cartozome:mod_aura_2024_no2_moyan">NO2</label>
+              <label><input type="checkbox" class="layer-checkbox" data-layer="cartozome:mod_aura_2024_no2_moyan">NO₂</label>
             </div>
           </div>
         </div>
@@ -209,12 +209,127 @@
       <div id="map"></div>
     </div>
 
+    <!-- ================================ -->
     <!-- POP-UP DE BIENVENUE -->
+    <!-- ================================ -->
     <div id="welcome-overlay" class="visible">
       <div id="welcome-popup">
         <button id="welcome-close">✖</button>
         <h2>Bienvenue sur Cartozome</h2>
-        <p>Cette carte vous permet de visualiser la pollution de l'air, le pollen et le bruit dans votre région.</p>
+        <p>
+          Cartozome est une carte interactive de sensibilisation aux exposomes environnementaux : l'ensemble des expositions à notre environnement qui peuvent influencer notre santé tout au long de la vie.<br>
+          Explorez vos expositions à différentes sources de pollution — bruit, rayonnements UV, polluants atmosphériques, pollens — en un point précis ou le long d'un itinéraire de votre choix.<br><br>
+          <i>Cette application a été développée par Laura Carrier, Fanny Fortin, Elias Makhlouf et Stéphanie Gabette, étudiants en Master GEONUM, à la demande du Centre de lutte contre le cancer Léon Bérard (Lyon).<i>
+        </p>
+      </div>
+    </div>
+  
+    <!-- ============================================= -->
+    <!-- CONTENUS POPUPS INFORMATION -->
+    <!-- ============================================= -->
+    <div id="info-contents" style="display: none;">
+
+      <div id="info-cat-air">
+        <h3 class="popup-title">
+          <img src="./img/air.png" alt="Logo Air">
+          Pollution de l'air
+        </h3>
+        <p>
+          On ne le voit pas, on ne le sent pas toujours — et pourtant, l'air que l'on respire chaque jour influence notre santé.
+          Nous sommes en permanence exposés à des polluants atmosphériques aux effets bien documentés.
+        </p>
+    
+        <p><strong>Sur cette carte, quatre polluants sont suivis :</strong></p>
+    
+        <p><strong>Le dioxyde d'azote (NO₂)</strong><br>
+        Produit principalement par les voitures thermiques et les chaudières, le NO₂ irrite les voies respiratoires et favorise l'asthme.
+        </p>
+    
+        <p><strong>Les particules fines (PM2.5 et PM10)</strong><br>
+        Les PM2.5 peuvent atteindre la circulation sanguine. Elles sont associées à des maladies cardiovasculaires et respiratoires.
+        </p>
+    
+        <p><strong>L'ozone troposphérique (O₃)</strong><br>
+        Le "mauvais ozone" formé au niveau du sol par temps chaud et ensoleillé.
+        </p>
+    
+        <p>
+          Les valeurs sont comparées aux recommandations de l'OMS (2021).
+        </p>
+      </div>
+
+      <div id="info-cat-pollen">
+        <h3 class="popup-title">
+          <img src="./img/pollen.png" alt="Logo Pollen">
+          Pollen
+        </h3>
+        <p>
+          Transportés par le vent, les pollens provoquent des réactions allergiques — appelées pollinoses — qui touchent entre 20 et 30 % de la population européenne. Ces réactions se manifestent principalement sous forme de rhinites et de rhino-conjonctivites, et plus rarement d'asthme.
+        </p>
+      
+        <p>
+          Si vous êtes allergique, connaître les niveaux de pollen sur votre trajet quotidien peut faire une vraie différence dans la gestion de vos symptômes.
+        </p>
+      
+        <p><strong>Comment évalue-t-on le risque allergique d'un pollen ?</strong><br>
+          Tous les pollens ne se valent pas. Leur potentiel allergisant — c'est-à-dire leur capacité à déclencher une réaction — est classé en trois niveaux :
+        </p>
+      
+        <ul>
+          <li><strong>Faible</strong> — Une très grande quantité de grains est nécessaire pour provoquer une réaction, et uniquement chez les personnes les plus sensibles.</li>
+          <li><strong>Modéré</strong> — Une quantité importante est nécessaire pour affecter un faible nombre de personnes sensibles.</li>
+          <li><strong>Fort</strong> — Quelques grains suffisent à déclencher une réaction chez la majorité des personnes allergiques.</li>
+        </ul>
+      
+        <p>
+          Les données représentent les concentrations moyennes de pollen d'ambroisie sur l'année 2024. L'ambroisie est une plante particulièrement invasive dans la région Auvergne-Rhône-Alpes, reconnue pour son potentiel allergisant fort.
+        </p>
+      </div>
+
+      <div id="info-cat-bruit">
+        <h3 class="popup-title">
+          <img src="./img/bruit.png" alt="Logo Bruit">
+          Bruit
+        </h3>
+        <p>
+          La pollution sonore liée aux transports représente à elle seule 65 % des nuisances sonores perçues, et on estime que 20 % des Européens sont exposés à des niveaux de bruit routier suffisamment élevés pour être préjudiciables à leur santé.
+        </p>
+      
+        <p>
+          Les effets ne se limitent pas à une simple gêne : une exposition prolongée au bruit peut perturber le sommeil, augmenter le risque de maladies cardiovasculaires, affecter le développement cognitif des enfants, réduire les performances, et même avoir des conséquences sur la santé des nouveau-nés. Sans oublier l'impact psychologique, avec des réactions d'agacement et des changements dans les comportements sociaux.
+        </p>
+      
+        <p><strong>Comment mesure-t-on le bruit ?</strong><br>
+          Le bruit s'exprime en décibels (dB). Sur cette carte, deux indicateurs sont utilisés, conformément aux recommandations de l'OMS : l'exposition en journée et l'exposition la nuit, cette dernière étant particulièrement importante pour évaluer les perturbations du sommeil.
+        </p>
+      
+        <p>
+          Les données représentent les niveaux de bruit moyens sur l'année 2022, issus de quatre sources : l'activité industrielle, le trafic routier, le trafic ferroviaire et le trafic aérien.
+        </p>
+      </div>
+
+      <div id="info-cat-uv">
+        <h3 class="popup-title">
+          <img src="./img/uv.png" alt="Logo UV">
+          Rayonnement UV
+        </h3>
+        <p>On pense souvent au soleil comme à un allié — et il l'est, en partie ! Une exposition modérée permet à notre corps de synthétiser la vitamine D, essentielle pour nos os et notre système immunitaire. Mais le soleil a aussi son revers : une exposition excessive ou répétée, surtout pendant l'enfance, peut avoir des conséquences durables sur notre santé. Selon la Ligue Contre le Cancer, 80 % des cancers de la peau sont liés à une surexposition au soleil. Et plus largement, 40 % des cancers seraient évitables, car directement liés à notre mode de vie ou à notre environnement.</p>
+
+        <p><strong>Comment mesure-t-on le risque UV ?</strong></p>
+        
+        <p>Pour savoir à quel point le soleil est "fort" un jour donné, les scientifiques utilisent l'Indice UV Global, une échelle internationale recommandée par l'OMS et l'OMM. Il va de 1 (risque faible) à 11 et au-delà (risque extrême), et reflète directement le risque de lésions cutanées et oculaires.</p>
+        
+        <p><strong>Niveaux de risque :</strong></p>
+        
+        <p>1-2 : Faible<br>
+        3-5 : Modéré<br>
+        6-7 : Fort<br>
+        8-10 : Très fort<br>
+        11+ : Extrême</p>
+        
+        <p>Source : <a href="http://www.meteo.fr/temps/domtom/La_Reunion/meteoreunion2/UV/legendeUV.html" target="_blank">Météo-France</a></p>
+        
+        <p>Sur cette carte, l'indice affiché est celui produit par Météo-France, mis à jour chaque jour.</p>
       </div>
     </div>
 
