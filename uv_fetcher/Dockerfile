@@ -18,6 +18,7 @@ RUN pip install --no-cache-dir -r /app/requirements.txt
 
 # Copier le script Python dans l'image
 COPY openmeteo_request_uv_general.py /app/openmeteo_request_uv_general.py
+COPY enrich_json_uv_communes.py /app/enrich_json_uv_communes.py
 
 # Copier la règle cron et l'enregistrer dans la crontab du conteneur
 COPY crontab /app/crontab
