@@ -447,20 +447,44 @@ document.addEventListener("DOMContentLoaded", () => {
   exposomeBtn.addEventListener("click", async () => {
 
     console.log("Calcul exposome lancé ✅");
-
     routingLayer.clearLayers();
 
-    const startInput = document.getElementById("address-start").value.trim();
-    const endInput   = document.getElementById("address-end").value.trim();
+    const pointInput  = document.getElementById("point-start")?.value.trim();
+    const routeStart  = document.getElementById("route-start")?.value.trim();
+    const routeEnd    = document.getElementById("route-end")?.value.trim();
 
-    if (!startInput) {
+    // ==============================
+    // CAS 1 : POINT UNIQUE
+    // ==============================
+    if (pointInput) {
+
+      const coords = await geocodeAddress(pointInput);
+
+      if (!coords) {
+        alert("Adresse introuvable");
+        return;
+      }
+
+      const latLng = L.latLng(coords[1], coords[0]);
+
+      L.marker(latLng)
+        .addTo(routingLayer)
+        .bindPopup("Point sélectionné")
+        .openPopup();
+
+      map.setView(latLng, 16);
+      return;
+    }
+
+    // ==============================
+    // CAS 2 : ITINÉRAIRE
+    // ==============================
+    if (!routeStart) {
       alert("Veuillez saisir une adresse de départ");
       return;
     }
 
-    // --- Départ ---
-    const startCoords = await geocodeAddress(startInput);
-
+    const startCoords = await geocodeAddress(routeStart);
     if (!startCoords) {
       alert("Adresse de départ introuvable");
       return;
@@ -473,15 +497,13 @@ document.addEventListener("DOMContentLoaded", () => {
       .bindPopup("Départ")
       .openPopup();
 
-    // --- Si pas d'arrivée : juste zoom ---
-    if (!endInput) {
+    // Si pas d'arrivée → juste zoom
+    if (!routeEnd) {
       map.setView(startLatLng, 16);
       return;
     }
 
-    // --- Arrivée ---
-    const endCoords = await geocodeAddress(endInput);
-
+    const endCoords = await geocodeAddress(routeEnd);
     if (!endCoords) {
       alert("Adresse d'arrivée introuvable");
       return;
@@ -493,7 +515,6 @@ document.addEventListener("DOMContentLoaded", () => {
       .addTo(routingLayer)
       .bindPopup("Arrivée");
 
-    // --- Calcul itinéraire ---
     const routeCoords = await getRoute(startCoords, endCoords);
 
     if (!routeCoords) {
