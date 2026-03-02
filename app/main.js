@@ -36,7 +36,6 @@ function closestUvPoint(points, lat, lon) {
  * Extrait une valeur UV max (si dispo) et une date à partir d'un objet point.
  */
 function extractUvMax(point) {
-  const date = point?.daily?.time?.[0] ?? null;
   const uv = point?.daily?.uv_index_max?.[0]; // souvent null pour l'instant
   return { date, uv };
 }
@@ -58,7 +57,7 @@ async function updateUvFromMapCenter(map) {
       return;
     }
 
-    const { date, uv } = extractUvMax(p);
+    const { uv } = extractUvMax(p);
 
     console.log("[UV] Point le plus proche du centre:", {
       center: { lat: center.lat, lon: center.lng },
@@ -70,8 +69,8 @@ async function updateUvFromMapCenter(map) {
     const el = document.getElementById("uv-status");
     if (el) {
       el.textContent = (uv === null || uv === undefined)
-        ? `UV max (${date ?? "date inconnue"}) : très faible`
-        : `UV max (${date ?? "date inconnue"}) : ${uv}`;
+        ? `UV max : très faible`
+        : `UV max : ${uv}`;
     }
   } catch (err) {
     console.error("[UV] Erreur de chargement UV:", err);
