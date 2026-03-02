@@ -162,6 +162,47 @@ html, body {
 }
 
 /* =============================================
+   ADRESSES
+   ============================================= */
+.input-and-button {
+    display: flex;
+    gap: 4px;
+    margin-top: 4px;
+    margin-bottom: 4px;
+}
+
+.input-and-button input[type="text"] {
+    flex: 1;
+    padding: 6px 10px;
+    border: 1px solid #dde4ea;
+    border-radius: 6px;
+    font-size: 0.84rem;
+    height: 36px;
+    box-sizing: border-box;
+    background-color: #fff;
+}
+
+.input-and-button button {
+    width: 36px;
+    height: 36px;
+    border-radius: 6px;
+    border: 1px solid #dde4ea;
+    background-color: #fff;
+    color: #1A4E72;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.input-and-button button:hover {
+    background-color: #1A4E72;
+    color: #fff;
+    border-color: #1A4E72;
+}
+
+/* =============================================
    CATÉGORIES (accordéon)
    ============================================= */
 /* Conteneur d’une catégorie */
@@ -279,15 +320,6 @@ html, body {
     color: #1A4E72;
 }
 
-/* Petite couleur associée à la couche */
-.layer-color {
-    width: 12px;
-    height: 12px;
-    border-radius: 3px;
-    flex-shrink: 0;
-    opacity: 0.85;
-}
-
 /* =============================================
    TOGGLE SWITCH MODERNE (remplace checkbox)
    ============================================= */
@@ -342,7 +374,7 @@ html, body {
 .subcategory-header {
     display: flex;
     align-items: center;
-    background-color: #5dade2; /* bleu plus clair que le bleu principal */
+    background-color: #5dade2;
 }
 
 /* Bouton sous-catégorie */
@@ -381,7 +413,7 @@ html, body {
 /* Conteneur des couches dans sous-catégorie */
 .subcategory-layers {
     background: #fefefe;
-    padding: 3px 0 3px 12px;
+    padding: 3px 0;
 }
 
 .subcategory-layers.hidden {
@@ -560,24 +592,13 @@ html, body {
 }
 
 /* =============================================
-   ADRESSES ET BOUTON EXPOSOME
+   BOUTON CALCUL EXPOSOME
    ============================================= */
-
-#address-start, #address-end {
-    width: 100%;
-    padding: 6px 10px;
-    margin-top: 4px;
-    margin-bottom: 4px;
-    box-sizing: border-box;
-    border-radius: 6px;
-    border: 1px solid #dde4ea;
-    font-size: 0.84rem;
-}
 
 #calc-exposome-btn {
     width: 100%;
     padding: 10px 12px;
-    background-color: #1A4E72;
+    background-color: rgb(10, 161, 128);
     color: #fff;
     border: none;
     border-radius: 6px;
@@ -585,11 +606,22 @@ html, body {
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.06em;
-    transition: background 0.15s;
+    transition: background 0.15s ease;
+    position: relative;
+    overflow: hidden;
 }
 
-#calc-exposome-btn:hover {
-    background-color: rgb(10, 161, 128);
+/* voile blanc au survol */
+#calc-exposome-btn::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-color: rgba(255,255,255,0);
+    transition: background-color 0.15s ease;
+}
+
+#calc-exposome-btn:hover::after {
+    background-color: rgba(255,255,255,0.1);
 }
 
 #exposome-results {

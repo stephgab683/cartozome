@@ -81,9 +81,21 @@ async function updateUvFromMapCenter(map) {
 }
 
 // =============================================
+// POP-UP DE BIENVENUE
+// =============================================
+window.addEventListener('load', () => {
+  const overlay = document.getElementById('welcome-overlay');
+  const closeBtn = document.getElementById('welcome-close');
+
+  overlay.style.display = 'flex';
+
+  closeBtn.addEventListener('click', () => {
+    overlay.style.display = 'none';
+  });
+});
+
+// =============================================
 // EXTENSION BETTERWMS
-// Inspirée de L.TileLayer.BetterWMS, adaptée
-// sans jQuery, compatible Leaflet moderne
 // =============================================
 L.TileLayer.BetterWMS = L.TileLayer.WMS.extend({
 
@@ -129,7 +141,6 @@ L.TileLayer.BetterWMS = L.TileLayer.WMS.extend({
       feature_count: 1,
     };
 
-    // x/y ou i/j selon la version WMS
     params[v === '1.3.0' ? 'i' : 'x'] = Math.round(point.x);
     params[v === '1.3.0' ? 'j' : 'y'] = Math.round(point.y);
 
@@ -142,7 +153,6 @@ L.TileLayer.BetterWMS = L.TileLayer.WMS.extend({
     const features = data?.features;
     if (!features || features.length === 0) return;
 
-    // Récupère la première valeur numérique dans les propriétés
     const props = features[0].properties;
     const entry = Object.entries(props).find(([, v]) => typeof v === 'number');
     if (!entry) return;
@@ -163,7 +173,6 @@ L.TileLayer.BetterWMS = L.TileLayer.WMS.extend({
   }
 });
 
-// Raccourci de création
 L.tileLayer.betterWms = function (url, options) {
   return new L.TileLayer.BetterWMS(url, options);
 };
@@ -180,7 +189,7 @@ const LAYER_LABELS = {
   "cartozome:GL_Fer_Lden":              "Bruit ferroviaire LDEN",
   "cartozome:GL_Fer_Ln":               "Bruit ferroviaire LN",
   "cartozome:GL_Rte_Lden":             "Bruit routier LDEN",
-  "cartozome:GL_Rte_Ln":              "Bruit routier LN",
+  "cartozome:GL_Rte_Ln":               "Bruit routier LN",
   "cartozome:Indus_GL_E4_Lden":        "Bruit industriel LDEN",
 };
 
@@ -193,7 +202,7 @@ const LAYER_UNITS = {
   "cartozome:GL_Fer_Lden":              "dB(A)",
   "cartozome:GL_Fer_Ln":               "dB(A)",
   "cartozome:GL_Rte_Lden":             "dB(A)",
-  "cartozome:GL_Rte_Ln":              "dB(A)",
+  "cartozome:GL_Rte_Ln":               "dB(A)",
   "cartozome:Indus_GL_E4_Lden":        "dB(A)",
 };
 
@@ -225,13 +234,10 @@ const GEOSERVER_WFS = "http://localhost:8081/geoserver/wfs";
 
 // =============================================
 // GESTION DES COUCHES (WMS + WFS)
-// Les couches WMS utilisent BetterWMS
-// pour permettre le clic → valeur pixel
 // =============================================
 const layerInstances = {};
 
 function createWMSLayer(layerName) {
-  // On utilise betterWms au lieu de tileLayer.wms
   return L.tileLayer.betterWms(GEOSERVER_URL, {
     layers:      layerName,
     transparent: true,
@@ -255,26 +261,10 @@ async function createWFSLayer(layerName) {
   console.log(`[WFS] Requête : ${url}`);
 
   const response = await fetch(url);
-  if (!response.ok) {
-    console.error(`[WFS] Erreur HTTP ${response.status} pour ${layerName}`);
-    throw new Error(`WFS HTTP ${response.status}`);
-  }
+  if (!response.ok) throw new Error(`[WFS] Erreur HTTP ${response.status} pour ${layerName}`);
 
-  const text = await response.text();
-  let geojson;
-  try {
-    geojson = JSON.parse(text);
-  } catch (e) {
-    console.error(`[WFS] Réponse non-JSON :`, text.slice(0, 300));
-    throw new Error("Réponse WFS non valide");
-  }
-
-  if (!geojson.features || geojson.features.length === 0) {
-    console.warn(`[WFS] Aucune entité pour ${layerName}`);
-    return L.geoJSON();
-  }
-
-  console.log(`[WFS] ${geojson.features.length} entités chargées pour ${layerName}`);
+  const geojson = await response.json();
+  if (!geojson.features || geojson.features.length === 0) return L.geoJSON();
 
   return L.geoJSON(geojson, {
     style: { color: "#5b6eae", weight: 1.5, opacity: 0.9, fillColor: "#7f8c8d", fillOpacity: 0.4 }
@@ -287,42 +277,30 @@ async function initLayer(layerName, isWFS) {
 
 document.querySelectorAll('.layer-checkbox').forEach(checkbox => {
   const layerName = checkbox.dataset.layer;
-  const isWFS     = checkbox.dataset.type === "wfs";
+  const isWFS = checkbox.dataset.type === "wfs";
 
   if (checkbox.checked) {
-    initLayer(layerName, isWFS)
-      .then(layer => {
-        layerInstances[layerName] = layer;
-        map.addLayer(layer);
-      })
-      .catch(err => console.error(`[initLayer] Erreur :`, err));
+    initLayer(layerName, isWFS).then(layer => {
+      layerInstances[layerName] = layer;
+      map.addLayer(layer);
+    }).catch(err => console.error(err));
   }
 
   checkbox.addEventListener('change', async function () {
     if (this.checked) {
-      try {
-        if (!layerInstances[layerName]) {
-          layerInstances[layerName] = await initLayer(layerName, isWFS);
-        }
-        map.addLayer(layerInstances[layerName]);
-      } catch (err) {
-        console.error(`[change] Erreur pour ${layerName} :`, err);
-        alert(`Impossible de charger la couche "${layerName}". Vérifiez la console.`);
-        this.checked = false;
-      }
+      if (!layerInstances[layerName]) layerInstances[layerName] = await initLayer(layerName, isWFS);
+      map.addLayer(layerInstances[layerName]);
     } else {
-      if (layerInstances[layerName]) {
-        map.removeLayer(layerInstances[layerName]);
-      }
+      if (layerInstances[layerName]) map.removeLayer(layerInstances[layerName]);
     }
   });
 });
 
 // =============================================
-// ACCORDÉON
+// ACCORDÉON CATEGORIES
 // =============================================
-document.querySelectorAll('.category-toggle').forEach(button => {
-  button.addEventListener('click', function () {
+document.querySelectorAll('.category-toggle').forEach(btn => {
+  btn.addEventListener('click', function () {
     const layersDiv = document.getElementById(this.dataset.target);
     layersDiv.classList.toggle('hidden');
     this.classList.toggle('closed');
@@ -330,14 +308,35 @@ document.querySelectorAll('.category-toggle').forEach(button => {
 });
 
 // =============================================
-// ACCORDÉON DES SOUS-CATÉGORIES
+// ACCORDÉON SOUS-CATÉGORIES
 // =============================================
-document.querySelectorAll('.subcategory-toggle').forEach(button => {
-  button.addEventListener('click', function () {
-    const targetId = this.dataset.target;
-    const layersDiv = document.getElementById(targetId);
+document.querySelectorAll('.subcategory-toggle').forEach(btn => {
+  btn.addEventListener('click', function () {
+    const layersDiv = document.getElementById(this.dataset.target);
     layersDiv.classList.toggle('hidden');
     this.classList.toggle('closed');
+  });
+});
+
+// =============================================
+// GÉOLOCALISATION
+// =============================================
+const geoButtons = [
+  {btn: "geolocate-point", input: "point-start"},
+  {btn: "geolocate-start", input: "route-start"},
+  {btn: "geolocate-end", input: "route-end"}
+];
+
+geoButtons.forEach(({btn, input}) => {
+  document.getElementById(btn).addEventListener("click", () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(pos => {
+        const { latitude, longitude } = pos.coords;
+        document.getElementById(input).value = `${latitude.toFixed(5)}, ${longitude.toFixed(5)}`;
+      }, err => alert("Impossible de récupérer la position : " + err.message));
+    } else {
+      alert("La géolocalisation n'est pas supportée par ce navigateur.");
+    }
   });
 });
 
@@ -347,23 +346,23 @@ document.querySelectorAll('.subcategory-toggle').forEach(button => {
 L.control.scale({ position: 'bottomleft', imperial: false }).addTo(map);
 
 // =============================================
-// POPUPS D'INFORMATION — haut à droite, sans overlay
+// POPUPS D'INFORMATION
 // =============================================
 const categoryInfo = {
   'cat-air': {
     titre:   "Pollution de l'air",
     icone:   "💨",
-    contenu: `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.`
+    contenu: `Lorem ipsum...`
   },
   'cat-pollen': {
     titre:   "Pollen",
     icone:   "🌿",
-    contenu: `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.`
+    contenu: `Lorem ipsum...`
   },
   'cat-bruit': {
     titre:   "Bruit",
     icone:   "🔊",
-    contenu: `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.`
+    contenu: `Lorem ipsum...`
   }
 };
 
@@ -379,31 +378,16 @@ popup.innerHTML = `
 document.body.appendChild(popup);
 
 document.querySelectorAll('.category-info-btn').forEach(btn => {
-  btn.addEventListener('click', function (e) {
+  btn.addEventListener('click', e => {
     e.stopPropagation();
-    const cat = categoryInfo[this.dataset.cat];
-    document.getElementById('popup-title').textContent   = `${cat.icone} ${cat.titre}`;
+    const cat = categoryInfo[btn.dataset.cat];
+    document.getElementById('popup-title').textContent = `${cat.icone} ${cat.titre}`;
     document.getElementById('popup-content').textContent = cat.contenu;
     popup.classList.add('visible');
   });
 });
 
 document.getElementById('popup-close').addEventListener('click', () => popup.classList.remove('visible'));
-
-// =============================================
-// POP-UP DE BIENVENUE
-// =============================================
-window.addEventListener('load', () => {
-  const overlay = document.getElementById('welcome-overlay');
-  const closeBtn = document.getElementById('welcome-close');
-
-  overlay.style.display = 'flex'; // rend visible et centre grâce à flex
-
-  closeBtn.addEventListener('click', () => {
-      overlay.style.display = 'none';
-  });
-});
-
 
 // =============================================
 // CALCUL EXPOSOME (GÉOCODAGE + ITINÉRAIRE GEOF)
