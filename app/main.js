@@ -70,7 +70,7 @@ async function updateUvFromMapCenter(map) {
     const el = document.getElementById("uv-status");
     if (el) {
       el.textContent = (uv === null || uv === undefined)
-        ? `UV max (${date ?? "date inconnue"}) : très faible`
+        ? `UV max (${date ?? "date inconnue"}) : indisponible`
         : `UV max (${date ?? "date inconnue"}) : ${uv}`;
     }
   } catch (err) {
@@ -402,4 +402,130 @@ window.addEventListener('load', () => {
   closeBtn.addEventListener('click', () => {
       overlay.style.display = 'none';
   });
+});
+
+
+// =============================================
+// CALCUL EXPOSOME (GÉOCODAGE + ITINÉRAIRE GEOF)
+// =============================================
+
+// Couche dédiée aux résultats (marqueurs + trajet)
+const routingLayer = L.layerGroup().addTo(map);
+
+// --- GÉOCODAGE ---
+async function geocodeAddress(query) {
+  try {
+    const res = await fetch(
+      `https://data.geopf.fr/geocodage/search?q=${encodeURIComponent(query)}&limit=1`
+    );
+    const data = await res.json();
+
+    if (!data.features || data.features.length === 0) return null;
+
+    return data.features[0].geometry.coordinates; // [lon, lat]
+  } catch (err) {
+    console.error("[GEOCODE ERROR]", err);
+    return null;
+  }
+}
+
+// --- ROUTING ---
+async function getRoute(start, end) {
+  const url =
+    `https://data.geopf.fr/navigation/itineraire?resource=bdtopo-osrm` +
+    `&start=${start.join(',')}` +
+    `&end=${end.join(',')}` +
+    `&profile=pedestrian` +
+    `&crs=EPSG:4326`;
+
+  try {
+    const res = await fetch(url);
+    const data = await res.json();
+    return data.geometry?.coordinates ?? null;
+  } catch (err) {
+    console.error("[ROUTING ERROR]", err);
+    return null;
+  }
+}
+
+// =============================================
+// BOUTON "CALCULER L'EXPOSOME"
+// =============================================
+document.addEventListener("DOMContentLoaded", () => {
+
+  const exposomeBtn = document.getElementById("calc-exposome-btn");
+
+  if (!exposomeBtn) {
+    console.error("Bouton calc-exposome-btn introuvable !");
+    return;
+  }
+
+  exposomeBtn.addEventListener("click", async () => {
+
+    console.log("Calcul exposome lancé ✅");
+
+    routingLayer.clearLayers();
+
+    const startInput = document.getElementById("address-start").value.trim();
+    const endInput   = document.getElementById("address-end").value.trim();
+
+    if (!startInput) {
+      alert("Veuillez saisir une adresse de départ");
+      return;
+    }
+
+    // --- Départ ---
+    const startCoords = await geocodeAddress(startInput);
+
+    if (!startCoords) {
+      alert("Adresse de départ introuvable");
+      return;
+    }
+
+    const startLatLng = L.latLng(startCoords[1], startCoords[0]);
+
+    L.marker(startLatLng)
+      .addTo(routingLayer)
+      .bindPopup("Départ")
+      .openPopup();
+
+    // --- Si pas d'arrivée : juste zoom ---
+    if (!endInput) {
+      map.setView(startLatLng, 16);
+      return;
+    }
+
+    // --- Arrivée ---
+    const endCoords = await geocodeAddress(endInput);
+
+    if (!endCoords) {
+      alert("Adresse d'arrivée introuvable");
+      return;
+    }
+
+    const endLatLng = L.latLng(endCoords[1], endCoords[0]);
+
+    L.marker(endLatLng)
+      .addTo(routingLayer)
+      .bindPopup("Arrivée");
+
+    // --- Calcul itinéraire ---
+    const routeCoords = await getRoute(startCoords, endCoords);
+
+    if (!routeCoords) {
+      alert("Impossible de calculer l'itinéraire");
+      return;
+    }
+
+    const latLngs = routeCoords.map(coord => [coord[1], coord[0]]);
+
+    const routeLine = L.polyline(latLngs, {
+      color: "red",
+      weight: 4
+    }).addTo(routingLayer);
+
+    map.fitBounds(routeLine.getBounds(), { padding: [50, 50] });
+
+  });
+
 });
