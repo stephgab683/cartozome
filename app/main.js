@@ -1,6 +1,8 @@
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 
+console.log("[MAIN] main.js chargé - build marker 2026-03-02TXX:YY"); /**Prouver que le main.js exécuté est bien celui qu'on édite.*/
+
 // =============================================
 // UV (JSON servi par Caddy)
 // Endpoint: /data/openmeteo_uv_meteofrance.json
@@ -36,9 +38,8 @@ function closestUvPoint(points, lat, lon) {
  * Extrait une valeur UV max (si dispo) et une date à partir d'un objet point.
  */
 function extractUvMax(point) {
-  const date = point?.daily?.time?.[0] ?? null;
   const uv = point?.daily?.uv_index_max?.[0]; // souvent null pour l'instant
-  return { date, uv };
+  return { uv };
 }
 
 /**
@@ -58,20 +59,19 @@ async function updateUvFromMapCenter(map) {
       return;
     }
 
-    const { date, uv } = extractUvMax(p);
+    const { uv } = extractUvMax(p);
 
     console.log("[UV] Point le plus proche du centre:", {
       center: { lat: center.lat, lon: center.lng },
       point: { lat: p.latitude, lon: p.longitude, location_id: p.location_id ?? null },
-      date,
       uv_max: uv
     });
 
     const el = document.getElementById("uv-status");
     if (el) {
       el.textContent = (uv === null || uv === undefined)
-        ? `UV max (${date ?? "date inconnue"}) : indisponible`
-        : `UV max (${date ?? "date inconnue"}) : ${uv}`;
+        ? `UV max : très faible`
+        : `UV max : ${uv}`;
     }
   } catch (err) {
     console.error("[UV] Erreur de chargement UV:", err);
