@@ -70,7 +70,7 @@ async function updateUvFromMapCenter(map) {
     const el = document.getElementById("uv-status");
     if (el) {
       el.textContent = (uv === null || uv === undefined)
-        ? `UV max (${date ?? "date inconnue"}) : indisponible`
+        ? `UV max (${date ?? "date inconnue"}) : très faible`
         : `UV max (${date ?? "date inconnue"}) : ${uv}`;
     }
   } catch (err) {
