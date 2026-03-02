@@ -375,6 +375,7 @@ document.getElementById('popup-close').addEventListener('click', () => {
 });
 document.getElementById('popup-close').addEventListener('click', () => popup.classList.remove('visible'));
 
+
 // =============================================
 // CALCUL EXPOSOME (GÉOCODAGE + ITINÉRAIRE GEOF)
 // =============================================
