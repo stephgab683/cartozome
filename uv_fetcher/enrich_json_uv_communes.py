@@ -96,7 +96,7 @@ def main():
 
         code = None
         for g in candidates:
-            if g.contains(pt):
+            if g.covers(pt):
                 code = props_by_id[id(g)].get(INSEE_FIELD)
                 break
 
