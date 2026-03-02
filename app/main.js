@@ -319,8 +319,28 @@ document.querySelectorAll('.subcategory-toggle').forEach(btn => {
 });
 
 // =============================================
-// GÉOLOCALISATION
+// GÉOLOCALISATION (avec reverse geocoding GéoPF)
 // =============================================
+
+async function reverseGeocode(lat, lon) {
+  try {
+    const url =
+      `https://data.geopf.fr/geocodage/reverse` +
+      `?lat=${lat}&lon=${lon}` +
+      `&limit=1`;
+
+    const res = await fetch(url);
+    const data = await res.json();
+
+    if (!data.features || data.features.length === 0) return null;
+
+    return data.features[0].properties.label; // adresse lisible
+  } catch (err) {
+    console.error("[REVERSE GEOCODE ERROR]", err);
+    return null;
+  }
+}
+
 const geoButtons = [
   {btn: "geolocate-point", input: "point-start"},
   {btn: "geolocate-start", input: "route-start"},
@@ -328,16 +348,41 @@ const geoButtons = [
 ];
 
 geoButtons.forEach(({btn, input}) => {
-  document.getElementById(btn).addEventListener("click", () => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(pos => {
-        const { latitude, longitude } = pos.coords;
-        document.getElementById(input).value = `${latitude.toFixed(5)}, ${longitude.toFixed(5)}`;
-      }, err => alert("Impossible de récupérer la position : " + err.message));
-    } else {
+
+  const buttonEl = document.getElementById(btn);
+  const inputEl  = document.getElementById(input);
+
+  if (!buttonEl || !inputEl) return;
+
+  buttonEl.addEventListener("click", async () => {
+
+    if (!navigator.geolocation) {
       alert("La géolocalisation n'est pas supportée par ce navigateur.");
+      return;
     }
+
+    navigator.geolocation.getCurrentPosition(async pos => {
+
+      const { latitude, longitude } = pos.coords;
+
+      inputEl.value = "Recherche de l'adresse...";
+
+      const address = await reverseGeocode(latitude, longitude);
+
+      if (!address) {
+        alert("Impossible de récupérer l'adresse.");
+        inputEl.value = "";
+        return;
+      }
+
+      inputEl.value = address;
+
+    }, err => {
+      alert("Impossible de récupérer la position : " + err.message);
+    });
+
   });
+
 });
 
 // =============================================
