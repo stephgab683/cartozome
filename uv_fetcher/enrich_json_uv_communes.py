@@ -3,7 +3,7 @@ import json
 import os
 from pathlib import Path
 import requests
-from shapely.geometry import shape, Point
+from shapely.geometry import mapping
 from shapely.strtree import STRtree
 
 DATA_DIR = Path(os.environ.get("DATA_API_DIR", "/app/DATA_API"))
@@ -109,7 +109,7 @@ def main():
         props["uv_mean"] = (sum(vals) / len(vals)) if vals else None
         out_features.append({
             "type": "Feature",
-            "geometry": json.loads(g.to_json()),
+            "geometry": mapping(g),
             "properties": props
         })
 
