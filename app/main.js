@@ -348,31 +348,12 @@ L.control.scale({ position: 'bottomleft', imperial: false }).addTo(map);
 // =============================================
 // POPUPS D'INFORMATION
 // =============================================
-const categoryInfo = {
-  'cat-air': {
-    titre:   "Pollution de l'air",
-    icone:   "💨",
-    contenu: `Lorem ipsum...`
-  },
-  'cat-pollen': {
-    titre:   "Pollen",
-    icone:   "🌿",
-    contenu: `Lorem ipsum...`
-  },
-  'cat-bruit': {
-    titre:   "Bruit",
-    icone:   "🔊",
-    contenu: `Lorem ipsum...`
-  }
-};
-
 const popup = document.createElement('div');
 popup.id = 'info-popup';
 popup.innerHTML = `
   <div id="popup-box">
     <button id="popup-close">✕</button>
-    <h3 id="popup-title"></h3>
-    <p id="popup-content"></p>
+    <div id="popup-content"></div>
   </div>
 `;
 document.body.appendChild(popup);
@@ -380,13 +361,18 @@ document.body.appendChild(popup);
 document.querySelectorAll('.category-info-btn').forEach(btn => {
   btn.addEventListener('click', e => {
     e.stopPropagation();
-    const cat = categoryInfo[btn.dataset.cat];
-    document.getElementById('popup-title').textContent = `${cat.icone} ${cat.titre}`;
-    document.getElementById('popup-content').textContent = cat.contenu;
+
+    const catId = btn.dataset.cat;
+    const content = document.getElementById(`info-${catId}`).innerHTML;
+
+    document.getElementById('popup-content').innerHTML = content;
     popup.classList.add('visible');
   });
 });
 
+document.getElementById('popup-close').addEventListener('click', () => {
+  popup.classList.remove('visible');
+});
 document.getElementById('popup-close').addEventListener('click', () => popup.classList.remove('visible'));
 
 // =============================================
