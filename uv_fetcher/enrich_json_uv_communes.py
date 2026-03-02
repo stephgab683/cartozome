@@ -5,6 +5,7 @@ from pathlib import Path
 import requests
 from shapely.geometry import shape, Point, mapping
 from shapely.strtree import STRtree
+import time
 
 DATA_DIR = Path(os.environ.get("DATA_API_DIR", "/app/DATA_API"))
 
@@ -39,9 +40,18 @@ def fetch_communes_geojson(bbox):
         "srsName": "EPSG:4326",
         "bbox": f"{bbox[0]},{bbox[1]},{bbox[2]},{bbox[3]},EPSG:4326",
     }
-    r = requests.get(WFS_URL, params=params, timeout=60)
-    r.raise_for_status()
-    return r.json()
+
+    last_err = None
+    for attempt in range(1, 11):  # 10 tentatives
+        try:
+            r = requests.get(WFS_URL, params=params, timeout=20)
+            r.raise_for_status()
+            return r.json()
+        except Exception as e:
+            last_err = e
+            time.sleep(2)
+
+    raise RuntimeError(f"WFS indisponible après plusieurs tentatives: {last_err}")
 
 def uv_from_point(p):
     daily = p.get("daily") or {}
