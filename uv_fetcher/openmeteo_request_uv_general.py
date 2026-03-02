@@ -45,7 +45,7 @@ for i, p in enumerate(data):
     out_points.append({
         "latitude": p.get("latitude"),
         "longitude": p.get("longitude"),
-        "code_insee": code_insee,
+        "code_insee": None,
         "generationtime_ms": p.get("generationtime_ms"),
         "utc_offset_seconds": p.get("utc_offset_seconds"),
         "timezone": p.get("timezone"),
