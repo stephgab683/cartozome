@@ -2,6 +2,85 @@ import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 
 // =============================================
+// UV (JSON servi par Caddy)
+// Endpoint: /data/openmeteo_uv_meteofrance.json
+// =============================================
+const UV_JSON_URL = "/data/openmeteo_uv_meteofrance.json";
+
+async function fetchUvJson() {
+  const res = await fetch(UV_JSON_URL, { cache: "no-store" });
+  if (!res.ok) throw new Error(`UV JSON HTTP ${res.status}`);
+  return res.json(); // tableau d'objets
+}
+
+/**
+ * Retourne le point UV le plus proche d'une coordonnée (lat/lon).
+ * On fait simple (distance euclidienne sur lat/lon), suffisant à l'échelle de la métropole.
+ */
+function closestUvPoint(points, lat, lon) {
+  let best = null;
+  let bestD2 = Infinity;
+  for (const p of points) {
+    const pLat = p?.latitude;
+    const pLon = p?.longitude;
+    if (typeof pLat !== "number" || typeof pLon !== "number") continue;
+    const dLat = pLat - lat;
+    const dLon = pLon - lon;
+    const d2 = dLat * dLat + dLon * dLon;
+    if (d2 < bestD2) { bestD2 = d2; best = p; }
+  }
+  return best;
+}
+
+/**
+ * Extrait une valeur UV max (si dispo) et une date à partir d'un objet point.
+ */
+function extractUvMax(point) {
+  const date = point?.daily?.time?.[0] ?? null;
+  const uv = point?.daily?.uv_index_max?.[0]; // souvent null pour l'instant
+  return { date, uv };
+}
+
+/**
+ * Debug/affichage : log la valeur UV la plus proche du centre de carte.
+ * Si un élément #uv-status existe, écrit dedans (sinon, console seulement).
+ */
+async function updateUvFromMapCenter(map) {
+  try {
+    const points = await fetchUvJson();
+    const center = map.getCenter();
+    const p = closestUvPoint(points, center.lat, center.lng);
+
+    if (!p) {
+      console.warn("[UV] Aucun point UV trouvé dans le JSON.");
+      const el = document.getElementById("uv-status");
+      if (el) el.textContent = "Aucune donnée UV.";
+      return;
+    }
+
+    const { date, uv } = extractUvMax(p);
+
+    console.log("[UV] Point le plus proche du centre:", {
+      center: { lat: center.lat, lon: center.lng },
+      point: { lat: p.latitude, lon: p.longitude, location_id: p.location_id ?? null },
+      date,
+      uv_max: uv
+    });
+
+    const el = document.getElementById("uv-status");
+    if (el) {
+      el.textContent = (uv === null || uv === undefined)
+        ? `UV max (${date ?? "date inconnue"}) : indisponible`
+        : `UV max (${date ?? "date inconnue"}) : ${uv}`;
+    }
+  } catch (err) {
+    console.error("[UV] Erreur de chargement UV:", err);
+    const el = document.getElementById("uv-status");
+    if (el) el.textContent = "Erreur de chargement des UV.";
+  }
+}
+
+// =============================================
 // EXTENSION BETTERWMS
 // Inspirée de L.TileLayer.BetterWMS, adaptée
 // sans jQuery, compatible Leaflet moderne
@@ -136,6 +215,10 @@ const map = L.map('map', {
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   attribution: '&copy; OpenStreetMap contributors'
 }).addTo(map);
+
+// --- UV : charge une première fois, puis met à jour quand la carte bouge
+updateUvFromMapCenter(map);
+map.on("moveend", () => updateUvFromMapCenter(map));
 
 const GEOSERVER_URL = "http://localhost:8081/geoserver/wms";
 const GEOSERVER_WFS = "http://localhost:8081/geoserver/wfs";
