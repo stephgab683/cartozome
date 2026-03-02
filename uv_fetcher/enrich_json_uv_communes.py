@@ -3,7 +3,7 @@ import json
 import os
 from pathlib import Path
 import requests
-from shapely.geometry import mapping
+from shapely.geometry import shape, Point, mapping
 from shapely.strtree import STRtree
 
 DATA_DIR = Path(os.environ.get("DATA_API_DIR", "/app/DATA_API"))
