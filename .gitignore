@@ -3,3 +3,6 @@
 
 # Generated API data (uv_fetcher)
 DATA_API/
+
+__pycache__/
+*.pyc

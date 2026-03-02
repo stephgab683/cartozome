@@ -1,6 +1,85 @@
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 
+console.log("[MAIN] main.js chargé - build marker 2026-03-02TXX:YY"); /**Prouver que le main.js exécuté est bien celui qu'on édite.*/
+
+// =============================================
+// UV (JSON servi par Caddy)
+// Endpoint: /data/openmeteo_uv_meteofrance.json
+// =============================================
+const UV_JSON_URL = "/data/openmeteo_uv_meteofrance.json";
+
+async function fetchUvJson() {
+  const res = await fetch(UV_JSON_URL, { cache: "no-store" });
+  if (!res.ok) throw new Error(`UV JSON HTTP ${res.status}`);
+  return res.json(); // tableau d'objets
+}
+
+/**
+ * Retourne le point UV le plus proche d'une coordonnée (lat/lon).
+ * On fait simple (distance euclidienne sur lat/lon), suffisant à l'échelle de la métropole.
+ */
+function closestUvPoint(points, lat, lon) {
+  let best = null;
+  let bestD2 = Infinity;
+  for (const p of points) {
+    const pLat = p?.latitude;
+    const pLon = p?.longitude;
+    if (typeof pLat !== "number" || typeof pLon !== "number") continue;
+    const dLat = pLat - lat;
+    const dLon = pLon - lon;
+    const d2 = dLat * dLat + dLon * dLon;
+    if (d2 < bestD2) { bestD2 = d2; best = p; }
+  }
+  return best;
+}
+
+/**
+ * Extrait une valeur UV max (si dispo) et une date à partir d'un objet point.
+ */
+function extractUvMax(point) {
+  const uv = point?.daily?.uv_index_max?.[0]; // souvent null pour l'instant
+  return { uv };
+}
+
+/**
+ * Debug/affichage : log la valeur UV la plus proche du centre de carte.
+ * Si un élément #uv-status existe, écrit dedans (sinon, console seulement).
+ */
+async function updateUvFromMapCenter(map) {
+  try {
+    const points = await fetchUvJson();
+    const center = map.getCenter();
+    const p = closestUvPoint(points, center.lat, center.lng);
+
+    if (!p) {
+      console.warn("[UV] Aucun point UV trouvé dans le JSON.");
+      const el = document.getElementById("uv-status");
+      if (el) el.textContent = "Aucune donnée UV.";
+      return;
+    }
+
+    const { uv } = extractUvMax(p);
+
+    console.log("[UV] Point le plus proche du centre:", {
+      center: { lat: center.lat, lon: center.lng },
+      point: { lat: p.latitude, lon: p.longitude, location_id: p.location_id ?? null },
+      uv_max: uv
+    });
+
+    const el = document.getElementById("uv-status");
+    if (el) {
+      el.textContent = (uv === null || uv === undefined)
+        ? `UV max : très faible`
+        : `UV max : ${uv}`;
+    }
+  } catch (err) {
+    console.error("[UV] Erreur de chargement UV:", err);
+    const el = document.getElementById("uv-status");
+    if (el) el.textContent = "Erreur de chargement des UV.";
+  }
+}
+
 // =============================================
 // POP-UP DE BIENVENUE
 // =============================================
@@ -145,6 +224,10 @@ const map = L.map('map', {
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   attribution: '&copy; OpenStreetMap contributors'
 }).addTo(map);
+
+// --- UV : charge une première fois, puis met à jour quand la carte bouge
+updateUvFromMapCenter(map);
+map.on("moveend", () => updateUvFromMapCenter(map));
 
 const GEOSERVER_URL = "http://localhost:8081/geoserver/wms";
 const GEOSERVER_WFS = "http://localhost:8081/geoserver/wfs";
@@ -305,3 +388,128 @@ document.querySelectorAll('.category-info-btn').forEach(btn => {
 });
 
 document.getElementById('popup-close').addEventListener('click', () => popup.classList.remove('visible'));
+
+// =============================================
+// CALCUL EXPOSOME (GÉOCODAGE + ITINÉRAIRE GEOF)
+// =============================================
+
+// Couche dédiée aux résultats (marqueurs + trajet)
+const routingLayer = L.layerGroup().addTo(map);
+
+// --- GÉOCODAGE ---
+async function geocodeAddress(query) {
+  try {
+    const res = await fetch(
+      `https://data.geopf.fr/geocodage/search?q=${encodeURIComponent(query)}&limit=1`
+    );
+    const data = await res.json();
+
+    if (!data.features || data.features.length === 0) return null;
+
+    return data.features[0].geometry.coordinates; // [lon, lat]
+  } catch (err) {
+    console.error("[GEOCODE ERROR]", err);
+    return null;
+  }
+}
+
+// --- ROUTING ---
+async function getRoute(start, end) {
+  const url =
+    `https://data.geopf.fr/navigation/itineraire?resource=bdtopo-osrm` +
+    `&start=${start.join(',')}` +
+    `&end=${end.join(',')}` +
+    `&profile=pedestrian` +
+    `&crs=EPSG:4326`;
+
+  try {
+    const res = await fetch(url);
+    const data = await res.json();
+    return data.geometry?.coordinates ?? null;
+  } catch (err) {
+    console.error("[ROUTING ERROR]", err);
+    return null;
+  }
+}
+
+// =============================================
+// BOUTON "CALCULER L'EXPOSOME"
+// =============================================
+document.addEventListener("DOMContentLoaded", () => {
+
+  const exposomeBtn = document.getElementById("calc-exposome-btn");
+
+  if (!exposomeBtn) {
+    console.error("Bouton calc-exposome-btn introuvable !");
+    return;
+  }
+
+  exposomeBtn.addEventListener("click", async () => {
+
+    console.log("Calcul exposome lancé ✅");
+
+    routingLayer.clearLayers();
+
+    const startInput = document.getElementById("address-start").value.trim();
+    const endInput   = document.getElementById("address-end").value.trim();
+
+    if (!startInput) {
+      alert("Veuillez saisir une adresse de départ");
+      return;
+    }
+
+    // --- Départ ---
+    const startCoords = await geocodeAddress(startInput);
+
+    if (!startCoords) {
+      alert("Adresse de départ introuvable");
+      return;
+    }
+
+    const startLatLng = L.latLng(startCoords[1], startCoords[0]);
+
+    L.marker(startLatLng)
+      .addTo(routingLayer)
+      .bindPopup("Départ")
+      .openPopup();
+
+    // --- Si pas d'arrivée : juste zoom ---
+    if (!endInput) {
+      map.setView(startLatLng, 16);
+      return;
+    }
+
+    // --- Arrivée ---
+    const endCoords = await geocodeAddress(endInput);
+
+    if (!endCoords) {
+      alert("Adresse d'arrivée introuvable");
+      return;
+    }
+
+    const endLatLng = L.latLng(endCoords[1], endCoords[0]);
+
+    L.marker(endLatLng)
+      .addTo(routingLayer)
+      .bindPopup("Arrivée");
+
+    // --- Calcul itinéraire ---
+    const routeCoords = await getRoute(startCoords, endCoords);
+
+    if (!routeCoords) {
+      alert("Impossible de calculer l'itinéraire");
+      return;
+    }
+
+    const latLngs = routeCoords.map(coord => [coord[1], coord[0]]);
+
+    const routeLine = L.polyline(latLngs, {
+      color: "red",
+      weight: 4
+    }).addTo(routingLayer);
+
+    map.fitBounds(routeLine.getBounds(), { padding: [50, 50] });
+
+  });
+
+});

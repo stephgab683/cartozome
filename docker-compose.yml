@@ -36,3 +36,4 @@ services:
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile
       - ./app/dist/:/srv
+      - ./DATA_API:/srv/data:ro

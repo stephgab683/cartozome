@@ -4,6 +4,11 @@
         reverse_proxy api:8000
     }
 
+    handle_path /data/* {
+        root * /srv/data
+        file_server
+    }
+
     root * /srv
     file_server
 }
