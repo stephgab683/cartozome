@@ -143,12 +143,13 @@ def main():
             continue
 
         pt = Point(lon, lat)
-        candidates = tree.query(pt)
+        idxs = tree.query(pt)
 
         code = None
-        for g in candidates:
+        for idx in idxs:
+            g = geoms[int(idx)]
             if g.covers(pt):
-                code = props_by_id[id(g)].get(INSEE_FIELD)
+                code = props_list[int(idx)].get(INSEE_FIELD)
                 break
 
         p["code_insee"] = code
