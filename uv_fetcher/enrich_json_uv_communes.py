@@ -37,8 +37,8 @@ def fetch_communes_geojson(bbox):
         "request": "GetFeature",
         "typeNames": TYPENAME,
         "outputFormat": "application/json",
-        "srsName": "EPSG:4326",
-        "bbox": f"{bbox[0]},{bbox[1]},{bbox[2]},{bbox[3]},EPSG:4326",
+        "srsName": "CRS:84",
+        "bbox": f"{bbox[0]},{bbox[1]},{bbox[2]},{bbox[3]},CRS:84",
     }
 
     last_err = None
