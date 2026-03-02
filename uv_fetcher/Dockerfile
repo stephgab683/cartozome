@@ -21,7 +21,8 @@ COPY openmeteo_request_uv_general.py /app/openmeteo_request_uv_general.py
 
 # Copier la règle cron et l'enregistrer dans la crontab du conteneur
 COPY crontab /app/crontab
-RUN chmod 0644 /app/crontab \
+RUN sed -i 's/\r$//' /app/crontab \
+    && chmod 0644 /app/crontab \
     && crontab /app/crontab
 
 # Copier l'entrypoint qui démarre cron et garde le conteneur vivant
