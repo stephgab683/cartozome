@@ -31,7 +31,7 @@ function closestUvPoint(points, lat, lon) {                                   //
   return best;                                                                // Retourne le point le plus proche
 }
 
-//Extrait une valeur UV max (si dispo) et une date à partir d'un objet point.
+// Extrait une valeur UV max (si dispo) et une date à partir d'un objet point.
 
 function extractUvMax(point) {                                                // Extrait la valeur UV max d'un point
   const uv = point?.daily?.uv_index_max?.[0];                                 // Récupère l'indice UV max (peut être null)
@@ -74,20 +74,6 @@ async function updateUvFromMapCenter(map) {                                   //
     if (el) el.textContent = "Erreur de chargement des UV.";                 // Met à jour le texte en cas d'erreur
   }
 }
-
-// =============================================
-// POP-UP DE BIENVENUE
-// =============================================
-window.addEventListener('load', () => {                                       // Écouteur d'événement pour le chargement de la page
-  const overlay = document.getElementById('welcome-overlay');                 // Récupère le pop-up de bienvenue
-  const closeBtn = document.getElementById('welcome-close');                  // Récupère le bouton de fermeture
-
-  overlay.style.display = 'flex';                                             // Affiche le pop-up
-
-  closeBtn.addEventListener('click', () => {                                  // Écouteur pour fermer le pop-up
-    overlay.style.display = 'none';                                           // Cache du pop-up
-  });
-});
 
 // =============================================
 // EXTENSION BETTERWMS
@@ -384,37 +370,6 @@ geoButtons.forEach(({btn, input}) => {                                       // 
 // ÉCHELLE LEAFLET
 // =============================================
 L.control.scale({ position: 'bottomleft', imperial: false }).addTo(map);     // Ajoute une échelle de distance en bas à gauche
-
-// =============================================
-// POPUPS D'INFORMATION
-// =============================================
-const popup = document.createElement('div');
-popup.id = 'info-popup';
-popup.innerHTML = `
-  <div id="popup-box">
-    <button id="popup-close">✕</button>
-    <div id="popup-content"></div>
-  </div>
-`;
-document.body.appendChild(popup);
-
-document.querySelectorAll('.category-info-btn').forEach(btn => {
-  btn.addEventListener('click', e => {
-    e.stopPropagation();
-
-    const catId = btn.dataset.cat;
-    const content = document.getElementById(`info-${catId}`).innerHTML;
-
-    document.getElementById('popup-content').innerHTML = content;
-    popup.classList.add('visible');
-  });
-});
-
-document.getElementById('popup-close').addEventListener('click', () => {
-  popup.classList.remove('visible');
-});
-document.getElementById('popup-close').addEventListener('click', () => popup.classList.remove('visible'));
-
 
 // =============================================
 // CALCUL EXPOSOME (GÉOCODAGE + ITINÉRAIRE GEOF)
