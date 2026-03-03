@@ -1,50 +1,57 @@
 // =============================================
 // POP-UP DE BIENVENUE
 // =============================================
-window.addEventListener('load', () => {                                       // Écouteur d'événement pour le chargement de la page
-    const overlay = document.getElementById('welcome-overlay');                 // Récupère le pop-up de bienvenue
-    const closeBtn = document.getElementById('welcome-close');                  // Récupère le bouton de fermeture
-  
-    if (!overlay || !closeBtn) return;
+window.addEventListener('load', () => {
+  const overlay = document.getElementById('welcome-overlay');
+  const closeBtn = document.getElementById('welcome-close');
 
-    overlay.style.display = 'flex';                                             // Affiche le pop-up
-  
-    closeBtn.addEventListener('click', () => {                                  // Écouteur pour fermer le pop-up
-      overlay.style.display = 'none';                                           // Cache du pop-up
-    });
+  if (!overlay || !closeBtn) return;
+
+  overlay.style.display = 'flex'; // Affiche le pop-up
+
+  closeBtn.addEventListener('click', () => {
+      overlay.style.display = 'none'; // Cache le pop-up
+  });
 });
 
 // =============================================
 // POPUPS D'INFORMATION
 // =============================================
 
-const popup = document.createElement('div');
-popup.id = 'info-popup';
-popup.innerHTML = `
-  <div id="popup-box">
-    <button id="popup-close">✕</button>
-    <div id="popup-content"></div>
-  </div>
-`;
-document.body.appendChild(popup);
+// Créer le popup d'info s'il n'existe pas déjà
+let infoPopup = document.getElementById('info-popup');
+if (!infoPopup) {
+  infoPopup = document.createElement('div');
+  infoPopup.id = 'info-popup';
+  infoPopup.innerHTML = `
+      <button id="popup-close">✕</button>
+      <div id="popup-content"></div>
+  `;
+  document.body.appendChild(infoPopup);
+}
 
 const popupContent = document.getElementById('popup-content');
 const popupClose = document.getElementById('popup-close');
 
-document.querySelectorAll('.category-info-btn').forEach(btn => {
-  btn.addEventListener('click', e => {
-    e.stopPropagation();
+// Fonction pour ouvrir la popup avec le contenu de la catégorie
+function openInfoPopup(catId) {
+  const contentEl = document.getElementById(`info-${catId}`);
+  if (!contentEl) return;
 
-    const catId = btn.dataset.cat;
-    const contentEl = document.getElementById(`info-${catId}`);
+  popupContent.innerHTML = contentEl.innerHTML; // injecte le texte
+  infoPopup.classList.add('visible');
+}
 
-    if (!contentEl) return;
-
-    popupContent.innerHTML = contentEl.innerHTML;
-    popup.classList.add('visible');
-  });
+// Événement pour fermer la popup
+popupClose.addEventListener('click', () => {
+  infoPopup.classList.remove('visible');
 });
 
-popupClose.addEventListener('click', () => {
-  popup.classList.remove('visible');
+// Clic sur les boutons ℹ️ des catégories
+document.querySelectorAll('.category-info-btn').forEach(btn => {
+  btn.addEventListener('click', e => {
+      e.stopPropagation();
+      const catId = btn.dataset.cat; // ex: "cat-air"
+      openInfoPopup(catId);
+  });
 });

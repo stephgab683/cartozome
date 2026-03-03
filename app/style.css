@@ -1,21 +1,7 @@
 /* =============================================
-   POLICES LOCALES
+   POLICES
    ============================================= */
-@font-face {
-    font-family: 'Jost';
-    src: url('./fonts/Jost-VariableFont_wght.woff2') format('woff2');
-    font-weight: 100 900;
-    font-style: normal;
-    font-display: swap;
-}
-
-@font-face {
-    font-family: 'Jost';
-    src: url('./fonts/Jost-Italic-VariableFont_wght.woff2') format('woff2');
-    font-weight: 100 900;
-    font-style: italic;
-    font-display: swap;
-}
+   @import url('https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,100..900;1,100..900&display=swap');
 
 /* =============================================
    BASE
@@ -477,7 +463,6 @@ html, body {
 /* =============================================
    POPUP D'INFORMATION
    ============================================= */
-/* Conteneur popup */
 #info-popup {
     display: none;
     position: fixed;
@@ -494,42 +479,55 @@ html, body {
     animation: slideIn 0.2s ease;
 }
 
-/* Animation popup */
+/* Contenu scrollable */
+#popup-content {
+    max-height: 60vh;
+    overflow-y: auto;
+    padding-top: 6px;
+    padding-right: 20px;
+    margin-top: 28px;
+}
+
+/* Scrollbar */
+#popup-content::-webkit-scrollbar {
+    width: 6px;
+    
+}
+
+#popup-content::-webkit-scrollbar-thumb {
+    background-color: #1A4E72;
+    border-radius: 3px;
+}
+
+/* Animation */
 @keyframes slideIn {
     from { opacity: 0; transform: translateY(-10px); }
     to { opacity: 1; transform: translateY(0); }
 }
 
+/* Affichage */
 #info-popup.visible {
     display: block;
 }
 
-/* Titre du popup */
-#popup-box h3 {
+/* Titre */
+#info-popup h3 {
     display: flex;
     align-items: center;
     gap: 8px;
     margin: 0 0 12px 0;
     font-size: 1rem;
     color: #1A4E72;
-    padding-right: 24px;
+    font-weight: 700;
 }
 
-/* Icône dans le titre */
-#popup-box h3 img {
+#info-popup h3 img {
     width: 20px;
     height: 20px;
     object-fit: contain;
 }
 
-/* Texte du popup */
-#popup-box p {
-    margin: 0;
-    font-size: 0.85rem;
-    line-height: 1.8;
-    color: #444;
-}
-
+/* Texte */
 #info-popup p,
 #info-popup ul,
 #info-popup li {
@@ -541,18 +539,18 @@ html, body {
 /* Bouton fermeture */
 #popup-close {
     position: absolute;
-    top: 12px;
+    top: 18px;
     right: 14px;
     background: none;
     border: none;
-    font-size: 1rem;
+    font-size: 1.2rem;
     cursor: pointer;
-    color: #888;
+    color: #1A4E72;
     line-height: 1;
 }
 
 #popup-close:hover {
-    color: #1A4E72;
+    color: #0d2f50;
 }
 
 /* =============================================
