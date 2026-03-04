@@ -30,94 +30,75 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 // COMMUNES UV (GeoJSON servi par Caddy)
 // Endpoint : /DATA_API/communes_uv.geojson
 // =============================================
+const UV_JSON_URL = "/data/openmeteo_uv_meteofrance.json";                   // URL du fichier JSON contenant les données UV
 
-const COMMUNES_UV_URL = "/DATA_API/communes_uv.geojson";
-
-function getUvColor(uv) {
-
-  if (uv === null || uv === undefined) return "#e0e0e0"; // gris (aucune donnée)
-
-  if (uv < 2) return "#8bc34a";       // faible
-  if (uv < 5) return "#ffeb3b";       // modéré
-  if (uv < 7) return "#ff9800";       // élevé
-  if (uv < 10) return "#f44336";      // très élevé
-  return "#9c27b0";                   // extrême
+async function fetchUvJson() {                                               // Fonction asynchrone pour récupérer le JSON des UV
+  const res = await fetch(UV_JSON_URL, { cache: "no-store" });               // Récupère le JSON sans utiliser le cache
+  if (!res.ok) throw new Error(`UV JSON HTTP ${res.status}`);                // Gère les erreurs HTTP
+  return res.json();                                                         // Retourne le JSON parsé
 }
 
-function styleCommunes(feature) {
+// Retourne le point UV le plus proche d'une coordonnée (lat/lon).
+// On fait simple (distance euclidienne sur lat/lon), suffisant à l'échelle de la métropole.
 
-  const uv = feature.properties?.uv_max;
-
-  return {
-    fillColor: getUvColor(uv),
-    weight: 1,
-    opacity: 1,
-    color: "#555",
-    fillOpacity: 0.6
-  };
+function closestUvPoint(points, lat, lon) {                                   // Trouve le point UV le plus proche d'une coordonnée
+  let best = null;                                                            // Variable pour stocker le meilleur point
+  let bestD2 = Infinity;                                                      // Variable pour stocker la meilleure distance au carré
+  for (const p of points) {                                                    // Parcourt tous les points
+    const pLat = p?.latitude;                                                 // Récupère la latitude du point
+    const pLon = p?.longitude;                                                // Récupère la longitude du point
+    if (typeof pLat !== "number" || typeof pLon !== "number") continue;       // Ignore si les coordonnées ne sont pas des nombres
+    const dLat = pLat - lat;                                                  // Calcule la différence de latitude
+    const dLon = pLon - lon;                                                  // Calcule la différence de longitude
+    const d2 = dLat * dLat + dLon * dLon;                                    // Calcule la distance au carré (euclidienne)
+    if (d2 < bestD2) { bestD2 = d2; best = p; }                               // Met à jour le meilleur point si la distance est plus petite
+  }
+  return best;                                                                // Retourne le point le plus proche
 }
 
-async function loadCommunesUV() {
+// Extrait une valeur UV max (si dispo) et une date à partir d'un objet point.
 
+function extractUvMax(point) {                                                // Extrait la valeur UV max d'un point
+  const uv = point?.daily?.uv_index_max?.[0];                                 // Récupère l'indice UV max (peut être null)
+  return { uv };                                                              // Retourne un objet avec la valeur UV
+}
+
+// Debug/affichage : log la valeur UV la plus proche du centre de carte.
+// Si un élément #uv-status existe, écrit dedans (sinon, console seulement).
+
+async function updateUvFromMapCenter(map) {                                   // Met à jour l'affichage des UV en fonction du centre de la carte
   try {
+    const points = await fetchUvJson();                                       // Récupère les points UV
+    const center = map.getCenter();                                           // Récupère le centre de la carte
+    const p = closestUvPoint(points, center.lat, center.lng);                 // Trouve le point UV le plus proche
 
-    const res = await fetch(COMMUNES_UV_URL, { cache: "no-store" });
+    if (!p) {                                                                 // Si aucun point trouvé
+      console.warn("[UV] Aucun point UV trouvé dans le JSON.");               // Log un avertissement
+      const el = document.getElementById("uv-status");                        // Récupère l'élément DOM pour afficher le statut UV
+      if (el) el.textContent = "Aucune donnée UV.";                           // Met à jour le texte si l'élément existe
+      return;                                                                 // Quitte la fonction
+    }
 
-    if (!res.ok) throw new Error(`GeoJSON HTTP ${res.status}`);
+    const { uv } = extractUvMax(p);                                          // Extrait la valeur UV max
 
-    const geojson = await res.json();
+    console.log("[UV] Point le plus proche du centre:", {                    // Log les infos du point UV le plus proche
+      center: { lat: center.lat, lon: center.lng },
+      point: { lat: p.latitude, lon: p.longitude, location_id: p.location_id ?? null },
+      uv_max: uv
+    });
 
-    L.geoJSON(geojson, {
-
-      style: styleCommunes
-
-    }).addTo(map);
-
-    console.log("[UV COMMUNES] couche chargée");
-
-  } catch (err) {
-
-    console.error("[UV COMMUNES] erreur :", err);
-
+    const el = document.getElementById("uv-status");                          // Récupère l'élément DOM pour afficher le statut UV
+    if (el) {                                                                 // Si l'élément existe
+      el.textContent = (uv === null || uv === undefined)                      // Met à jour le texte en fonction de la valeur UV
+        ? `UV max : très faible`
+        : `UV max : ${uv}`;
+    }
+  } catch (err) {                                                            // Gère les erreurs
+    console.error("[UV] Erreur de chargement UV:", err);                     // Log l'erreur
+    const el = document.getElementById("uv-status");                         // Récupère l'élément DOM pour afficher le statut UV
+    if (el) el.textContent = "Erreur de chargement des UV.";                 // Met à jour le texte en cas d'erreur
   }
 }
-
-loadCommunesUV();
-
-// Barre d'échelle en bas à gauche (unités métriques uniquement)
-L.control.scale({ position: 'bottomleft', imperial: false }).addTo(map);
-
-// LayerGroup qui accueille les marqueurs et la polyligne de l'itinéraire.
-// Effacé à chaque nouvelle recherche.
-const routingLayer = L.layerGroup().addTo(map);
-
-// =============================================
-// ICÔNES MARQUEURS PERSONNALISÉES
-// Les SVG sont définis dans des <template> dans
-// le HTML. markerIcon() clone le contenu du template 
-// et crée une icône Leaflet de type divIcon.
-// iconAnchor [16,40] : pointe du pin sur le sol
-// popupAnchor [0,-40] : popup au-dessus du pin
-// =============================================
-
-// Crée une icône Leaflet à partir d'un <template> HTML
-function markerIcon(templateId) {
-  const svg = document.getElementById(templateId).innerHTML; // Récupère le SVG du template
-  return L.divIcon({
-    className:   '',          // Pas de classe CSS par défaut (évite le carré blanc Leaflet)
-    html:        svg,
-    iconSize:    [32, 40],
-    iconAnchor:  [16, 40],    // Point d'ancrage : bas centre du pin
-    popupAnchor: [0, -40],    // Popup s'affiche au-dessus du pin
-  });
-}
-
-const iconPoint   = markerIcon('tpl-marker-point');   // Pin bleu, point unique
-const iconCompareA = markerIcon('tpl-marker-compare-a'); // Pin vert, point A comparaison
-const iconCompareB = markerIcon('tpl-marker-compare-b'); // Pin rouge, point B comparaison
-const iconDepart  = markerIcon('tpl-marker-depart');  // Pin vert, départ itinéraire
-const iconArrivee = markerIcon('tpl-marker-arrivee'); // Pin rouge, arrivée itinéraire
-
 
 // =============================================
 // EXTENSION BETTERWMS
@@ -677,87 +658,34 @@ document.getElementById("calc-route-btn").addEventListener("click", async () => 
 
   if (!routeEnd) { map.setView(startLatLng, 16); return; }
 
-  const endCoords = await geocodeAddress(routeEnd);
-  if (!endCoords) { alert("Adresse d'arrivée introuvable"); return; }
-  const endLatLng = L.latLng(endCoords[1], endCoords[0]);
-  L.marker(endLatLng, { icon: iconArrivee }).addTo(routingLayer).bindPopup("Arrivée");
+    const endCoords = await geocodeAddress(routeEnd);                         // Géocode l'adresse d'arrivée
+    if (!endCoords) {                                                         // Si pas de coordonnées trouvées
+      alert("Adresse d'arrivée introuvable");                                 // Affiche une alerte
+      return;                                                                 // Quitte la fonction
+    }
 
-  const routeCoords = await getRoute(startCoords, endCoords);
-  if (!routeCoords) { alert("Impossible de calculer l'itinéraire"); return; }
+    const endLatLng = L.latLng(endCoords[1], endCoords[0]);                  // Crée un objet LatLng pour l'arrivée
 
-  const latLngs   = routeCoords.map(c => [c[1], c[0]]);
-  const routeLine = L.polyline(latLngs, { color: "#1A4E72", weight: 4, opacity: 1 }).addTo(routingLayer);
-  map.fitBounds(routeLine.getBounds(), { padding: [50, 50] });
+    L.marker(endLatLng)                                                      // Crée un marqueur pour l'arrivée
+      .addTo(routingLayer)                                                    // Ajoute le marqueur à la couche
+      .bindPopup("Arrivée");                                                  // Ajoute une popup
 
-  console.log("[ITINÉRAIRE] Coordonnées :", routeCoords);
-  openResultsPanel();
+    const routeCoords = await getRoute(startCoords, endCoords);               // Calcule l'itinéraire
+
+    if (!routeCoords) {                                                       // Si pas d'itinéraire trouvé
+      alert("Impossible de calculer l'itinéraire");                           // Affiche une alerte
+      return;                                                                 // Quitte la fonction
+    }
+
+    const latLngs = routeCoords.map(coord => [coord[1], coord[0]]);            // Convertit les coordonnées en LatLng
+
+    const routeLine = L.polyline(latLngs, {                                    // Crée une polyligne pour l'itinéraire
+      color: "red",                                                            // Couleur rouge
+      weight: 4                                                                // Épaisseur de 4px
+    }).addTo(routingLayer);                                                    // Ajoute la polyligne à la couche
+
+    map.fitBounds(routeLine.getBounds(), { padding: [50, 50] });               // Ajuste la vue pour afficher tout l'itinéraire
+
+  });
+
 });
-
-// Autocomplétion : affiche des suggestions pendant la frappe (délai 250ms).
-// Appelle l'API géocodage avec limit=50, filtre côté client sur les bounds métropole.
-function attachAutocomplete(inputId) {
-  const input = document.getElementById(inputId);
-  if (!input) return;
-
-  // Crée la liste de suggestions et l'accroche au parent du champ
-  const list = document.createElement('ul');
-  list.className = 'autocomplete-list hidden';
-  input.parentNode.style.position = 'relative';
-  input.parentNode.appendChild(list);
-
-  let debounceTimer;
-
-  input.addEventListener('input', () => {
-    clearTimeout(debounceTimer);
-    const query = input.value.trim();
-
-    if (query.length < 3) { list.classList.add('hidden'); return; }          // Pas de recherche sous 3 caractères
-
-    debounceTimer = setTimeout(async () => {                                  // Délai anti-spam avant d'appeler l'API
-      const res  = await fetch(`https://data.geopf.fr/geocodage/search?q=${encodeURIComponent(query)}&limit=50`);
-      const data = await res.json();
-
-      list.innerHTML = '';
-      if (!data.features || data.features.length === 0) { list.classList.add('hidden'); return; }
-
-      // Filtre les résultats hors bounds de la métropole de Lyon
-      const filtered = data.features.filter(f => {
-        const [lon, lat] = f.geometry.coordinates;
-        return lat >= 45.45 && lat <= 46.00 && lon >= 4.65 && lon <= 5.25;
-      });
-
-      if (filtered.length === 0) { list.classList.add('hidden'); return; }
-
-      filtered.forEach(f => {                                                 // Crée un <li> par suggestion
-        const li = document.createElement('li');
-        li.textContent = f.properties.label;
-        li.addEventListener('mousedown', () => {                              // mousedown avant blur pour que le clic se déclenche
-          input.value = f.properties.label;
-          list.classList.add('hidden');
-        });
-        list.appendChild(li);
-      });
-
-      list.classList.remove('hidden');
-    }, 250);
-  });
-
-  // Délai de 150ms pour laisser le mousedown se déclencher avant de cacher
-  input.addEventListener('blur', () => {
-    setTimeout(() => list.classList.add('hidden'), 150);
-  });
-}
-
-// Initialisation au chargement
-setAddressMode();
-attachGeolocate();
-attachAutocomplete('point-start');
-attachAutocomplete('compare-a');
-attachAutocomplete('compare-b');
-attachAutocomplete('route-start');
-attachAutocomplete('route-end');
-
-btnAddress.addEventListener("click", setAddressMode);
-btnCompare.addEventListener("click", setCompareMode);
-btnRoute.addEventListener("click", setRouteMode);
-
