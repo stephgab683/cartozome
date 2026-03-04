@@ -2,6 +2,6 @@
 *.sh text eol=lf
 crontab text eol=lf
 
-# Optionnel : dockerfiles aussi
-Dockerfile text eol=lf
+# Optionnel : dockerfiles aussi (partout)
+**/Dockerfile text eol=lf
 *.yml text eol=lf
