@@ -32,7 +32,6 @@ function closestUvPoint(points, lat, lon) {                                   //
 }
 
 // Extrait une valeur UV max (si dispo) et une date à partir d'un objet point.
-
 function extractUvMax(point) {                                                // Extrait la valeur UV max d'un point
   const uv = point?.daily?.uv_index_max?.[0];                                 // Récupère l'indice UV max (peut être null)
   return { uv };                                                              // Retourne un objet avec la valeur UV
@@ -514,5 +513,105 @@ document.addEventListener("DOMContentLoaded", () => {                         //
     map.fitBounds(routeLine.getBounds(), { padding: [50, 50] });               // Ajuste la vue pour afficher tout l'itinéraire
 
   });
+
+});
+
+// // ==============================
+// // TEST SIMPLE POST -> POPUP
+// // ==============================
+
+// const API_BASE_URL = "http://localhost:8000";
+
+// async function testPostPopup() {
+//   try {
+//     const response = await fetch(`${API_BASE_URL}/pollution`, {
+//       method: "POST",
+//       headers: {
+//         "Content-Type": "application/json"
+//       },
+//       body: JSON.stringify({ test: "hello" })
+//     });
+
+//     const data = await response.json();
+
+//     L.popup()
+//       .setLatLng(map.getCenter())
+//       .setContent(`
+//         <b>Test POST réussi ✅</b><br><br>
+//         PM2.5 : ${data.pollution["PM2.5"]}<br>
+//         NO2 : ${data.pollution["NO2"]}<br>
+//         O3 : ${data.pollution["O3"]}
+//       `)
+//       .openOn(map);
+
+//   } catch (err) {
+
+//     L.popup()
+//       .setLatLng(map.getCenter())
+//       .setContent(`
+//         <b>Erreur POST ❌</b><br>
+//         ${err}
+//       `)
+//       .openOn(map);
+
+//   }
+// }
+
+// testPostPopup();
+
+
+const API_BASE_URL = "http://127.0.0.1:8000";
+
+// Au clic sur la carte
+map.on("click", async function (e) {
+
+  const lat = e.latlng.lat;
+  const lon = e.latlng.lng;
+
+  try {
+
+    const response = await fetch(`${API_BASE_URL}/indicateurs`, {  // attention : endpoint mis à jour
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ latitude: lat, longitude: lon })
+    });
+
+    const data = await response.json();
+
+    let content = "<b>Valeurs des couches :</b><br>";
+
+    let hasData = false;
+
+    // Boucle sur toutes les couches
+    for (const [layer, value] of Object.entries(data)) {
+      if (value !== null && !value.toString().startsWith("Erreur")) {
+        hasData = true;
+        content += `${layer} : ${value}<br>`;
+      } else if (value && value.toString().startsWith("Erreur")) {
+        content += `${layer} : <span style="color:red;">${value}</span><br>`;
+      } else {
+        content += `${layer} : Aucun résultat<br>`;
+      }
+    }
+
+    if (!hasData) {
+      content = "<b>Aucun résultat pour toutes les couches</b>";
+    }
+
+    L.popup()
+      .setLatLng(e.latlng)
+      .setContent(content)
+      .openOn(map);
+
+  } catch (error) {
+
+    L.popup()
+      .setLatLng(e.latlng)
+      .setContent(`<b>Erreur ❌</b><br>${error}`)
+      .openOn(map);
+
+  }
 
 });
