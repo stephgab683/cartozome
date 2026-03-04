@@ -26,7 +26,7 @@
       <key>STYLES</key>
       <defaultValue></defaultValue>
       <availableStyles class="sorted-set"/>
-      <defaultStyle></defaultStyle>
+      <defaultStyle>o3_somo35_legende_oms</defaultStyle>
     </styleParameterFilter>
   </parameterFilters>
   <gutter>0</gutter>

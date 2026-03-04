@@ -70,7 +70,7 @@ Valeur guide OMS NO2 : 10 µg.m-3</abstract>
   <simpleConversionEnabled>false</simpleConversionEnabled>
   <internationalTitle/>
   <internationalAbstract/>
-  <forcedRemoteStyle></forcedRemoteStyle>
+  <forcedRemoteStyle>Style_no2_dep_oms</forcedRemoteStyle>
   <preferredFormat>image/png</preferredFormat>
   <selectedRemoteFormats>
     <string>image/png</string>

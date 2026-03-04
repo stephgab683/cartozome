@@ -26,7 +26,6 @@
       <key>STYLES</key>
       <defaultValue></defaultValue>
       <availableStyles class="sorted-set">
-        <string>Style_no2_dep_oms</string>
         <string>Style_no2_dep_oms_lineaire</string>
         <string>moyan_no2</string>
         <string>moyan_no2_boolean</string>
@@ -34,7 +33,7 @@
         <string>moyan_no2_vl2030</string>
         <string>moyan_no2_vl2030_boolean</string>
       </availableStyles>
-      <defaultStyle></defaultStyle>
+      <defaultStyle>Style_no2_dep_oms</defaultStyle>
     </styleParameterFilter>
   </parameterFilters>
   <gutter>0</gutter>
