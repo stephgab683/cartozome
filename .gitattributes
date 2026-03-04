@@ -1,0 +1,7 @@
+# Scripts et cron doivent rester en LF (Unix)
+*.sh text eol=lf
+crontab text eol=lf
+
+# Optionnel : dockerfiles aussi
+Dockerfile text eol=lf
+*.yml text eol=lf
