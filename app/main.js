@@ -39,34 +39,7 @@ function getColor(uv) {
                    '#a0ffa0';
 }
 
-// fetch("http://localhost:8000/uvCommunes")
-//   .then(res => res.json())
-//   .then(communesGeojson => {
-
-//     L.geoJSON(communesGeojson, {
-
-//       style: feature => ({
-//         fillColor: getColor(feature.properties.uv),
-//         weight: 1,
-//         color: "white",
-//         fillOpacity: 0.7
-//       }),
-
-//       onEachFeature: (feature, layer) => {
-//         layer.bindPopup(
-//           `<b>${feature.properties.nom}</b><br>UV: ${feature.properties.uv}`
-//         );
-//       }
-//     }).addTo(map);
-//   });
-
-// // Barre d'échelle en bas à gauche (unités métriques uniquement)
-// L.control.scale({ position: 'bottomleft', imperial: false }).addTo(map);
-
-// // LayerGroup qui accueille les marqueurs et la polyligne de l'itinéraire.
-// // Effacé à chaque nouvelle recherche.
 const routingLayer = L.layerGroup().addTo(map);
-
 let uvLayer = null; // variable globale pour la couche UV
 
 // Fonction pour récupérer les données UV et créer la couche GeoJSON
@@ -86,22 +59,6 @@ async function loadUvLayer() {
     },
     onEachFeature: (feature, layer) => {
       layer.bindPopup(`Commune: ${feature.properties.nom}<br>UV: ${feature.properties.uv}`);
-    }
-  });
-
-  // Affichage initial si la checkbox est cochée
-  const checkbox = document.querySelector('.layer-checkbox[data-layer="uvLayer"]');
-  if (checkbox.checked) {
-    uvLayer.addTo(map);
-  }
-
-  // Listener pour la checkbox
-  checkbox.addEventListener('change', function() {
-    if (!uvLayer) return;
-    if (this.checked) {
-      uvLayer.addTo(map);
-    } else {
-      map.removeLayer(uvLayer);
     }
   });
 }
