@@ -30,7 +30,6 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 // COMMUNES UV (GeoJSON servi par Caddy)
 // Endpoint : /DATA_API/communes_uv.geojson
 // =============================================
-const UV_JSON_URL = "/data/openmeteo_uv_meteofrance.json";                   // URL du fichier JSON contenant les données UV
 
 async function fetchUvJson() {                                               // Fonction asynchrone pour récupérer le JSON des UV
   const res = await fetch(UV_JSON_URL, { cache: "no-store" });               // Récupère le JSON sans utiliser le cache
@@ -688,4 +687,3 @@ document.getElementById("calc-route-btn").addEventListener("click", async () => 
 
   });
 
-});

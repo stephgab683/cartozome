@@ -9,9 +9,10 @@ app = FastAPI()
 # Autoriser le front
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=["*"], 
     allow_methods=["*"],
     allow_headers=["*"],
+    allow_credentials=True
 )
 
 # Conversion WGS84 -> Lambert 93
@@ -24,8 +25,11 @@ class Coordonnees(BaseModel):
 # Liste de toutes les couches à interroger
 WMS_LAYERS = [
     "cartozome:Ambroisie_2024_AURA",
-    "cartozome:GL_Fer_Lden",
-    # ajouter d'autres couches ici
+    "cartozome:mod_aura_2024_no2_moyan",
+    "cartozome:mod_aura_2024_o3_somo35 ",
+    "cartozome:mod_aura_2024_pm10_moyan ",
+    "cartozome:mod_aura_2024_pm25_moyan", 
+    
 ]
 
 WMS_URL = "http://localhost:8081/geoserver/cartozome/ows"
