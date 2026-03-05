@@ -1,15 +1,16 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-import requests
+import httpx
 from pyproj import Transformer
+import asyncio
 
 app = FastAPI()
 
 # Autoriser le front
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], 
+    allow_origins=["*"],
     allow_methods=["*"],
     allow_headers=["*"],
     allow_credentials=True
@@ -22,63 +23,116 @@ class Coordonnees(BaseModel):
     latitude: float
     longitude: float
 
-# Liste de toutes les couches à interroger
-WMS_LAYERS = [
-    "cartozome:Ambroisie_2024_AURA",
-    "cartozome:mod_aura_2024_no2_moyan",
-    "cartozome:mod_aura_2024_o3_somo35 ",
-    "cartozome:mod_aura_2024_pm10_moyan ",
-    "cartozome:mod_aura_2024_pm25_moyan", 
-    "cartozome:sous_indice_multibruit_orhane_2023",
-]
+
+# Mapping noms lisibles -> couches GeoServer
+WMS_LAYERS = {
+    "ambroisie": "cartozome:Ambroisie_2024_AURA",
+    "no2": "cartozome:mod_aura_2024_no2_moyan",
+    "o3": "cartozome:mod_aura_2024_o3_somo35",
+    "pm10": "cartozome:mod_aura_2024_pm10_moyan",
+    "pm25": "cartozome:mod_aura_2024_pm25_moyan",
+    "bruit": "cartozome:sous_indice_multibruit_orhane_2023"
+}
+
 
 WMS_URL = "http://localhost:8081/geoserver/cartozome/ows"
+UV_URL = "https://api.open-meteo.com/v1/forecast"
 
+
+# -------- fonction requête WMS --------
+async def fetch_wms_all(client, bbox):
+
+    layers = ",".join(WMS_LAYERS.values())
+
+    params = {
+        "service": "WMS",
+        "version": "1.3.0",
+        "request": "GetFeatureInfo",
+        "layers": layers,
+        "query_layers": layers,
+        "crs": "EPSG:2154",
+        "bbox": bbox,
+        "width": 101,
+        "height": 101,
+        "format": "image/png",
+        "info_format": "application/json",
+        "x": 50,
+        "y": 50
+    }
+
+    r = await client.get(WMS_URL, params=params)
+    data = r.json()
+
+    result = {k: None for k in WMS_LAYERS.keys()}
+
+    if "features" in data:
+
+        for feature in data["features"]:
+
+            layer_name = feature["id"].split(".")[0]
+            value = feature["properties"].get("GRAY_INDEX")
+
+            for key, layer in WMS_LAYERS.items():
+                if layer.endswith(layer_name):
+                    result[key] = value
+
+    return result
+
+
+# -------- fonction requête UV --------
+async def fetch_uv(client, lat, lon):
+
+    params = {
+        "latitude": lat,
+        "longitude": lon,
+        "current": "uv_index"
+    }
+
+    try:
+        r = await client.get(UV_URL, params=params)
+        data = r.json()
+
+        return data["current"]["uv_index"]
+
+    except Exception as e:
+        return f"Erreur: {e}"
+
+
+# -------- endpoint principal --------
 @app.post("/indicateurs")
-def get_indicateurs(coords: Coordonnees):
+async def get_indicateurs(coords: Coordonnees):
+
     lat = coords.latitude
     lon = coords.longitude
 
-    # Conversion en Lambert 93 
+    # conversion vers Lambert 93
     x, y = transformer.transform(lon, lat)
 
-    # Petit BBOX autour du point (5 mètres)
+    # petite bbox autour du point
     delta = 5
     bbox = f"{x-delta},{y-delta},{x+delta},{y+delta}"
 
     result = {}
 
-    for layer in WMS_LAYERS:
-        params = {
-            "service": "WMS",
-            "version": "1.3.0",
-            "request": "GetFeatureInfo",
-            "layers": layer,
-            "query_layers": layer,
-            "crs": "EPSG:2154",
-            "bbox": bbox,
-            "width": 101,
-            "height": 101,
-            "format": "image/png",
-            "info_format": "application/json",
-            "x": 50,
-            "y": 50
-        }
+    async with httpx.AsyncClient(timeout=30) as client:
 
-        try:
-            response = requests.get(WMS_URL, params=params)
-            data = response.json()
+        # tâches WMS parallèles
+        wms_tasks = [
+            fetch_wms(client, key, layer, bbox)
+            for key, layer in WMS_LAYERS.items()
+        ]
 
-            if data.get("features"):
-                # On récupère la première valeur trouvée
-                gray_value = data["features"][0]["properties"].get("GRAY_INDEX")
-                result[layer] = gray_value
-            else:
-                result[layer] = None
+        # tâche UV
+        uv_task = fetch_uv(client, lat, lon)
 
-        except Exception as e:
-            # En cas d'erreur, on renvoie None ou un message d'erreur
-            result[layer] = f"Erreur: {e}"
+        # exécution parallèle
+        responses = await asyncio.gather(*wms_tasks)
+
+        # remplissage du résultat
+        for key, value in responses:
+            result[key] = value
+
+        result["uv"] = await uv_task
 
     return result
 
