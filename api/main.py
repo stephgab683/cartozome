@@ -29,7 +29,7 @@ WMS_LAYERS = [
     "cartozome:mod_aura_2024_o3_somo35 ",
     "cartozome:mod_aura_2024_pm10_moyan ",
     "cartozome:mod_aura_2024_pm25_moyan", 
-    
+
 ]
 
 WMS_URL = "http://localhost:8081/geoserver/cartozome/ows"
@@ -39,7 +39,7 @@ def get_indicateurs(coords: Coordonnees):
     lat = coords.latitude
     lon = coords.longitude
 
-    # Conversion en Lambert 93
+    # Conversion en Lambert 93 
     x, y = transformer.transform(lon, lat)
 
     # Petit BBOX autour du point (5 mètres)
