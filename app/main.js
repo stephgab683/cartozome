@@ -1,87 +1,61 @@
 import 'leaflet/dist/leaflet.css';                                           // Import du CSS de Leaflet pour le style des cartes
 import L from 'leaflet';                                                     // Import de la bibliothèque Leaflet pour la gestion des cartes
 
+
 // =============================================
-// UV (JSON servi par Caddy)
-// Endpoint: /data/openmeteo_uv_meteofrance.json
+// CARTE LEAFLET
+// Centrée sur Lyon, limitée aux bounds de la
+// métropole (pan + zoom bloqués hors zone).
+// Fond de carte OpenStreetMap.
 // =============================================
-const UV_JSON_URL = "/data/openmeteo_uv_meteofrance.json";                   // URL du fichier JSON contenant les données UV
 
-async function fetchUvJson() {                                               // Fonction asynchrone pour récupérer le JSON des UV
-  const res = await fetch(UV_JSON_URL, { cache: "no-store" });               // Récupère le JSON sans utiliser le cache
-  if (!res.ok) throw new Error(`UV JSON HTTP ${res.status}`);                // Gère les erreurs HTTP
-  return res.json();                                                         // Retourne le JSON parsé
-}
+// Bounds de la métropole de Lyon — utilisées aussi pour filtrer l'autocomplétion
+const METROPOLE_BOUNDS = L.latLngBounds(
+  [45.45, 4.65],
+  [46.00, 5.25]
+);
 
-function closestUvPoint(points, lat, lon) {                                   // Trouve le point UV le plus proche d'une coordonnée
-  let best = null;                                                            // Variable pour stocker le meilleur point
-  let bestD2 = Infinity;                                                      // Variable pour stocker la meilleure distance au carré
-  for (const p of points) {                                                    // Parcourt tous les points
-    const pLat = p?.latitude;                                                 // Récupère la latitude du point
-    const pLon = p?.longitude;                                                // Récupère la longitude du point
-    if (typeof pLat !== "number" || typeof pLon !== "number") continue;       // Ignore si les coordonnées ne sont pas des nombres
-    const dLat = pLat - lat;                                                  // Calcule la différence de latitude
-    const dLon = pLon - lon;                                                  // Calcule la différence de longitude
-    const d2 = dLat * dLat + dLon * dLon;                                    // Calcule la distance au carré (euclidienne)
-    if (d2 < bestD2) { bestD2 = d2; best = p; }                               // Met à jour le meilleur point si la distance est plus petite
-  }
-  return best;                                                                // Retourne le point le plus proche
-}
+const map = L.map('map', {
+  maxBounds:          METROPOLE_BOUNDS,
+  maxBoundsViscosity: 1.0,                                                   // Empêche de sortir des bounds
+  minZoom:            10,
+  maxZoom:            18,
+}).setView([45.757295, 4.832391], 11);                                       // Vue initiale centrée sur Lyon
 
-function extractUvMax(point) {                                                // Extrait la valeur UV max d'un point
-  const uv = point?.daily?.uv_index_max?.[0];                                 // Récupère l'indice UV max (peut être null)
-  return { uv };                                                              // Retourne un objet avec la valeur UV
-}
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  attribution: '&copy; OpenStreetMap contributors'
+}).addTo(map);
 
-async function updateUvFromMapCenter(map) {                                   // Met à jour l'affichage des UV en fonction du centre de la carte
-  try {
-    const points = await fetchUvJson();                                       // Récupère les points UV
-    const center = map.getCenter();                                           // Récupère le centre de la carte
-    const p = closestUvPoint(points, center.lat, center.lng);                 // Trouve le point UV le plus proche
+// Barre d'échelle en bas à gauche (unités métriques uniquement)
+L.control.scale({ position: 'bottomleft', imperial: false }).addTo(map);
 
-    if (!p) {                                                                 // Si aucun point trouvé
-      console.warn("[UV] Aucun point UV trouvé dans le JSON.");               // Log un avertissement
-      const el = document.getElementById("uv-status");                        // Récupère l'élément DOM pour afficher le statut UV
-      if (el) el.textContent = "Aucune donnée UV.";                           // Met à jour le texte si l'élément existe
-      return;                                                                 // Quitte la fonction
-    }
+// LayerGroup qui accueille les marqueurs et la polyligne de l'itinéraire.
+// Effacé à chaque nouvelle recherche.
+const routingLayer = L.layerGroup().addTo(map);
 
-    const { uv } = extractUvMax(p);                                          // Extrait la valeur UV max
-
-    console.log("[UV] Point le plus proche du centre:", {                    // Log les infos du point UV le plus proche
-      center: { lat: center.lat, lon: center.lng },
-      point: { lat: p.latitude, lon: p.longitude, location_id: p.location_id ?? null },
-      uv_max: uv
-    });
-
-    const el = document.getElementById("uv-status");                          // Récupère l'élément DOM pour afficher le statut UV
-    if (el) {                                                                 // Si l'élément existe
-      el.textContent = (uv === null || uv === undefined)                      // Met à jour le texte en fonction de la valeur UV
-        ? `UV max : très faible`
-        : `UV max : ${uv}`;
-    }
-  } catch (err) {                                                            // Gère les erreurs
-    console.error("[UV] Erreur de chargement UV:", err);                     // Log l'erreur
-    const el = document.getElementById("uv-status");                         // Récupère l'élément DOM pour afficher le statut UV
-    if (el) el.textContent = "Erreur de chargement des UV.";                 // Met à jour le texte en cas d'erreur
-  }
-}
 
 // =============================================
 // EXTENSION BETTERWMS
+// Extension de L.TileLayer.WMS qui ajoute le
+// support du clic pour interroger GeoServer
+// via GetFeatureInfo et afficher la valeur
+// de la couche à l'endroit cliqué dans une popup
 // =============================================
 L.TileLayer.BetterWMS = L.TileLayer.WMS.extend({
 
+  // Branche l'écouteur de clic à l'ajout de la couche
   onAdd: function (map) {
     L.TileLayer.WMS.prototype.onAdd.call(this, map);
     map.on('click', this.getFeatureInfo, this);
   },
 
+  // Retire l'écouteur de clic à la suppression de la couche
   onRemove: function (map) {
     L.TileLayer.WMS.prototype.onRemove.call(this, map);
     map.off('click', this.getFeatureInfo, this);
   },
 
+  // Construit l'URL GetFeatureInfo et lance la requête
   getFeatureInfo: function (evt) {
     const url  = this.getFeatureInfoUrl(evt.latlng);
     const show = this.showGetFeatureInfo.bind(this);
@@ -91,25 +65,27 @@ L.TileLayer.BetterWMS = L.TileLayer.WMS.extend({
       .catch(err => show(err));
   },
 
+  // Construit les paramètres WMS GetFeatureInfo
+  // Adapte les paramètres i/j ou x/y selon la version WMS (1.1.1 vs 1.3.0)
   getFeatureInfoUrl: function (latlng) {
     const point = this._map.latLngToContainerPoint(latlng, this._map.getZoom());
     const size  = this._map.getSize();
     const v     = this.wmsParams.version;
 
     const params = {
-      request:      'GetFeatureInfo',
-      service:      'WMS',
-      srs:          'EPSG:4326',
-      styles:       this.wmsParams.styles,
-      transparent:  this.wmsParams.transparent,
-      version:      v,
-      format:       this.wmsParams.format,
-      bbox:         this._map.getBounds().toBBoxString(),
-      height:       size.y,
-      width:        size.x,
-      layers:       this.wmsParams.layers,
-      query_layers: this.wmsParams.layers,
-      info_format:  'application/json',
+      request:       'GetFeatureInfo',
+      service:       'WMS',
+      srs:           'EPSG:4326',
+      styles:        this.wmsParams.styles,
+      transparent:   this.wmsParams.transparent,
+      version:       v,
+      format:        this.wmsParams.format,
+      bbox:          this._map.getBounds().toBBoxString(),
+      height:        size.y,
+      width:         size.x,
+      layers:        this.wmsParams.layers,
+      query_layers:  this.wmsParams.layers,
+      info_format:   'application/json',
       feature_count: 1,
     };
 
@@ -119,6 +95,8 @@ L.TileLayer.BetterWMS = L.TileLayer.WMS.extend({
     return this._url + L.Util.getParamString(params, this._url, true);
   },
 
+  // Affiche la valeur numérique de la couche dans une popup Leaflet
+  // Utilise LAYER_LABELS et LAYER_UNITS pour formater l'affichage
   showGetFeatureInfo: function (err, latlng, data) {
     if (err) { console.error('[BetterWMS]', err); return; }
 
@@ -129,9 +107,9 @@ L.TileLayer.BetterWMS = L.TileLayer.WMS.extend({
     const entry = Object.entries(props).find(([, v]) => typeof v === 'number');
     if (!entry) return;
 
-    const [key, val] = entry;
-    const label = LAYER_LABELS[this.wmsParams.layers] ?? this.wmsParams.layers;
-    const unit  = LAYER_UNITS[this.wmsParams.layers]  ?? "";
+    const [, val] = entry;
+    const label   = LAYER_LABELS[this.wmsParams.layers] ?? this.wmsParams.layers;
+    const unit    = LAYER_UNITS[this.wmsParams.layers]  ?? "";
 
     L.popup({ maxWidth: 300 })
       .setLatLng(latlng)
@@ -145,75 +123,55 @@ L.TileLayer.BetterWMS = L.TileLayer.WMS.extend({
   }
 });
 
+// Raccourci de création pour BetterWMS
 L.tileLayer.betterWms = function (url, options) {
   return new L.TileLayer.BetterWMS(url, options);
 };
 
+
 // =============================================
-// MÉTADONNÉES DES COUCHES
+// GESTION DES COUCHES (WMS + WFS)
+// Les instances sont mises en cache dans
+// layerInstances pour éviter de recharger
+// une couche déjà initialisée.
+// Une seule couche peut être active à la fois.
 // =============================================
+
+// Noms affichés dans la popup de clic (GetFeatureInfo)
 const LAYER_LABELS = {
   "cartozome:mod_aura_2024_pm10_moyan":  "PM10",
   "cartozome:mod_aura_2024_pm25_moyan":  "PM2,5",
   "cartozome:mod_aura_2024_no2_moyan":   "NO2",
   "cartozome:mod_aura_2024_o3_somo35":   "O3 SOMO35",
   "cartozome:Ambroisie_2024_AURA":       "Ambroisie",
-  "cartozome:GL_Fer_Lden":              "Bruit ferroviaire LDEN",
-  "cartozome:GL_Fer_Ln":               "Bruit ferroviaire LN",
-  "cartozome:GL_Rte_Lden":             "Bruit routier LDEN",
-  "cartozome:GL_Rte_Ln":               "Bruit routier LN",
-  "cartozome:Indus_GL_E4_Lden":        "Bruit industriel LDEN",
+  "cartozome:GL_Fer_Lden":               "Bruit ferroviaire LDEN",
+  "cartozome:GL_Fer_Ln":                 "Bruit ferroviaire LN",
+  "cartozome:GL_Rte_Lden":               "Bruit routier LDEN",
+  "cartozome:GL_Rte_Ln":                 "Bruit routier LN",
+  "cartozome:Indus_GL_E4_Lden":          "Bruit industriel LDEN",
 };
 
+// Unités affichées dans la popup de clic
 const LAYER_UNITS = {
   "cartozome:mod_aura_2024_pm10_moyan":  "µg/m³",
   "cartozome:mod_aura_2024_pm25_moyan":  "µg/m³",
   "cartozome:mod_aura_2024_no2_moyan":   "µg/m³",
   "cartozome:mod_aura_2024_o3_somo35":   "µg/m³·j",
   "cartozome:Ambroisie_2024_AURA":       "grains/m³",
-  "cartozome:GL_Fer_Lden":              "dB(A)",
-  "cartozome:GL_Fer_Ln":               "dB(A)",
-  "cartozome:GL_Rte_Lden":             "dB(A)",
-  "cartozome:GL_Rte_Ln":               "dB(A)",
-  "cartozome:Indus_GL_E4_Lden":        "dB(A)",
+  "cartozome:GL_Fer_Lden":               "dB(A)",
+  "cartozome:GL_Fer_Ln":                 "dB(A)",
+  "cartozome:GL_Rte_Lden":               "dB(A)",
+  "cartozome:GL_Rte_Ln":                 "dB(A)",
+  "cartozome:Indus_GL_E4_Lden":          "dB(A)",
 };
 
-// =============================================
-// CARTE
-// =============================================
-const METROPOLE_BOUNDS = L.latLngBounds(
-  [45.45, 4.65],
-  [46.00, 5.25]
-);
-
-const map = L.map('map', {
-  maxBounds:          METROPOLE_BOUNDS,
-  maxBoundsViscosity: 1.0,
-  minZoom:            10,
-  maxZoom:            18,
-}).setView([45.757295, 4.832391], 11);
-
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-  attribution: '&copy; OpenStreetMap contributors'
-}).addTo(map);
-
-// UV
-updateUvFromMapCenter(map);
-map.on("moveend", () => updateUvFromMapCenter(map));
-
+// URLs GeoServer local (WMS pour les rasters, WFS pour le bruit aérien)
 const GEOSERVER_URL = "http://localhost:8081/geoserver/wms";
 const GEOSERVER_WFS = "http://localhost:8081/geoserver/wfs";
 
-// =============================================
-// ÉCHELLE LEAFLET
-// =============================================
-L.control.scale({ position: 'bottomleft', imperial: false }).addTo(map);
+const layerInstances = {};                                                   // Cache des instances de couches déjà chargées
 
-// =============================================
-// GESTION DES COUCHES (WMS + WFS)
-// =============================================
-const layerInstances = {};
-
+// Crée une couche WMS avec support GetFeatureInfo (BetterWMS)
 function createWMSLayer(layerName) {
   return L.tileLayer.betterWms(GEOSERVER_URL, {
     layers:      layerName,
@@ -224,6 +182,8 @@ function createWMSLayer(layerName) {
   });
 }
 
+// Récupère les features WFS depuis GeoServer et crée un layer GeoJSON
+// Utilisé uniquement pour les couches bruit aérien (data-type="wfs")
 async function createWFSLayer(layerName) {
   const params = new URLSearchParams({
     service:      "WFS",
@@ -248,100 +208,180 @@ async function createWFSLayer(layerName) {
   });
 }
 
+// Sélectionne WMS ou WFS selon le type de la couche
 async function initLayer(layerName, isWFS) {
   return isWFS ? await createWFSLayer(layerName) : createWMSLayer(layerName);
 }
 
+// Écoute les changements sur les checkboxes de couches.
+// Au cochage : retire toutes les autres couches, ajoute la nouvelle.
+// Au décochage : retire la couche de la carte.
 document.querySelectorAll('.layer-checkbox').forEach(checkbox => {
   const layerName = checkbox.dataset.layer;
-  const isWFS = checkbox.dataset.type === "wfs";
+  const isWFS     = checkbox.dataset.type === "wfs";
 
   checkbox.addEventListener('change', async function () {
-      if (this.checked) {
-          // Décoche et retire toutes les autres couches
-          document.querySelectorAll('.layer-checkbox').forEach(async other => {
-              if (other !== this && other.checked) {
-                  other.checked = false;
-                  if (layerInstances[other.dataset.layer]) {
-                      map.removeLayer(layerInstances[other.dataset.layer]);
-                  }
-              }
-          });
-
-          if (!layerInstances[layerName]) layerInstances[layerName] = await initLayer(layerName, isWFS);
-          map.addLayer(layerInstances[layerName]);
-      } else {
-          if (layerInstances[layerName]) map.removeLayer(layerInstances[layerName]);
-      }
+    if (this.checked) {
+      // Décoche et retire toutes les autres couches actives
+      document.querySelectorAll('.layer-checkbox').forEach(other => {
+        if (other !== this && other.checked) {
+          other.checked = false;
+          if (layerInstances[other.dataset.layer]) {
+            map.removeLayer(layerInstances[other.dataset.layer]);
+          }
+        }
+      });
+      // Initialise la couche si pas encore en cache, puis l'ajoute
+      if (!layerInstances[layerName]) layerInstances[layerName] = await initLayer(layerName, isWFS);
+      map.addLayer(layerInstances[layerName]);
+    } else {
+      if (layerInstances[layerName]) map.removeLayer(layerInstances[layerName]);
+    }
   });
 });
 
-// =============================================
-// ACCORDÉON COUCHES
-// =============================================
+// Accordéon : un seul groupe ouvert à la fois.
+// Cliquer sur un groupe ouvert le referme.
 document.querySelectorAll('.layer-group-toggle').forEach(btn => {
   btn.addEventListener('click', () => {
-      const clickedGroup = btn.closest('.layer-group');
-      const clickedContent = clickedGroup.querySelector('.layer-group-content');
-      const isOpen = !clickedContent.classList.contains('hidden');
+    const clickedGroup   = btn.closest('.layer-group');
+    const clickedContent = clickedGroup.querySelector('.layer-group-content');
+    const isOpen         = !clickedContent.classList.contains('hidden');
 
-      // Ferme tous les groupes
-      document.querySelectorAll('.layer-group').forEach(group => {
-          group.querySelector('.layer-group-content').classList.add('hidden');
-          group.querySelector('.layer-group-toggle').classList.add('closed');
-      });
+    // Ferme tous les groupes
+    document.querySelectorAll('.layer-group').forEach(group => {
+      group.querySelector('.layer-group-content').classList.add('hidden');
+      group.querySelector('.layer-group-toggle').classList.add('closed');
+    });
 
-      // Ouvre uniquement le groupe cliqué si il était fermé
-      if (isOpen) return;
-      clickedContent.classList.remove('hidden');
-      btn.classList.remove('closed');
+    // Si le groupe cliqué était fermé, on l'ouvre
+    if (isOpen) return;
+    clickedContent.classList.remove('hidden');
+    btn.classList.remove('closed');
   });
 });
 
-// =============================================
-// COUCHE RÉSULTATS (marqueurs + trajet)
-// =============================================
-const routingLayer = L.layerGroup().addTo(map);
+// Ouvre/ferme le panneau latéral droit au clic sur le bouton couches
+document.getElementById("layers-toggle").addEventListener("click", () => {
+  document.getElementById("layers-panel").classList.toggle("hidden");
+});
+
 
 // =============================================
-// GÉOCODAGE
+// DONNÉES UV
+// Récupère chaque jour l'indice UV max depuis
+// un fichier JSON servi par Caddy.
+// Endpoint : /data/openmeteo_uv_meteofrance.json
+// Source : Météo-France via Open-Meteo
 // =============================================
+
+const UV_JSON_URL = "/data/openmeteo_uv_meteofrance.json";                   // URL du fichier JSON contenant les données UV
+
+// Récupère le JSON UV sans cache (données fraîches à chaque appel)
+async function fetchUvJson() {
+  const res = await fetch(UV_JSON_URL, { cache: "no-store" });               // Récupère le JSON sans utiliser le cache
+  if (!res.ok) throw new Error(`UV JSON HTTP ${res.status}`);                // Gère les erreurs HTTP
+  return res.json();                                                         // Retourne le JSON parsé
+}
+
+// Retourne le point UV le plus proche d'une coordonnée (distance euclidienne)
+function closestUvPoint(points, lat, lon) {
+  let best   = null;                                                         // Variable pour stocker le meilleur point
+  let bestD2 = Infinity;                                                     // Variable pour stocker la meilleure distance au carré
+  for (const p of points) {
+    const pLat = p?.latitude;                                                // Récupère la latitude du point
+    const pLon = p?.longitude;                                               // Récupère la longitude du point
+    if (typeof pLat !== "number" || typeof pLon !== "number") continue;      // Ignore si les coordonnées ne sont pas des nombres
+    const dLat = pLat - lat;                                                 // Calcule la différence de latitude
+    const dLon = pLon - lon;                                                 // Calcule la différence de longitude
+    const d2   = dLat * dLat + dLon * dLon;                                 // Calcule la distance au carré (euclidienne)
+    if (d2 < bestD2) { bestD2 = d2; best = p; }                             // Met à jour le meilleur point si distance plus petite
+  }
+  return best;                                                               // Retourne le point le plus proche
+}
+
+// Extrait l'indice UV max du jour depuis la structure Open-Meteo
+function extractUvMax(point) {
+  const uv = point?.daily?.uv_index_max?.[0];                               // Récupère l'indice UV max (peut être null)
+  return { uv };
+}
+
+// Met à jour l'élément #uv-status avec l'indice UV du point
+// le plus proche du centre visible de la carte
+async function updateUvFromMapCenter(map) {
+  try {
+    const points = await fetchUvJson();                                      // Récupère les points UV
+    const center = map.getCenter();                                          // Récupère le centre de la carte
+    const p      = closestUvPoint(points, center.lat, center.lng);          // Trouve le point UV le plus proche
+
+    if (!p) {                                                                // Si aucun point trouvé
+      console.warn("[UV] Aucun point UV trouvé dans le JSON.");
+      const el = document.getElementById("uv-status");
+      if (el) el.textContent = "Aucune donnée UV.";
+      return;
+    }
+
+    const { uv } = extractUvMax(p);                                         // Extrait la valeur UV max
+
+    console.log("[UV] Point le plus proche du centre:", {                   // Log les infos du point UV le plus proche
+      center: { lat: center.lat, lon: center.lng },
+      point:  { lat: p.latitude, lon: p.longitude, location_id: p.location_id ?? null },
+      uv_max: uv
+    });
+
+    const el = document.getElementById("uv-status");                        // Récupère l'élément DOM pour afficher le statut UV
+    if (el) {
+      el.textContent = (uv === null || uv === undefined)                    // Met à jour le texte en fonction de la valeur UV
+        ? `UV max : très faible`
+        : `UV max : ${uv}`;
+    }
+  } catch (err) {
+    console.error("[UV] Erreur de chargement UV:", err);                    // Log l'erreur
+    const el = document.getElementById("uv-status");
+    if (el) el.textContent = "Erreur de chargement des UV.";
+  }
+}
+
+// Charge les UV au démarrage puis à chaque déplacement de la carte
+updateUvFromMapCenter(map);
+map.on("moveend", () => updateUvFromMapCenter(map));
+
+
+// =============================================
+// APIs GOUVERNEMENTALES
+// Géocodage, reverse géocodage et calcul
+// d'itinéraire via data.geopf.fr
+// =============================================
+
+// Convertit une adresse texte en coordonnées [lon, lat]
 async function geocodeAddress(query) {
   try {
-    const res = await fetch(
-      `https://data.geopf.fr/geocodage/search?q=${encodeURIComponent(query)}&limit=1`
-    );
+    const res  = await fetch(`https://data.geopf.fr/geocodage/search?q=${encodeURIComponent(query)}&limit=1`);
     const data = await res.json();
     if (!data.features || data.features.length === 0) return null;
-    return data.features[0].geometry.coordinates;                             // [lon, lat]
+    return data.features[0].geometry.coordinates;                            // Retourne [lon, lat]
   } catch (err) {
     console.error("[GEOCODE ERROR]", err);
     return null;
   }
 }
 
-// =============================================
-// REVERSE GÉOCODAGE
-// =============================================
+// Convertit des coordonnées GPS en adresse lisible
+// Utilisé par les boutons de géolocalisation
 async function reverseGeocode(lat, lon) {
   try {
-    const url =
-      `https://data.geopf.fr/geocodage/reverse` +
-      `?lat=${lat}&lon=${lon}` +
-      `&limit=1`;
-    const res = await fetch(url);
+    const res  = await fetch(`https://data.geopf.fr/geocodage/reverse?lat=${lat}&lon=${lon}&limit=1`);
     const data = await res.json();
     if (!data.features || data.features.length === 0) return null;
-    return data.features[0].properties.label;
+    return data.features[0].properties.label;                               // Retourne l'adresse formatée
   } catch (err) {
     console.error("[REVERSE GEOCODE ERROR]", err);
     return null;
   }
 }
 
-// =============================================
-// ROUTING
-// =============================================
+// Calcule un itinéraire piéton entre deux points via bdtopo-osrm
+// Retourne un tableau de coordonnées [lon, lat]
 async function getRoute(start, end) {
   const url =
     `https://data.geopf.fr/navigation/itineraire?resource=bdtopo-osrm` +
@@ -350,7 +390,7 @@ async function getRoute(start, end) {
     `&profile=pedestrian` +
     `&crs=EPSG:4326`;
   try {
-    const res = await fetch(url);
+    const res  = await fetch(url);
     const data = await res.json();
     return data.geometry?.coordinates ?? null;
   } catch (err) {
@@ -359,129 +399,130 @@ async function getRoute(start, end) {
   }
 }
 
+
 // =============================================
-// ADRESSE / ITINÉRAIRE
+// RECHERCHE : ADRESSE / ITINÉRAIRE
+// Deux modes gérés par toggle de classes .hidden
+// sur les panels définis dans le HTML.
+// Comprend : affichage des panels, géolocalisation,
+// autocomplétion et validation des formulaires.
 // =============================================
+
 const btnAddress  = document.getElementById("btn-address");
 const btnRoute    = document.getElementById("btn-route");
 const searchPanel = document.getElementById("search-panel");
 
-// --- Affichage des panels ---
+// Affiche le panel adresse, cache le panel itinéraire
 function setAddressMode() {
-    document.getElementById('panel-address').classList.remove('hidden');
-    document.getElementById('panel-route').classList.add('hidden');
-    searchPanel.classList.remove('hidden');
-    btnAddress.classList.add('active');
-    btnRoute.classList.remove('active');
+  document.getElementById('panel-address').classList.remove('hidden');
+  document.getElementById('panel-route').classList.add('hidden');
+  searchPanel.classList.remove('hidden');
+  btnAddress.classList.add('active');
+  btnRoute.classList.remove('active');
 }
 
+// Affiche le panel itinéraire, cache le panel adresse
 function setRouteMode() {
-    document.getElementById('panel-route').classList.remove('hidden');
-    document.getElementById('panel-address').classList.add('hidden');
-    searchPanel.classList.remove('hidden');
-    btnRoute.classList.add('active');
-    btnAddress.classList.remove('active');
+  document.getElementById('panel-route').classList.remove('hidden');
+  document.getElementById('panel-address').classList.add('hidden');
+  searchPanel.classList.remove('hidden');
+  btnRoute.classList.add('active');
+  btnAddress.classList.remove('active');
 }
 
-// --- Géolocalisation ---
+// Branche les boutons de géolocalisation sur chaque champ.
+// Au clic : récupère la position GPS et remplit le champ via reverse géocodage
 function attachGeolocate() {
-    const geoButtons = [
-        { btn: "geolocate-point", input: "point-start" },
-        { btn: "geolocate-start", input: "route-start" },
-        { btn: "geolocate-end",   input: "route-end"   }
-    ];
+  const geoButtons = [
+    { btn: "geolocate-point", input: "point-start" },
+    { btn: "geolocate-start", input: "route-start" },
+    { btn: "geolocate-end",   input: "route-end"   }
+  ];
 
-    geoButtons.forEach(({ btn, input }) => {
-        const buttonEl = document.getElementById(btn);
-        const inputEl  = document.getElementById(input);
-        if (!buttonEl || !inputEl) return;
+  geoButtons.forEach(({ btn, input }) => {
+    const buttonEl = document.getElementById(btn);
+    const inputEl  = document.getElementById(input);
+    if (!buttonEl || !inputEl) return;
 
-        buttonEl.addEventListener("click", async () => {
-            if (!navigator.geolocation) {
-                alert("La géolocalisation n'est pas supportée par ce navigateur.");
-                return;
-            }
-            navigator.geolocation.getCurrentPosition(async pos => {
-                const { latitude, longitude } = pos.coords;
-                inputEl.value = "Recherche de l'adresse...";
-                const address = await reverseGeocode(latitude, longitude);
-                if (!address) {
-                    alert("Impossible de récupérer l'adresse.");
-                    inputEl.value = "";
-                    return;
-                }
-                inputEl.value = address;
-            }, err => {
-                alert("Impossible de récupérer la position : " + err.message);
-            });
-        });
+    buttonEl.addEventListener("click", async () => {
+      if (!navigator.geolocation) {
+        alert("La géolocalisation n'est pas supportée par ce navigateur.");
+        return;
+      }
+      navigator.geolocation.getCurrentPosition(async pos => {
+        const { latitude, longitude } = pos.coords;
+        inputEl.value = "Recherche de l'adresse...";
+        const address = await reverseGeocode(latitude, longitude);
+        if (!address) {
+          alert("Impossible de récupérer l'adresse.");
+          inputEl.value = "";
+          return;
+        }
+        inputEl.value = address;
+      }, err => {
+        alert("Impossible de récupérer la position : " + err.message);
+      });
     });
+  });
 }
 
-// --- Valider point unique ---
+// Validation point unique : géocode l'adresse, place un marqueur, centre la vue.
+// TODO : interroger les couches actives pour ce point et afficher les valeurs d'exposition
 document.getElementById("calc-point-btn").addEventListener("click", async () => {
-    routingLayer.clearLayers();
+  routingLayer.clearLayers();
 
-    const pointInput = document.getElementById("point-start").value.trim();
-    if (!pointInput) { alert("Veuillez saisir une adresse"); return; }
+  const pointInput = document.getElementById("point-start").value.trim();
+  if (!pointInput) { alert("Veuillez saisir une adresse"); return; }
 
-    const coords = await geocodeAddress(pointInput);
-    if (!coords) { alert("Adresse introuvable"); return; }
+  const coords = await geocodeAddress(pointInput);
+  if (!coords) { alert("Adresse introuvable"); return; }
 
-    const latLng = L.latLng(coords[1], coords[0]);
-    L.marker(latLng).addTo(routingLayer).bindPopup("Point sélectionné").openPopup();
-    map.setView(latLng, 16);
+  const latLng = L.latLng(coords[1], coords[0]);
+  L.marker(latLng).addTo(routingLayer).bindPopup("Point sélectionné").openPopup();
+  map.setView(latLng, 16);
 
-    // TODO : récupérer les valeurs des couches pour ce point
-    console.log("[POINT] Coordonnées :", { lat: coords[1], lon: coords[0] });
+  console.log("[POINT] Coordonnées :", { lat: coords[1], lon: coords[0] });
 });
 
-// --- Valider itinéraire ---
+// Validation itinéraire : géocode départ et arrivée, trace la route piétonne.
+// TODO : échantillonner des points le long de la polyligne et interroger les
+// couches actives pour calculer l'exposition moyenne sur le trajet
 document.getElementById("calc-route-btn").addEventListener("click", async () => {
-    routingLayer.clearLayers();
+  routingLayer.clearLayers();
 
-    const routeStart = document.getElementById("route-start").value.trim();
-    const routeEnd   = document.getElementById("route-end").value.trim();
-    if (!routeStart) { alert("Veuillez saisir une adresse de départ"); return; }
+  const routeStart = document.getElementById("route-start").value.trim();
+  const routeEnd   = document.getElementById("route-end").value.trim();
+  if (!routeStart) { alert("Veuillez saisir une adresse de départ"); return; }
 
-    const startCoords = await geocodeAddress(routeStart);
-    if (!startCoords) { alert("Adresse de départ introuvable"); return; }
-    const startLatLng = L.latLng(startCoords[1], startCoords[0]);
-    L.marker(startLatLng).addTo(routingLayer).bindPopup("Départ").openPopup();
+  const startCoords = await geocodeAddress(routeStart);
+  if (!startCoords) { alert("Adresse de départ introuvable"); return; }
+  const startLatLng = L.latLng(startCoords[1], startCoords[0]);
+  L.marker(startLatLng).addTo(routingLayer).bindPopup("Départ").openPopup();
 
-    if (!routeEnd) { map.setView(startLatLng, 16); return; }
+  if (!routeEnd) { map.setView(startLatLng, 16); return; }
 
-    const endCoords = await geocodeAddress(routeEnd);
-    if (!endCoords) { alert("Adresse d'arrivée introuvable"); return; }
-    const endLatLng = L.latLng(endCoords[1], endCoords[0]);
-    L.marker(endLatLng).addTo(routingLayer).bindPopup("Arrivée");
+  const endCoords = await geocodeAddress(routeEnd);
+  if (!endCoords) { alert("Adresse d'arrivée introuvable"); return; }
+  const endLatLng = L.latLng(endCoords[1], endCoords[0]);
+  L.marker(endLatLng).addTo(routingLayer).bindPopup("Arrivée");
 
-    const routeCoords = await getRoute(startCoords, endCoords);
-    if (!routeCoords) { alert("Impossible de calculer l'itinéraire"); return; }
+  const routeCoords = await getRoute(startCoords, endCoords);
+  if (!routeCoords) { alert("Impossible de calculer l'itinéraire"); return; }
 
-    const latLngs = routeCoords.map(c => [c[1], c[0]]);
-    const routeLine = L.polyline(latLngs, { color: "red", weight: 4 }).addTo(routingLayer);
-    map.fitBounds(routeLine.getBounds(), { padding: [50, 50] });
+  const latLngs   = routeCoords.map(c => [c[1], c[0]]);
+  const routeLine = L.polyline(latLngs, { color: "red", weight: 4 }).addTo(routingLayer);
+  map.fitBounds(routeLine.getBounds(), { padding: [50, 50] });
 
-    // TODO : récupérer les valeurs des couches le long de cette ligne
-    console.log("[ITINÉRAIRE] Coordonnées :", routeCoords);
+  console.log("[ITINÉRAIRE] Coordonnées :", routeCoords);
 });
 
-// --- Init ---
-setAddressMode();
-attachGeolocate();
-
-btnAddress.addEventListener("click", setAddressMode);
-btnRoute.addEventListener("click", setRouteMode);
-
-// =============================================
-// AUTOCOMPLÉTION ADRESSE
-// =============================================
+// Autocomplétion : affiche des suggestions pendant la frappe (délai 250ms).
+// Appelle l'API géocodage avec limit=50, filtre côté client sur les bounds métropole.
 function attachAutocomplete(inputId) {
   const input = document.getElementById(inputId);
   if (!input) return;
 
-  // Crée la liste de suggestions
+  // Crée la liste de suggestions et l'accroche au parent du champ
   const list = document.createElement('ul');
   list.className = 'autocomplete-list hidden';
   input.parentNode.style.position = 'relative';
@@ -490,55 +531,52 @@ function attachAutocomplete(inputId) {
   let debounceTimer;
 
   input.addEventListener('input', () => {
-      clearTimeout(debounceTimer);
-      const query = input.value.trim();
+    clearTimeout(debounceTimer);
+    const query = input.value.trim();
 
-      if (query.length < 3) { list.classList.add('hidden'); return; }
+    if (query.length < 3) { list.classList.add('hidden'); return; }          // Pas de recherche sous 3 caractères
 
-      debounceTimer = setTimeout(async () => {
-        const res = await fetch(`https://data.geopf.fr/geocodage/search?q=${encodeURIComponent(query)}&limit=50`);
-        const data = await res.json();
-        
-        list.innerHTML = '';
-        if (!data.features || data.features.length === 0) { list.classList.add('hidden'); return; }
-        
-        // Filtre uniquement les résultats dans les bounds de la métropole
-        const filtered = data.features.filter(f => {
-            const [lon, lat] = f.geometry.coordinates;
-            return lat >= 45.45 && lat <= 46.00 && lon >= 4.65 && lon <= 5.25;
+    debounceTimer = setTimeout(async () => {                                  // Délai anti-spam avant d'appeler l'API
+      const res  = await fetch(`https://data.geopf.fr/geocodage/search?q=${encodeURIComponent(query)}&limit=50`);
+      const data = await res.json();
+
+      list.innerHTML = '';
+      if (!data.features || data.features.length === 0) { list.classList.add('hidden'); return; }
+
+      // Filtre les résultats hors bounds de la métropole de Lyon
+      const filtered = data.features.filter(f => {
+        const [lon, lat] = f.geometry.coordinates;
+        return lat >= 45.45 && lat <= 46.00 && lon >= 4.65 && lon <= 5.25;
+      });
+
+      if (filtered.length === 0) { list.classList.add('hidden'); return; }
+
+      filtered.forEach(f => {                                                 // Crée un <li> par suggestion
+        const li = document.createElement('li');
+        li.textContent = f.properties.label;
+        li.addEventListener('mousedown', () => {                              // mousedown avant blur pour que le clic se déclenche
+          input.value = f.properties.label;
+          list.classList.add('hidden');
         });
-        
-        if (filtered.length === 0) { list.classList.add('hidden'); return; }
-        
-        filtered.forEach(f => {
-            const li = document.createElement('li');
-            li.textContent = f.properties.label;
-            li.addEventListener('mousedown', () => {
-                input.value = f.properties.label;
-                list.classList.add('hidden');
-            });
-            list.appendChild(li);
-        });
-        
-        list.classList.remove('hidden');
-      }, 250);
+        list.appendChild(li);
+      });
+
+      list.classList.remove('hidden');
+    }, 250);
   });
 
+  // Délai de 150ms pour laisser le mousedown se déclencher avant de cacher
   input.addEventListener('blur', () => {
-      setTimeout(() => list.classList.add('hidden'), 150);
+    setTimeout(() => list.classList.add('hidden'), 150);
   });
 }
 
-// Attache l'autocomplétion sur les 3 inputs
+// Initialisation au chargement
+setAddressMode();
+attachGeolocate();
 attachAutocomplete('point-start');
 attachAutocomplete('route-start');
 attachAutocomplete('route-end');
 
-// =============================================
-// TOGGLE LAYERS PANEL
-// =============================================
-document.getElementById("layers-toggle")
-    .addEventListener("click", () => {
-        document.getElementById("layers-panel")
-        .classList.toggle("hidden");
-    });
+btnAddress.addEventListener("click", setAddressMode);
+btnRoute.addEventListener("click", setRouteMode);

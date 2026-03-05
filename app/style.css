@@ -1,12 +1,15 @@
 /* =============================================
-   POLICES
-   ============================================= */
+    POLICES
+    Import de la police Jost depuis Google Fonts
+    Utilisée sur toute l'interface
+    ============================================= */
 @import url('https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,100..900;1,100..900&display=swap');
 
 /* =============================================
-   BASE
-   ============================================= */
-/* HTML et BODY */
+    BASE
+    Reset des marges/paddings, mise en page
+    colonne pour empiler le bandeau + la carte
+    ============================================= */
 html, body {
     margin: 0;
     padding: 0;
@@ -17,19 +20,22 @@ html, body {
 }
 
 /* =============================================
-   UTILITAIRES
-   ============================================= */
+    UTILITAIRES
+    Classe générique .hidden utilisée par le JS
+    pour masquer/afficher les panels et couches
+    ============================================= */
 .hidden {
     display: none !important;
 }
 
 /* =============================================
-   POP-UP DE BIENVENUE
-   ============================================= */
-
-/* Overlay semi-transparent */
+    POP-UP DE BIENVENUE
+    Overlay plein écran semi-transparent +
+    boîte blanche centrée. Affichée au
+    chargement, fermée via le bouton ✖
+    ============================================= */
 #welcome-overlay {
-    display: none; /* caché par défaut, JS le rend visible */
+    display: none;
     position: fixed;
     top: 0;
     left: 0;
@@ -41,7 +47,6 @@ html, body {
     align-items: center;
 }
 
-/* Pop-up centrale */
 #welcome-popup {
     background: #fff;
     border-radius: 12px;
@@ -54,7 +59,6 @@ html, body {
     border-left: 4px solid #1A4E72;
 }
 
-/* Bouton de fermeture */
 #welcome-close {
     position: absolute;
     top: 12px;
@@ -70,14 +74,12 @@ html, body {
     color: #1A4E72;
 }
 
-/* Titre pop-up */
 #welcome-popup h2 {
     margin: 0 0 15px 0;
     font-size: 1.5rem;
     color: #1A4E72;
 }
 
-/* Texte pop-up */
 #welcome-popup p {
     font-size: 1rem;
     line-height: 1.6;
@@ -85,32 +87,31 @@ html, body {
 }
 
 /* =============================================
-   BANDEAU HAUT
-   ============================================= */
-/* Conteneur principal de la bannière */
+    BANDEAU HAUT
+    Barre fixe en haut de page avec logo
+    Cartozome à gauche et logo Léon Bérard
+    à droite
+    ============================================= */
 #top-banner {
     display: flex;
     align-items: center;
-    justify-content: space-between; 
+    justify-content: space-between;
     padding: 15px 20px;
     background-color: #FFFFFF;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    flex: 0 0 55px;
+    flex: 0 0 55px; /* hauteur fixe, ne s'étire pas */
 }
 
-/* Conteneur gauche : logo Cartozome + texte */
 #banner-left {
     display: flex;
     align-items: center;
     gap: 10px;
 }
 
-/* Logo Cartozome (gauche) */
 #banner-logo {
     height: 50px;
 }
 
-/* Texte Cartozome */
 #banner-left h1 {
     margin: 0;
     font-size: 1.8rem;
@@ -118,22 +119,26 @@ html, body {
     text-transform: uppercase;
 }
 
-/* Logo Centre Léon Bérard (droite) */
 #banner-logo-right {
     height: 50px;
 }
 
 /* =============================================
-   CONTENEUR PRINCIPAL
-   ============================================= */
+    CONTENEUR PRINCIPAL
+    Prend tout l'espace restant sous le bandeau.
+    Position relative pour ancrer les éléments
+    flottants (carte, panels, boutons)
+    ============================================= */
 #main-container {
     position: relative;
     flex: 1;
 }
 
 /* =============================================
-   CARTE
-   ============================================= */
+    CARTE LEAFLET
+    Occupe tout le conteneur principal.
+    z-index: 0 pour passer sous les panels
+    ============================================= */
 #map {
     position: absolute;
     inset: 0;
@@ -143,8 +148,10 @@ html, body {
 }
 
 /* =============================================
-   BOUTONS FLOTTANTS
-   ============================================= */
+    BOUTONS FLOTTANTS
+    Style de base partagé par le bouton couches
+    et les boutons Adresse/Itinéraire
+    ============================================= */
 .floating-btn {
     width: 44px;
     height: 44px;
@@ -157,9 +164,16 @@ html, body {
     margin-bottom: 10px;
 }
 
+.floating-btn:hover {
+background: #f5f5f5;
+}
 /* =============================================
-   ADRESSE / ITINERAIRE
-   ============================================= */
+    RECHERCHE : ADRESSE / ITINÉRAIRE
+    Conteneur positionné en haut à gauche.
+    Contient les deux boutons toggle (Adresse /
+    Itinéraire) et le panel de saisie qui
+    s'affiche en dessous
+    ============================================= */
 #search-controls {
     position: absolute;
     top: 20px;
@@ -170,11 +184,12 @@ html, body {
     gap: 8px;
 }
 
+/* Boutons Adresse / Itinéraire : style pill */
 .search-btn {
     width: auto !important;
     height: 36px !important;
     padding: 0 16px;
-    border-radius: 20px !important; /* bien rond */
+    border-radius: 20px !important;
     font-size: 0.82rem !important;
     font-weight: 600;
     font-family: 'Jost', sans-serif;
@@ -183,11 +198,13 @@ html, body {
     letter-spacing: 0.03em;
 }
 
+/* État actif du bouton sélectionné */
 .search-btn.active {
     background-color: #1A4E72;
     color: #fff;
 }
 
+/* Boîte blanche qui contient les champs de saisie */
 #search-panel {
     position: absolute;
     top: 46px;
@@ -199,11 +216,12 @@ html, body {
     box-shadow: 0 4px 20px rgba(0,0,0,0.15);
 }
 
+/* Champs de saisie d'adresse */
 #search-panel input {
     width: 100%;
     padding: 10px 16px;
     margin-bottom: 8px;
-    border-radius: 24px; /* rond à la Google Maps */
+    border-radius: 24px;
     border: 1.5px solid #ddd;
     font-family: 'Jost', sans-serif;
     font-size: 0.85rem;
@@ -217,7 +235,9 @@ html, body {
     border-color: #1A4E72;
 }
 
-#search-panel button {
+/* Bouton Valider — s'applique à tous les boutons
+    du panel sauf .geolocate-btn (voir :not()) */
+#search-panel button:not(.geolocate-btn) {
     width: 100%;
     padding: 10px;
     background-color: #1A4E72;
@@ -233,14 +253,18 @@ html, body {
     transition: background 0.15s;
 }
 
-#search-panel button:hover {
+#search-panel button:not(.geolocate-btn):hover {
     background-color: #1A4E72;
     box-shadow: inset 0 0 0 1000px rgba(255,255,255,0.1);
 }
 
 /* =============================================
-   BOUTON GEOLOCALISATION
-   ============================================= */
+    BOUTON GÉOLOCALISATION
+    Petit bouton rond à droite du champ de
+    saisie. Remplit le champ avec l'adresse
+    correspondant à la position GPS de
+    l'utilisateur via l'API gouvernementale
+    ============================================= */
 .search-row {
     display: flex;
     align-items: center;
@@ -273,19 +297,16 @@ html, body {
 .geolocate-btn:hover {
     border-color: #1A4E72;
     background: #f0f5fa;
-    color: #1A4E72;
-}
-
-.geolocate-btn:active {
-    background: #1A4E72;
-    color: white;
-    border-color: #1A4E72;
 }
 
 /* =============================================
-   AUTOCOMPLÉTION
-   ============================================= */
-   .autocomplete-list {
+    AUTOCOMPLÉTION
+    Liste déroulante qui apparaît sous le champ
+    de saisie pendant la frappe. Les suggestions
+    viennent de l'API géocodage gouvernementale,
+    filtrées sur les bounds de la métropole de Lyon
+    ============================================= */
+.autocomplete-list {
     position: absolute;
     top: calc(100% + 4px);
     left: 0;
@@ -319,20 +340,22 @@ html, body {
 }
 
 /* =============================================
-   COUCHES
-   ============================================= */
+    SÉLECTEUR DE COUCHES
+    Bouton flottant en haut à droite qui ouvre
+    le panneau de sélection des couches
+    ============================================= */
 #layers-control {
     position: fixed;
     top: 95px;
     right: 10px;
-    bottom: auto;
     z-index: 1000;
 }
 
+/* Panneau scrollable contenant les groupes
+    de couches (Air, Pollen, Bruit, UV) */
 #layers-panel {
     position: absolute;
     top: 50px;
-    bottom: auto;
     right: 0;
     width: 200px;
     background: #f5f7f9;
@@ -344,8 +367,12 @@ html, body {
 }
 
 /* =============================================
-   GROUPES DE COUCHES
-   ============================================= */
+    GROUPES DE COUCHES
+    Chaque groupe est un accordéon : un header
+    cliquable (bleu foncé) qui affiche/masque
+    la liste des couches. Un seul groupe peut
+    être ouvert à la fois (géré dans main.js)
+    ============================================= */
 .layer-group {
     margin-bottom: 6px;
     border-radius: 8px;
@@ -353,12 +380,14 @@ html, body {
     border: 1px solid #dde4ea;
 }
 
+/* Header : bouton toggle + bouton ℹ */
 .layer-group-header {
     display: flex;
     align-items: stretch;
     background-color: #1A4E72;
 }
 
+/* Bouton toggle (titre de la catégorie) */
 .layer-group-toggle {
     flex: 1;
     display: flex;
@@ -388,8 +417,8 @@ html, body {
     object-fit: contain;
 }
 
+/* Chevron : tourne quand le groupe est fermé */
 .layer-group-toggle .chevron {
-    margin-left: 0;
     margin-right: 8px;
     font-size: 0.85rem;
     transition: transform 0.2s;
@@ -399,6 +428,7 @@ html, body {
     transform: rotate(-90deg);
 }
 
+/* Bouton ℹ : ouvre la popup d'information */
 .info-btn {
     background: none;
     border: none;
@@ -415,6 +445,7 @@ html, body {
     background-color: rgba(255,255,255,0.15);
 }
 
+/* Contenu du groupe (liste des couches) */
 .layer-group-content {
     background: #fff;
     padding: 4px 0;
@@ -425,8 +456,12 @@ html, body {
 }
 
 /* =============================================
-   ITEMS DE COUCHE
-   ============================================= */
+    ITEMS DE COUCHE
+    Chaque couche est un label cliquable avec
+    un toggle switch personnalisé (CSS only).
+    Une seule couche peut être active à la fois
+    (géré dans main.js)
+    ============================================= */
 .layer-group-content label {
     display: flex;
     align-items: center;
@@ -447,7 +482,7 @@ html, body {
     color: #1A4E72;
 }
 
-/* Toggle switch */
+/* Toggle switch (checkbox stylisée) */
 .layer-group-content input[type="checkbox"] {
     appearance: none;
     -webkit-appearance: none;
@@ -461,6 +496,7 @@ html, body {
     flex-shrink: 0;
 }
 
+/* Rond blanc du toggle */
 .layer-group-content input[type="checkbox"]::before {
     content: "";
     position: absolute;
@@ -474,6 +510,7 @@ html, body {
     box-shadow: 0 1px 3px rgba(0,0,0,0.3);
 }
 
+/* État coché : fond bleu + rond décalé à droite */
 .layer-group-content input[type="checkbox"]:checked {
     background-color: #1A4E72;
 }
@@ -483,8 +520,11 @@ html, body {
 }
 
 /* =============================================
-   SOUS-LABELS JOURNÉE / NUIT
-   ============================================= */
+    SOUS-LABELS JOURNÉE / NUIT
+    Séparateurs visuels dans la catégorie Bruit
+    pour distinguer les indicateurs Lden (jour)
+    et Ln (nuit)
+    ============================================= */
 .sublabel {
     margin: 4px 0 0 0;
     padding: 4px 12px;
@@ -495,10 +535,12 @@ html, body {
 }
 
 /* =============================================
-   POPUP D'INFORMATION
-   ============================================= */
-
-/* Overlay */
+    POPUP D'INFORMATION
+    Overlay + boîte blanche avec animation
+    d'entrée. Affichée au clic sur un bouton ℹ,
+    son contenu est injecté dynamiquement
+    depuis #info-contents par popups.js
+    ============================================= */
 #info-popup {
     display: none;
     position: fixed;
@@ -516,7 +558,6 @@ html, body {
     display: flex;
 }
 
-/* Boîte blanche */
 #popup-inner {
     background: #fff;
     border-radius: 12px;
@@ -529,7 +570,7 @@ html, body {
     animation: slideIn 0.2s ease;
 }
 
-/* Contenu scrollable */
+/* Zone de contenu scrollable */
 #popup-content {
     max-height: 60vh;
     overflow-y: auto;
@@ -546,12 +587,12 @@ html, body {
     border-radius: 3px;
 }
 
+/* Animation d'entrée de la popup */
 @keyframes slideIn {
     from { opacity: 0; transform: translateY(-10px); }
     to { opacity: 1; transform: translateY(0); }
 }
 
-/* Croix */
 #popup-close {
     position: absolute;
     top: 12px;
@@ -567,7 +608,7 @@ html, body {
     color: #1A4E72;
 }
 
-/* Titre avec logo */
+/* Titre de la popup avec icône de catégorie */
 #popup-content h3 {
     display: flex;
     align-items: center;
@@ -584,7 +625,6 @@ html, body {
     object-fit: contain;
 }
 
-/* Texte */
 #popup-content p,
 #popup-content ul,
 #popup-content li {
@@ -594,8 +634,10 @@ html, body {
 }
 
 /* =============================================
-   STYLES GÉNÉRAUX POUR TOUS LES CONTRÔLES
-   ============================================= */
+    CONTRÔLES LEAFLET — STYLES GLOBAUX
+    Override des styles natifs de Leaflet pour
+    harmoniser avec la charte graphique
+    ============================================= */
 .leaflet-control {
     font-family: 'Jost', sans-serif !important;
     font-weight: 500 !important;
@@ -603,15 +645,18 @@ html, body {
     color: #1A4E72 !important;
 }
 
-/* =============================================
-   BOUTONS ZOOM
-   ============================================= */
+/* Suppression des bordures natives Leaflet */
 .leaflet-control-zoom,
 .leaflet-control {
     border: none !important;
     box-shadow: none !important;
 }
 
+/* =============================================
+    BOUTONS ZOOM
+    Déplacés en bas à droite (au lieu du
+    comportement par défaut en haut à gauche)
+    ============================================= */
 .leaflet-top.leaflet-left .leaflet-control-zoom {
     position: fixed !important;
     bottom: 40px !important;
@@ -621,7 +666,6 @@ html, body {
     z-index: 1000;
 }
 
-/* Boutons + et - */
 .leaflet-control-zoom a {
     width: 32px !important;
     height: 32px !important;
@@ -647,8 +691,10 @@ html, body {
 }
 
 /* =============================================
-   ÉCHELLE
-   ============================================= */
+    ÉCHELLE
+    Barre d'échelle en bas à gauche,
+    stylisée pour correspondre à la charte
+    ============================================= */
 .leaflet-control-scale {
     background: rgba(255,255,255,0.9) !important;
     padding: 4px 8px !important;
@@ -657,10 +703,9 @@ html, body {
     font-family: 'Jost', sans-serif !important;
     font-size: 0.75rem !important;
     font-weight: 500 !important;
-    color: #1A4E72 !important; 
+    color: #1A4E72 !important;
 }
 
-/* Texte */
 .leaflet-control-scale-line {
     background: none !important;
     color: #1A4E72 !important;
@@ -669,8 +714,10 @@ html, body {
 }
 
 /* =============================================
-   CREDITS
-   ============================================= */
+    CRÉDITS OPENSTREETMAP
+    Bandeau de crédits en bas à droite,
+    stylisé pour correspondre à la charte
+    ============================================= */
 .leaflet-control-attribution {
     background: rgba(255,255,255,0.9) !important;
     padding: 6px 10px !important;
@@ -682,7 +729,6 @@ html, body {
     color: #1A4E72 !important;
 }
 
-/* Liens dans les crédits */
 .leaflet-control-attribution a {
     color: #1A4E72 !important;
     text-decoration: none !important;
