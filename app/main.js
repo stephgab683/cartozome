@@ -55,6 +55,8 @@ function markerIcon(templateId) {
 }
 
 const iconPoint   = markerIcon('tpl-marker-point');   // Pin bleu, point unique
+const iconCompareA = markerIcon('tpl-marker-compare-a'); // Pin vert, point A comparaison
+const iconCompareB = markerIcon('tpl-marker-compare-b'); // Pin rouge, point B comparaison
 const iconDepart  = markerIcon('tpl-marker-depart');  // Pin vert, départ itinéraire
 const iconArrivee = markerIcon('tpl-marker-arrivee'); // Pin rouge, arrivée itinéraire
 
@@ -436,35 +438,51 @@ async function getRoute(start, end) {
   }
 }
 
-
 // =============================================
-// RECHERCHE : ADRESSE / ITINÉRAIRE
-// Deux modes gérés par toggle de classes .hidden
+// RECHERCHE : ADRESSE / COMPARAISON / ITINÉRAIRE
+// Trois modes gérés par toggle de classes .hidden
 // sur les panels définis dans le HTML.
 // Comprend : affichage des panels, géolocalisation,
 // autocomplétion et validation des formulaires.
+// setAddressMode / setCompareMode / setRouteMode
 // =============================================
 
 const btnAddress  = document.getElementById("btn-address");
-const btnRoute    = document.getElementById("btn-route");
+const btnCompare = document.getElementById("btn-compare");
+const btnRoute = document.getElementById("btn-route");
 const searchPanel = document.getElementById("search-panel");
 
-// Affiche le panel adresse, cache le panel itinéraire
+// Affiche le panel adresse, cache les autres
 function setAddressMode() {
   document.getElementById('panel-address').classList.remove('hidden');
+  document.getElementById('panel-compare').classList.add('hidden');
   document.getElementById('panel-route').classList.add('hidden');
   searchPanel.classList.remove('hidden');
   btnAddress.classList.add('active');
+  btnCompare.classList.remove('active');
   btnRoute.classList.remove('active');
 }
 
-// Affiche le panel itinéraire, cache le panel adresse
+// Affiche le panel comparaison, cache les autres
+function setCompareMode() {
+  document.getElementById('panel-compare').classList.remove('hidden');
+  document.getElementById('panel-address').classList.add('hidden');
+  document.getElementById('panel-route').classList.add('hidden');
+  searchPanel.classList.remove('hidden');
+  btnCompare.classList.add('active');
+  btnAddress.classList.remove('active');
+  btnRoute.classList.remove('active');
+}
+
+// Affiche le panel itinéraire, cache les autres
 function setRouteMode() {
   document.getElementById('panel-route').classList.remove('hidden');
   document.getElementById('panel-address').classList.add('hidden');
+  document.getElementById('panel-compare').classList.add('hidden');
   searchPanel.classList.remove('hidden');
   btnRoute.classList.add('active');
   btnAddress.classList.remove('active');
+  btnCompare.classList.remove('active');
 }
 
 // Branche les boutons de géolocalisation sur chaque champ.
@@ -472,6 +490,8 @@ function setRouteMode() {
 function attachGeolocate() {
   const geoButtons = [
     { btn: "geolocate-point", input: "point-start" },
+    { btn: "geolocate-compare-a", input: "compare-a" },
+    { btn: "geolocate-compare-b", input: "compare-b" },
     { btn: "geolocate-start", input: "route-start" },
     { btn: "geolocate-end",   input: "route-end"   }
   ];
@@ -519,6 +539,37 @@ document.getElementById("calc-point-btn").addEventListener("click", async () => 
   map.setView(latLng, 16);
 
   console.log("[POINT] Coordonnées :", { lat: coords[1], lon: coords[0] });
+});
+
+// Validation comparaison : géocode les deux points et place deux marqueurs.
+// TODO : interroger les couches actives pour chaque point et afficher
+// les valeurs d'exposition en comparaison dans le panel de résultats
+document.getElementById("calc-compare-btn").addEventListener("click", async () => {
+  routingLayer.clearLayers();
+
+  const inputA = document.getElementById("compare-a").value.trim();
+  const inputB = document.getElementById("compare-b").value.trim();
+  if (!inputA) { alert("Veuillez saisir le Point A"); return; }
+  if (!inputB) { alert("Veuillez saisir le Point B"); return; }
+
+  const coordsA = await geocodeAddress(inputA);
+  if (!coordsA) { alert("Point A introuvable"); return; }
+
+  const coordsB = await geocodeAddress(inputB);
+  if (!coordsB) { alert("Point B introuvable"); return; }
+
+  const latLngA = L.latLng(coordsA[1], coordsA[0]);
+  const latLngB = L.latLng(coordsB[1], coordsB[0]);
+
+  L.marker(latLngA, { icon: iconCompareA }).addTo(routingLayer).bindPopup("Point A").openPopup();
+  L.marker(latLngB, { icon: iconCompareB }).addTo(routingLayer).bindPopup("Point B");
+
+  // Centre la vue pour afficher les deux points
+  const bounds = L.latLngBounds([latLngA, latLngB]);
+  map.fitBounds(bounds, { padding: [80, 80] });
+
+  console.log("[COMPARAISON] Point A :", { lat: coordsA[1], lon: coordsA[0] });
+  console.log("[COMPARAISON] Point B :", { lat: coordsB[1], lon: coordsB[0] });
 });
 
 // Validation itinéraire : géocode départ et arrivée, trace la route piétonne.
@@ -612,8 +663,11 @@ function attachAutocomplete(inputId) {
 setAddressMode();
 attachGeolocate();
 attachAutocomplete('point-start');
+attachAutocomplete('compare-a');
+attachAutocomplete('compare-b');
 attachAutocomplete('route-start');
 attachAutocomplete('route-end');
 
 btnAddress.addEventListener("click", setAddressMode);
+btnCompare.addEventListener("click", setCompareMode);
 btnRoute.addEventListener("click", setRouteMode);
