@@ -205,6 +205,11 @@ const GEOSERVER_URL = "http://localhost:8081/geoserver/wms";
 const GEOSERVER_WFS = "http://localhost:8081/geoserver/wfs";
 
 // =============================================
+// ÉCHELLE LEAFLET
+// =============================================
+L.control.scale({ position: 'bottomleft', imperial: false }).addTo(map);
+
+// =============================================
 // GESTION DES COUCHES (WMS + WFS)
 // =============================================
 const layerInstances = {};
@@ -251,20 +256,23 @@ document.querySelectorAll('.layer-checkbox').forEach(checkbox => {
   const layerName = checkbox.dataset.layer;
   const isWFS = checkbox.dataset.type === "wfs";
 
-  if (checkbox.checked) {
-    initLayer(layerName, isWFS).then(layer => {
-      layerInstances[layerName] = layer;
-      map.addLayer(layer);
-    }).catch(err => console.error(err));
-  }
-
   checkbox.addEventListener('change', async function () {
-    if (this.checked) {
-      if (!layerInstances[layerName]) layerInstances[layerName] = await initLayer(layerName, isWFS);
-      map.addLayer(layerInstances[layerName]);
-    } else {
-      if (layerInstances[layerName]) map.removeLayer(layerInstances[layerName]);
-    }
+      if (this.checked) {
+          // Décoche et retire toutes les autres couches
+          document.querySelectorAll('.layer-checkbox').forEach(async other => {
+              if (other !== this && other.checked) {
+                  other.checked = false;
+                  if (layerInstances[other.dataset.layer]) {
+                      map.removeLayer(layerInstances[other.dataset.layer]);
+                  }
+              }
+          });
+
+          if (!layerInstances[layerName]) layerInstances[layerName] = await initLayer(layerName, isWFS);
+          map.addLayer(layerInstances[layerName]);
+      } else {
+          if (layerInstances[layerName]) map.removeLayer(layerInstances[layerName]);
+      }
   });
 });
 
@@ -272,17 +280,23 @@ document.querySelectorAll('.layer-checkbox').forEach(checkbox => {
 // ACCORDÉON COUCHES
 // =============================================
 document.querySelectorAll('.layer-group-toggle').forEach(btn => {
-    btn.addEventListener('click', () => {
-        const content = btn.closest('.layer-group').querySelector('.layer-group-content');
-        content.classList.toggle('hidden');
-        btn.classList.toggle('closed');
-    });
-});
+  btn.addEventListener('click', () => {
+      const clickedGroup = btn.closest('.layer-group');
+      const clickedContent = clickedGroup.querySelector('.layer-group-content');
+      const isOpen = !clickedContent.classList.contains('hidden');
 
-// =============================================
-// ÉCHELLE LEAFLET
-// =============================================
-L.control.scale({ position: 'bottomleft', imperial: false }).addTo(map);
+      // Ferme tous les groupes
+      document.querySelectorAll('.layer-group').forEach(group => {
+          group.querySelector('.layer-group-content').classList.add('hidden');
+          group.querySelector('.layer-group-toggle').classList.add('closed');
+      });
+
+      // Ouvre uniquement le groupe cliqué si il était fermé
+      if (isOpen) return;
+      clickedContent.classList.remove('hidden');
+      btn.classList.remove('closed');
+  });
+});
 
 // =============================================
 // COUCHE RÉSULTATS (marqueurs + trajet)
@@ -352,6 +366,24 @@ const btnAddress  = document.getElementById("btn-address");
 const btnRoute    = document.getElementById("btn-route");
 const searchPanel = document.getElementById("search-panel");
 
+// --- Affichage des panels ---
+function setAddressMode() {
+    document.getElementById('panel-address').classList.remove('hidden');
+    document.getElementById('panel-route').classList.add('hidden');
+    searchPanel.classList.remove('hidden');
+    btnAddress.classList.add('active');
+    btnRoute.classList.remove('active');
+}
+
+function setRouteMode() {
+    document.getElementById('panel-route').classList.remove('hidden');
+    document.getElementById('panel-address').classList.add('hidden');
+    searchPanel.classList.remove('hidden');
+    btnRoute.classList.add('active');
+    btnAddress.classList.remove('active');
+}
+
+// --- Géolocalisation ---
 function attachGeolocate() {
     const geoButtons = [
         { btn: "geolocate-point", input: "point-start" },
@@ -386,91 +418,121 @@ function attachGeolocate() {
     });
 }
 
-function attachExposomeBtn() {
-    const exposomeBtn = document.getElementById("calc-exposome-btn");
-    if (!exposomeBtn) return;
+// --- Valider point unique ---
+document.getElementById("calc-point-btn").addEventListener("click", async () => {
+    routingLayer.clearLayers();
 
-    exposomeBtn.addEventListener("click", async () => {
-        console.log("Calcul exposome lancé ✅");
-        routingLayer.clearLayers();
+    const pointInput = document.getElementById("point-start").value.trim();
+    if (!pointInput) { alert("Veuillez saisir une adresse"); return; }
 
-        const pointInput = document.getElementById("point-start")?.value.trim();
-        const routeStart = document.getElementById("route-start")?.value.trim();
-        const routeEnd   = document.getElementById("route-end")?.value.trim();
+    const coords = await geocodeAddress(pointInput);
+    if (!coords) { alert("Adresse introuvable"); return; }
 
-        // CAS 1 : POINT UNIQUE
-        if (pointInput) {
-            const coords = await geocodeAddress(pointInput);
-            if (!coords) { alert("Adresse introuvable"); return; }
-            const latLng = L.latLng(coords[1], coords[0]);
-            L.marker(latLng).addTo(routingLayer).bindPopup("Point sélectionné").openPopup();
-            map.setView(latLng, 16);
-            return;
-        }
+    const latLng = L.latLng(coords[1], coords[0]);
+    L.marker(latLng).addTo(routingLayer).bindPopup("Point sélectionné").openPopup();
+    map.setView(latLng, 16);
 
-        // CAS 2 : ITINÉRAIRE
-        if (!routeStart) { alert("Veuillez saisir une adresse de départ"); return; }
+    // TODO : récupérer les valeurs des couches pour ce point
+    console.log("[POINT] Coordonnées :", { lat: coords[1], lon: coords[0] });
+});
 
-        const startCoords = await geocodeAddress(routeStart);
-        if (!startCoords) { alert("Adresse de départ introuvable"); return; }
-        const startLatLng = L.latLng(startCoords[1], startCoords[0]);
-        L.marker(startLatLng).addTo(routingLayer).bindPopup("Départ").openPopup();
+// --- Valider itinéraire ---
+document.getElementById("calc-route-btn").addEventListener("click", async () => {
+    routingLayer.clearLayers();
 
-        if (!routeEnd) { map.setView(startLatLng, 16); return; }
+    const routeStart = document.getElementById("route-start").value.trim();
+    const routeEnd   = document.getElementById("route-end").value.trim();
+    if (!routeStart) { alert("Veuillez saisir une adresse de départ"); return; }
 
-        const endCoords = await geocodeAddress(routeEnd);
-        if (!endCoords) { alert("Adresse d'arrivée introuvable"); return; }
-        const endLatLng = L.latLng(endCoords[1], endCoords[0]);
-        L.marker(endLatLng).addTo(routingLayer).bindPopup("Arrivée");
+    const startCoords = await geocodeAddress(routeStart);
+    if (!startCoords) { alert("Adresse de départ introuvable"); return; }
+    const startLatLng = L.latLng(startCoords[1], startCoords[0]);
+    L.marker(startLatLng).addTo(routingLayer).bindPopup("Départ").openPopup();
 
-        const routeCoords = await getRoute(startCoords, endCoords);
-        if (!routeCoords) { alert("Impossible de calculer l'itinéraire"); return; }
+    if (!routeEnd) { map.setView(startLatLng, 16); return; }
 
-        const latLngs = routeCoords.map(coord => [coord[1], coord[0]]);
-        const routeLine = L.polyline(latLngs, { color: "red", weight: 4 }).addTo(routingLayer);
-        map.fitBounds(routeLine.getBounds(), { padding: [50, 50] });
-    });
-}
+    const endCoords = await geocodeAddress(routeEnd);
+    if (!endCoords) { alert("Adresse d'arrivée introuvable"); return; }
+    const endLatLng = L.latLng(endCoords[1], endCoords[0]);
+    L.marker(endLatLng).addTo(routingLayer).bindPopup("Arrivée");
 
-function setAddressMode() {
-    searchPanel.innerHTML = `
-        <div class="search-row">
-            <input type="text" id="point-start" placeholder="Entrer une adresse">
-            <button class="geolocate-btn" id="geolocate-point">📍</button>
-        </div>
-        <button id="calc-exposome-btn">Valider</button>
-    `;
-    searchPanel.classList.remove("hidden");
-    btnAddress.classList.add("active");
-    btnRoute.classList.remove("active");
-    attachGeolocate();
-    attachExposomeBtn();
-}
+    const routeCoords = await getRoute(startCoords, endCoords);
+    if (!routeCoords) { alert("Impossible de calculer l'itinéraire"); return; }
 
-function setRouteMode() {
-    searchPanel.innerHTML = `
-        <div class="search-row">
-            <input type="text" id="route-start" placeholder="Départ">
-            <button class="geolocate-btn" id="geolocate-start">📍</button>
-        </div>
-        <div class="search-row">
-            <input type="text" id="route-end" placeholder="Arrivée">
-            <button class="geolocate-btn" id="geolocate-end">📍</button>
-        </div>
-        <button id="calc-exposome-btn">Valider</button>
-    `;
-    searchPanel.classList.remove("hidden");
-    btnRoute.classList.add("active");
-    btnAddress.classList.remove("active");
-    attachGeolocate();
-    attachExposomeBtn();
-}
+    const latLngs = routeCoords.map(c => [c[1], c[0]]);
+    const routeLine = L.polyline(latLngs, { color: "red", weight: 4 }).addTo(routingLayer);
+    map.fitBounds(routeLine.getBounds(), { padding: [50, 50] });
 
-// Mode adresse sélectionné par défaut au chargement
+    // TODO : récupérer les valeurs des couches le long de cette ligne
+    console.log("[ITINÉRAIRE] Coordonnées :", routeCoords);
+});
+
+// --- Init ---
 setAddressMode();
+attachGeolocate();
 
 btnAddress.addEventListener("click", setAddressMode);
 btnRoute.addEventListener("click", setRouteMode);
+
+// =============================================
+// AUTOCOMPLÉTION ADRESSE
+// =============================================
+function attachAutocomplete(inputId) {
+  const input = document.getElementById(inputId);
+  if (!input) return;
+
+  // Crée la liste de suggestions
+  const list = document.createElement('ul');
+  list.className = 'autocomplete-list hidden';
+  input.parentNode.style.position = 'relative';
+  input.parentNode.appendChild(list);
+
+  let debounceTimer;
+
+  input.addEventListener('input', () => {
+      clearTimeout(debounceTimer);
+      const query = input.value.trim();
+
+      if (query.length < 3) { list.classList.add('hidden'); return; }
+
+      debounceTimer = setTimeout(async () => {
+        const res = await fetch(`https://data.geopf.fr/geocodage/search?q=${encodeURIComponent(query)}&limit=50`);
+        const data = await res.json();
+        
+        list.innerHTML = '';
+        if (!data.features || data.features.length === 0) { list.classList.add('hidden'); return; }
+        
+        // Filtre uniquement les résultats dans les bounds de la métropole
+        const filtered = data.features.filter(f => {
+            const [lon, lat] = f.geometry.coordinates;
+            return lat >= 45.45 && lat <= 46.00 && lon >= 4.65 && lon <= 5.25;
+        });
+        
+        if (filtered.length === 0) { list.classList.add('hidden'); return; }
+        
+        filtered.forEach(f => {
+            const li = document.createElement('li');
+            li.textContent = f.properties.label;
+            li.addEventListener('mousedown', () => {
+                input.value = f.properties.label;
+                list.classList.add('hidden');
+            });
+            list.appendChild(li);
+        });
+        
+        list.classList.remove('hidden');
+      }, 250);
+  });
+
+  input.addEventListener('blur', () => {
+      setTimeout(() => list.classList.add('hidden'), 150);
+  });
+}
+
+// Attache l'autocomplétion sur les 3 inputs
+attachAutocomplete('point-start');
+attachAutocomplete('route-start');
+attachAutocomplete('route-end');
 
 // =============================================
 // TOGGLE LAYERS PANEL

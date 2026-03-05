@@ -30,18 +30,30 @@
             <div id="panel-address" class="hidden">
                 <div class="search-row">
                     <input type="text" id="point-start" placeholder="Entrer une adresse">
-                    <button class="geolocate-btn" id="geolocate-point">📍</button>
+                    <button class="geolocate-btn" id="geolocate-point">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M2 12L21 3L12 22L10 14L2 12Z"/>
+                      </svg>
+                    </button>
                 </div>
                 <button id="calc-point-btn">Valider</button>
             </div>
             <div id="panel-route" class="hidden">
                 <div class="search-row">
                     <input type="text" id="route-start" placeholder="Départ">
-                    <button class="geolocate-btn" id="geolocate-start">📍</button>
+                    <button class="geolocate-btn" id="geolocate-start">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M2 12L21 3L12 22L10 14L2 12Z"/>
+                      </svg>
+                    </button>
                 </div>
                 <div class="search-row">
                     <input type="text" id="route-end" placeholder="Arrivée">
-                    <button class="geolocate-btn" id="geolocate-end">📍</button>
+                    <button class="geolocate-btn" id="geolocate-end">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M2 12L21 3L12 22L10 14L2 12Z"/>
+                      </svg>
+                    </button>
                 </div>
                 <button id="calc-route-btn">Valider</button>
             </div>
@@ -68,9 +80,15 @@
               <button class="layer-group-toggle closed">
                 <span class="chevron">▾</span>
                 <img src="./img/air.png" alt="Air" class="cat-icon">
-                <span>Qualité de l'air</span>
+                <span>Air</span>
               </button>
-              <button class="info-btn" data-cat="cat-air">ℹ</button>
+              <button class="info-btn" data-cat="cat-air">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round">
+                  <circle cx="12" cy="12" r="10"/>
+                  <line x1="12" y1="11" x2="12" y2="17"/>
+                  <circle cx="12" cy="7.5" r="0.5" fill="white" stroke="white" stroke-width="1"/>
+                </svg>
+              </button>
             </div>
             <div class="layer-group-content hidden">
               <label><input type="checkbox" class="layer-checkbox" data-layer="cartozome:mod_aura_2024_pm10_moyan"> PM10</label>
@@ -88,7 +106,13 @@
                 <img src="./img/pollen.png" alt="Pollen" class="cat-icon">
                 <span>Pollen</span>
               </button>
-              <button class="info-btn" data-cat="cat-pollen">ℹ</button>
+              <button class="info-btn" data-cat="cat-pollen">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round">
+                  <circle cx="12" cy="12" r="10"/>
+                  <line x1="12" y1="11" x2="12" y2="17"/>
+                  <circle cx="12" cy="7.5" r="0.5" fill="white" stroke="white" stroke-width="1"/>
+                </svg>
+              </button>
             </div>
             <div class="layer-group-content hidden">
               <label><input type="checkbox" class="layer-checkbox" data-layer="cartozome:Ambroisie_2024_AURA"> Ambroisie</label>
@@ -103,7 +127,13 @@
                 <img src="./img/bruit.png" alt="Bruit" class="cat-icon">
                 <span>Bruit</span>
               </button>
-              <button class="info-btn" data-cat="cat-bruit">ℹ</button>
+              <button class="info-btn" data-cat="cat-bruit">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round">
+                  <circle cx="12" cy="12" r="10"/>
+                  <line x1="12" y1="11" x2="12" y2="17"/>
+                  <circle cx="12" cy="7.5" r="0.5" fill="white" stroke="white" stroke-width="1"/>
+                </svg>
+              </button>
             </div>
             <div class="layer-group-content hidden">
               <p class="sublabel">Journée</p>
@@ -126,7 +156,13 @@
                 <img src="./img/uv.png" alt="UV" class="cat-icon">
                 <span>UV</span>
               </button>
-              <button class="info-btn" data-cat="cat-uv">ℹ</button>
+              <button class="info-btn" data-cat="cat-uv">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round">
+                  <circle cx="12" cy="12" r="10"/>
+                  <line x1="12" y1="11" x2="12" y2="17"/>
+                  <circle cx="12" cy="7.5" r="0.5" fill="white" stroke="white" stroke-width="1"/>
+                </svg>
+              </button>
             </div>
             <div class="layer-group-content hidden">
               <label><input type="checkbox" class="layer-checkbox" data-layer="cartozome:uv_index">Index UV</label>

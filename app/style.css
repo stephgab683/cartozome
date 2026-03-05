@@ -17,6 +17,13 @@ html, body {
 }
 
 /* =============================================
+   UTILITAIRES
+   ============================================= */
+.hidden {
+    display: none !important;
+}
+
+/* =============================================
    POP-UP DE BIENVENUE
    ============================================= */
 
@@ -44,6 +51,7 @@ html, body {
     text-align: center;
     position: relative;
     box-shadow: 0 6px 30px rgba(0,0,0,0.25);
+    border-left: 4px solid #1A4E72;
 }
 
 /* Bouton de fermeture */
@@ -249,9 +257,9 @@ html, body {
     width: 36px !important;
     height: 36px !important;
     border-radius: 50% !important;
-    border: none;
+    border: 1.5px solid #e0e0e0;
     background: white;
-    box-shadow: none; /* supprime l'ombre */
+    color: #1A4E72;
     cursor: pointer;
     font-size: 14px;
     flex-shrink: 0;
@@ -259,10 +267,55 @@ html, body {
     align-items: center;
     justify-content: center;
     margin-bottom: 0 !important;
+    transition: border-color 0.2s, color 0.2s, background 0.2s;
 }
 
 .geolocate-btn:hover {
+    border-color: #1A4E72;
+    background: #f0f5fa;
+    color: #1A4E72;
+}
+
+.geolocate-btn:active {
     background: #1A4E72;
+    color: white;
+    border-color: #1A4E72;
+}
+
+/* =============================================
+   AUTOCOMPLÉTION
+   ============================================= */
+   .autocomplete-list {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    list-style: none;
+    margin: 0;
+    padding: 4px 0;
+    z-index: 2000;
+    overflow: hidden;
+}
+
+.autocomplete-list li {
+    padding: 10px 16px;
+    font-size: 0.84rem;
+    color: #333;
+    cursor: pointer;
+    border-bottom: 1px solid #f0f0f0;
+    font-family: 'Jost', sans-serif;
+}
+
+.autocomplete-list li:last-child {
+    border-bottom: none;
+}
+
+.autocomplete-list li:hover {
+    background: #f0f5fa;
+    color: #1A4E72;
 }
 
 /* =============================================
@@ -281,10 +334,10 @@ html, body {
     top: 50px;
     bottom: auto;
     right: 0;
-    width: 240px;
+    width: 200px;
     background: #f5f7f9;
     border-radius: 12px;
-    padding: 8px;
+    padding: 10px;
     box-shadow: 0 4px 20px rgba(0,0,0,0.15);
     max-height: 70vh;
     overflow-y: auto;
@@ -442,6 +495,105 @@ html, body {
 }
 
 /* =============================================
+   POPUP D'INFORMATION
+   ============================================= */
+
+/* Overlay */
+#info-popup {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    z-index: 2000;
+    justify-content: center;
+    align-items: center;
+}
+
+#info-popup.visible {
+    display: flex;
+}
+
+/* Boîte blanche */
+#popup-inner {
+    background: #fff;
+    border-radius: 12px;
+    padding: 30px 40px;
+    max-width: 500px;
+    width: 90%;
+    position: relative;
+    box-shadow: 0 6px 30px rgba(0,0,0,0.25);
+    border-left: 4px solid #1A4E72;
+    animation: slideIn 0.2s ease;
+}
+
+/* Contenu scrollable */
+#popup-content {
+    max-height: 60vh;
+    overflow-y: auto;
+    padding-right: 6px;
+    margin-top: 10px;
+}
+
+#popup-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+#popup-content::-webkit-scrollbar-thumb {
+    background-color: #1A4E72;
+    border-radius: 3px;
+}
+
+@keyframes slideIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Croix */
+#popup-close {
+    position: absolute;
+    top: 12px;
+    right: 14px;
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    color: #888;
+}
+
+#popup-close:hover {
+    color: #1A4E72;
+}
+
+/* Titre avec logo */
+#popup-content h3 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 12px 0;
+    font-size: 1rem;
+    color: #1A4E72;
+    font-weight: 700;
+}
+
+#popup-content h3 img {
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
+}
+
+/* Texte */
+#popup-content p,
+#popup-content ul,
+#popup-content li {
+    font-size: 0.85rem;
+    line-height: 1.8;
+    color: #444;
+}
+
+/* =============================================
    STYLES GÉNÉRAUX POUR TOUS LES CONTRÔLES
    ============================================= */
 .leaflet-control {
@@ -544,103 +696,4 @@ html, body {
 
 .leaflet-control-attribution a:hover {
     text-decoration: underline !important;
-}
-
-/* =============================================
-   POPUP D'INFORMATION
-   ============================================= */
-
-/* Overlay */
-#info-popup {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.5);
-    z-index: 2000;
-    justify-content: center;
-    align-items: center;
-}
-
-#info-popup.visible {
-    display: flex;
-}
-
-/* Boîte blanche */
-#popup-inner {
-    background: #fff;
-    border-radius: 12px;
-    padding: 30px 40px;
-    max-width: 500px;
-    width: 90%;
-    position: relative;
-    box-shadow: 0 6px 30px rgba(0,0,0,0.25);
-    border-left: 4px solid #1A4E72;
-    animation: slideIn 0.2s ease;
-}
-
-/* Contenu scrollable */
-#popup-content {
-    max-height: 60vh;
-    overflow-y: auto;
-    padding-right: 6px;
-    margin-top: 10px;
-}
-
-#popup-content::-webkit-scrollbar {
-    width: 6px;
-}
-
-#popup-content::-webkit-scrollbar-thumb {
-    background-color: #1A4E72;
-    border-radius: 3px;
-}
-
-@keyframes slideIn {
-    from { opacity: 0; transform: translateY(-10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-/* Croix */
-#popup-close {
-    position: absolute;
-    top: 12px;
-    right: 14px;
-    background: none;
-    border: none;
-    font-size: 1.2rem;
-    cursor: pointer;
-    color: #888;
-}
-
-#popup-close:hover {
-    color: #1A4E72;
-}
-
-/* Titre avec logo */
-#popup-content h3 {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin: 0 0 12px 0;
-    font-size: 1rem;
-    color: #1A4E72;
-    font-weight: 700;
-}
-
-#popup-content h3 img {
-    width: 20px;
-    height: 20px;
-    object-fit: contain;
-}
-
-/* Texte */
-#popup-content p,
-#popup-content ul,
-#popup-content li {
-    font-size: 0.85rem;
-    line-height: 1.8;
-    color: #444;
 }
