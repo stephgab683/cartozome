@@ -188,9 +188,21 @@
             <!-- Déclenche le géocodage départ/arrivée et trace l'itinéraire sur la carte -->
             <button id="calc-route-btn">Valider</button>
           </div>
-
         </div>
       </div>
+
+      <!-- ================================ -->
+      <!-- PANEL DE RÉSULTATS               -->
+      <!-- S'affiche sous le panel de       -->
+      <!-- recherche après validation.      -->
+      <!-- Contenu injecté par main.js      -->
+      <!-- selon le mode actif.             -->
+      <!-- ================================ -->
+      <div id="results-panel" class="hidden">
+        <button id="results-close">✖</button>
+        <div id="results-content"></div>
+      </div>
+
       
       <!-- ================================ -->
       <!-- SÉLECTEUR DE COUCHES             -->
@@ -313,10 +325,10 @@
           </div>
       
           <!-- ---- CATÉGORIE : UV ---- -->
-          <!-- Couche WMS : index UV                          -->
-          <!-- Valeur dynamique récupérée depuis un JSON      -->
+          <!-- Couche WMS : index UV                                 -->
+          <!-- Valeur dynamique récupérée depuis un JSON             -->
           <!-- servi par Caddy : /data/openmeteo_uv_meteofrance.json -->
-          <!-- Mise à jour quotidienne par Météo-France       -->
+          <!-- Mise à jour quotidienne par Météo-France              -->
           <div class="layer-group">
             <div class="layer-group-header">
               <button class="layer-group-toggle closed">

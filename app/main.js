@@ -20,7 +20,7 @@ const map = L.map('map', {
   maxBoundsViscosity: 1.0,                                                   // Empêche de sortir des bounds
   minZoom:            10,
   maxZoom:            18,
-}).setView([45.757295, 4.832391], 11);                                       // Vue initiale centrée sur Lyon
+}).fitBounds(METROPOLE_BOUNDS);                                      // Vue initiale centrée sur Lyon
 
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   attribution: '&copy; OpenStreetMap contributors'
@@ -439,6 +439,31 @@ async function getRoute(start, end) {
 }
 
 // =============================================
+// PANEL DE RÉSULTATS
+// S'affiche après validation d'une recherche
+// (point, comparaison, itinéraire).
+// Positionné dynamiquement sous le search-panel.
+// Fermé au clic sur la croix ou au changement
+// de mode.
+// =============================================
+const resultsPanel = document.getElementById("results-panel");
+
+// Positionne et affiche le panel sous le search-panel
+function openResultsPanel() {
+  const container   = document.getElementById("main-container");
+  const panel       = document.getElementById("search-panel");
+  const panelRect   = panel.getBoundingClientRect();
+  const contRect    = container.getBoundingClientRect();
+  resultsPanel.style.top = `${panelRect.bottom - contRect.top + 10}px`;
+  resultsPanel.classList.remove("hidden");
+}
+
+// Ferme le panel au clic sur la croix
+document.getElementById("results-close").addEventListener("click", () => {
+  resultsPanel.classList.add("hidden");
+});
+
+// =============================================
 // RECHERCHE : ADRESSE / COMPARAISON / ITINÉRAIRE
 // Trois modes gérés par toggle de classes .hidden
 // sur les panels définis dans le HTML.
@@ -461,6 +486,7 @@ function setAddressMode() {
   btnAddress.classList.add('active');
   btnCompare.classList.remove('active');
   btnRoute.classList.remove('active');
+  resultsPanel.classList.add("hidden");
 }
 
 // Affiche le panel comparaison, cache les autres
@@ -472,6 +498,7 @@ function setCompareMode() {
   btnCompare.classList.add('active');
   btnAddress.classList.remove('active');
   btnRoute.classList.remove('active');
+  resultsPanel.classList.add("hidden");
 }
 
 // Affiche le panel itinéraire, cache les autres
@@ -483,6 +510,7 @@ function setRouteMode() {
   btnRoute.classList.add('active');
   btnAddress.classList.remove('active');
   btnCompare.classList.remove('active');
+  resultsPanel.classList.add("hidden");
 }
 
 // Branche les boutons de géolocalisation sur chaque champ.
@@ -539,6 +567,7 @@ document.getElementById("calc-point-btn").addEventListener("click", async () => 
   map.setView(latLng, 16);
 
   console.log("[POINT] Coordonnées :", { lat: coords[1], lon: coords[0] });
+  openResultsPanel();
 });
 
 // Validation comparaison : géocode les deux points et place deux marqueurs.
@@ -570,6 +599,7 @@ document.getElementById("calc-compare-btn").addEventListener("click", async () =
 
   console.log("[COMPARAISON] Point A :", { lat: coordsA[1], lon: coordsA[0] });
   console.log("[COMPARAISON] Point B :", { lat: coordsB[1], lon: coordsB[0] });
+  openResultsPanel();
 });
 
 // Validation itinéraire : géocode départ et arrivée, trace la route piétonne.
@@ -602,6 +632,7 @@ document.getElementById("calc-route-btn").addEventListener("click", async () => 
   map.fitBounds(routeLine.getBounds(), { padding: [50, 50] });
 
   console.log("[ITINÉRAIRE] Coordonnées :", routeCoords);
+  openResultsPanel();
 });
 
 // Autocomplétion : affiche des suggestions pendant la frappe (délai 250ms).
@@ -671,3 +702,4 @@ attachAutocomplete('route-end');
 btnAddress.addEventListener("click", setAddressMode);
 btnCompare.addEventListener("click", setCompareMode);
 btnRoute.addEventListener("click", setRouteMode);
+

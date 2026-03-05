@@ -99,7 +99,7 @@ html, body {
     padding: 15px 20px;
     background-color: #FFFFFF;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    flex: 0 0 55px; /* hauteur fixe, ne s'étire pas */
+    flex: 0 0 55px;
 }
 
 #banner-left {
@@ -165,14 +165,14 @@ html, body {
 }
 
 .floating-btn:hover {
-background: #f5f5f5;
+    background: #f5f5f5;
 }
+
 /* =============================================
-    RECHERCHE : ADRESSE / ITINÉRAIRE
+    RECHERCHE : ADRESSE / COMPARAISON / ITINÉRAIRE
     Conteneur positionné en haut à gauche.
-    Contient les deux boutons toggle (Adresse /
-    Itinéraire) et le panel de saisie qui
-    s'affiche en dessous
+    Contient les trois boutons toggle et le
+    panel de saisie qui s'affiche en dessous
     ============================================= */
 #search-controls {
     position: absolute;
@@ -184,11 +184,11 @@ background: #f5f5f5;
     gap: 8px;
 }
 
-/* Boutons Adresse / Itinéraire : style pill */
+/* Boutons Où je suis / Comparer / Mon chemin : style pill */
 .search-btn {
     width: auto !important;
     height: 36px !important;
-    padding: 0 16px;
+    padding: 0 21px;
     border-radius: 20px !important;
     font-size: 0.82rem !important;
     font-weight: 600;
@@ -209,7 +209,7 @@ background: #f5f5f5;
     position: absolute;
     top: 46px;
     left: 0;
-    width: 300px;
+    width: 320px;
     background: white;
     border-radius: 16px;
     padding: 14px;
@@ -235,8 +235,7 @@ background: #f5f5f5;
     border-color: #1A4E72;
 }
 
-/* Bouton Valider — s'applique à tous les boutons
-    du panel sauf .geolocate-btn (voir :not()) */
+/* Bouton Valider */
 #search-panel button:not(.geolocate-btn) {
     width: 100%;
     padding: 10px;
@@ -340,6 +339,62 @@ background: #f5f5f5;
 }
 
 /* =============================================
+    PANEL DE RÉSULTATS
+    S'affiche sous le panel de recherche après
+    validation. Même style que les popups
+    d'information (bordure bleue, ombre, arrondi).
+    Contenu injecté dynamiquement par main.js
+    selon le mode actif (point, comparaison,
+    itinéraire)
+    ============================================= */
+#results-panel {
+    position: absolute;
+    top: 130px; /* sous les boutons + le search-panel — à ajuster selon le mode */
+    left: 20px;
+    width: 305px;
+    background: white;
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    border-left: 4px solid #1A4E72;
+    z-index: 1000;
+    max-height: 60vh;
+    overflow-y: auto;
+    animation: slideIn 0.2s ease;
+}
+
+#results-panel::-webkit-scrollbar {
+    width: 6px;
+}
+
+#results-panel::-webkit-scrollbar-thumb {
+    background-color: #1A4E72;
+    border-radius: 3px;
+}
+
+#results-close {
+    position: absolute;
+    top: 12px;
+    right: 14px;
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    color: #888;
+}
+
+#results-close:hover {
+    color: #1A4E72;
+}
+
+#results-content {
+    margin-top: 8px;
+    font-size: 0.85rem;
+    line-height: 1.8;
+    color: #444;
+}
+
+/* =============================================
     SÉLECTEUR DE COUCHES
     Bouton flottant en haut à droite qui ouvre
     le panneau de sélection des couches
@@ -351,8 +406,6 @@ background: #f5f5f5;
     z-index: 1000;
 }
 
-/* Panneau scrollable contenant les groupes
-    de couches (Air, Pollen, Bruit, UV) */
 #layers-panel {
     position: absolute;
     top: 50px;
@@ -380,14 +433,12 @@ background: #f5f5f5;
     border: 1px solid #dde4ea;
 }
 
-/* Header : bouton toggle + bouton ℹ */
 .layer-group-header {
     display: flex;
     align-items: stretch;
     background-color: #1A4E72;
 }
 
-/* Bouton toggle (titre de la catégorie) */
 .layer-group-toggle {
     flex: 1;
     display: flex;
@@ -417,7 +468,6 @@ background: #f5f5f5;
     object-fit: contain;
 }
 
-/* Chevron : tourne quand le groupe est fermé */
 .layer-group-toggle .chevron {
     margin-right: 8px;
     font-size: 0.85rem;
@@ -428,7 +478,6 @@ background: #f5f5f5;
     transform: rotate(-90deg);
 }
 
-/* Bouton ℹ : ouvre la popup d'information */
 .info-btn {
     background: none;
     border: none;
@@ -445,7 +494,6 @@ background: #f5f5f5;
     background-color: rgba(255,255,255,0.15);
 }
 
-/* Contenu du groupe (liste des couches) */
 .layer-group-content {
     background: #fff;
     padding: 4px 0;
@@ -457,10 +505,6 @@ background: #f5f5f5;
 
 /* =============================================
     ITEMS DE COUCHE
-    Chaque couche est un label cliquable avec
-    un toggle switch personnalisé (CSS only).
-    Une seule couche peut être active à la fois
-    (géré dans main.js)
     ============================================= */
 .layer-group-content label {
     display: flex;
@@ -506,7 +550,6 @@ background: #f5f5f5;
     flex-shrink: 0;
 }
 
-/* Rond blanc du toggle */
 .layer-group-content input[type="checkbox"]::before {
     content: "";
     position: absolute;
@@ -520,7 +563,6 @@ background: #f5f5f5;
     box-shadow: 0 1px 3px rgba(0,0,0,0.3);
 }
 
-/* État coché : fond bleu + rond décalé à droite */
 .layer-group-content input[type="checkbox"]:checked {
     background-color: #1A4E72;
 }
@@ -531,9 +573,6 @@ background: #f5f5f5;
 
 /* =============================================
     SOUS-LABELS JOURNÉE / NUIT
-    Séparateurs visuels dans la catégorie Bruit
-    pour distinguer les indicateurs Lden (jour)
-    et Ln (nuit)
     ============================================= */
 .sublabel {
     margin: 4px 0 0 0;
@@ -546,10 +585,6 @@ background: #f5f5f5;
 
 /* =============================================
     POPUP D'INFORMATION
-    Overlay + boîte blanche avec animation
-    d'entrée. Affichée au clic sur un bouton ℹ,
-    son contenu est injecté dynamiquement
-    depuis #info-contents par popups.js
     ============================================= */
 #info-popup {
     display: none;
@@ -580,7 +615,6 @@ background: #f5f5f5;
     animation: slideIn 0.2s ease;
 }
 
-/* Zone de contenu scrollable */
 #popup-content {
     max-height: 60vh;
     overflow-y: auto;
@@ -597,7 +631,6 @@ background: #f5f5f5;
     border-radius: 3px;
 }
 
-/* Animation d'entrée de la popup */
 @keyframes slideIn {
     from { opacity: 0; transform: translateY(-10px); }
     to { opacity: 1; transform: translateY(0); }
@@ -618,7 +651,6 @@ background: #f5f5f5;
     color: #1A4E72;
 }
 
-/* Titre de la popup avec icône de catégorie */
 #popup-content h3 {
     display: flex;
     align-items: center;
@@ -645,8 +677,6 @@ background: #f5f5f5;
 
 /* =============================================
     CONTRÔLES LEAFLET — STYLES GLOBAUX
-    Override des styles natifs de Leaflet pour
-    harmoniser avec la charte graphique
     ============================================= */
 .leaflet-control {
     font-family: 'Jost', sans-serif !important;
@@ -655,7 +685,6 @@ background: #f5f5f5;
     color: #1A4E72 !important;
 }
 
-/* Suppression des bordures natives Leaflet */
 .leaflet-control-zoom,
 .leaflet-control {
     border: none !important;
@@ -664,8 +693,6 @@ background: #f5f5f5;
 
 /* =============================================
     BOUTONS ZOOM
-    Déplacés en bas à droite (au lieu du
-    comportement par défaut en haut à gauche)
     ============================================= */
 .leaflet-top.leaflet-left .leaflet-control-zoom {
     position: fixed !important;
@@ -702,8 +729,6 @@ background: #f5f5f5;
 
 /* =============================================
     ÉCHELLE
-    Barre d'échelle en bas à gauche,
-    stylisée pour correspondre à la charte
     ============================================= */
 .leaflet-control-scale {
     background: rgba(255,255,255,0.9) !important;
@@ -725,8 +750,6 @@ background: #f5f5f5;
 
 /* =============================================
     CRÉDITS OPENSTREETMAP
-    Bandeau de crédits en bas à droite,
-    stylisé pour correspondre à la charte
     ============================================= */
 .leaflet-control-attribution {
     background: rgba(255,255,255,0.9) !important;
