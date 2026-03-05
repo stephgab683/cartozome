@@ -298,7 +298,6 @@
           <!-- ---- CATÉGORIE : Bruit ---- -->
           <!-- Couches WMS : routier, ferroviaire, industriel (Lden/Ln) -->
           <!-- Couches WFS : aérien (Lden/Ln) — data-type="wfs"         -->
-          <!-- Lden = indicateur journée, Ln = indicateur nuit           -->
           <div class="layer-group">
             <div class="layer-group-header">
               <button class="layer-group-toggle closed">
@@ -315,15 +314,7 @@
               </button>
             </div>
             <div class="layer-group-content hidden">
-              <p class="sublabel">Journée</p>
-              <label><input type="checkbox" class="layer-checkbox" data-layer="cartozome:GL_Rte_Lden"> Routier</label>
-              <label><input type="checkbox" class="layer-checkbox" data-layer="cartozome:GL_Fer_Lden"> Ferroviaire</label>
-              <label><input type="checkbox" class="layer-checkbox" data-layer="cartozome:Indus_GL_E4_Lden"> Industriel</label>
-              <label><input type="checkbox" class="layer-checkbox" data-layer="cartozome:metropole-de-lyon_noi_carto_bruit.noiaerien2022_lden" data-type="wfs"> Aérien</label>
-              <p class="sublabel">Nuit</p>
-              <label><input type="checkbox" class="layer-checkbox" data-layer="cartozome:GL_Rte_Ln"> Routier</label>
-              <label><input type="checkbox" class="layer-checkbox" data-layer="cartozome:GL_Fer_Ln"> Ferroviaire</label>
-              <label><input type="checkbox" class="layer-checkbox" data-layer="cartozome:metropole-de-lyon_noi_carto_bruit.noiaerien2022_ln" data-type="wfs"> Aérien</label>
+              <label><input type="checkbox" class="layer-checkbox" data-layer="cartozome:sous_indice_multibruit_orhane_2023">Bruit</label>
             </div>
           </div>
       
@@ -348,7 +339,7 @@
               </button>
             </div>
             <div class="layer-group-content hidden">
-              <label><input type="checkbox" class="layer-checkbox" data-layer="cartozome:uv_index">Index UV</label>
+              <label><input type="checkbox" class="layer-checkbox" data-layer="uvLayer">Index UV</label>
             </div>
           </div>
 
