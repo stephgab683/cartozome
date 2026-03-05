@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="./style.css" />
   </head>
 
-    <!-- ============================================= -->
+  <!-- ============================================= -->
   <!-- TEMPLATES DES ICÔNES DE MARQUEURS            -->
   <!-- Point : pin bleu + rond blanc                -->
   <!-- Départ : pin vert + lettre A                 -->
@@ -191,7 +191,11 @@
           </div>
       
           <!-- ---- CATÉGORIE : Pollen ---- -->
-          <!-- Couche WMS : Ambroisie 2024  -->
+          <!-- Couche WMS disponible : Ambroisie 2024   -->
+          <!-- Couches à venir (flux WMS non disponible -->
+          <!-- pour l'instant) : Multi-taxons,          -->
+          <!-- Graminées, Olivier, Bouleau, Aulne,      -->
+          <!-- Armoise                                  -->
           <div class="layer-group">
             <div class="layer-group-header">
               <button class="layer-group-toggle closed">
@@ -208,7 +212,15 @@
               </button>
             </div>
             <div class="layer-group-content hidden">
+              <!-- Couche disponible -->
               <label><input type="checkbox" class="layer-checkbox" data-layer="cartozome:Ambroisie_2024_AURA"> Ambroisie</label>
+              <!-- Couches à venir — data-layer à renseigner quand le flux sera disponible -->
+              <label class="layer-disabled"><input type="checkbox" class="layer-checkbox" data-layer="" disabled> Multi-taxons</label>
+              <label class="layer-disabled"><input type="checkbox" class="layer-checkbox" data-layer="" disabled> Graminées</label>
+              <label class="layer-disabled"><input type="checkbox" class="layer-checkbox" data-layer="" disabled> Olivier</label>
+              <label class="layer-disabled"><input type="checkbox" class="layer-checkbox" data-layer="" disabled> Bouleau</label>
+              <label class="layer-disabled"><input type="checkbox" class="layer-checkbox" data-layer="" disabled> Aulne</label>
+              <label class="layer-disabled"><input type="checkbox" class="layer-checkbox" data-layer="" disabled> Armoise</label>
             </div>
           </div>
       

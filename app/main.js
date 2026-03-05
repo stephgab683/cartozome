@@ -169,6 +169,12 @@ const LAYER_LABELS = {
   "cartozome:mod_aura_2024_no2_moyan":   "NO2",
   "cartozome:mod_aura_2024_o3_somo35":   "O3 SOMO35",
   "cartozome:Ambroisie_2024_AURA":       "Ambroisie",
+  // Multi-taxons
+  // Graminées
+  // Olivier
+  // Bouleau
+  // Aulne
+  // Armoise
   "cartozome:GL_Fer_Lden":               "Bruit ferroviaire LDEN",
   "cartozome:GL_Fer_Ln":                 "Bruit ferroviaire LN",
   "cartozome:GL_Rte_Lden":               "Bruit routier LDEN",
@@ -183,6 +189,12 @@ const LAYER_UNITS = {
   "cartozome:mod_aura_2024_no2_moyan":   "µg/m³",
   "cartozome:mod_aura_2024_o3_somo35":   "µg/m³·j",
   "cartozome:Ambroisie_2024_AURA":       "grains/m³",
+  // Multi-taxons
+  // Graminées
+  // Olivier
+  // Bouleau
+  // Aulne
+  // Armoise
   "cartozome:GL_Fer_Lden":               "dB(A)",
   "cartozome:GL_Fer_Ln":                 "dB(A)",
   "cartozome:GL_Rte_Lden":               "dB(A)",

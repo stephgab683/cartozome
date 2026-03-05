@@ -482,6 +482,16 @@ background: #f5f5f5;
     color: #1A4E72;
 }
 
+/* Couches non encore disponibles */
+.layer-disabled {
+    opacity: 0.4;
+    cursor: not-allowed !important;
+}
+
+.layer-disabled input {
+    cursor: not-allowed !important;
+}
+
 /* Toggle switch (checkbox stylisée) */
 .layer-group-content input[type="checkbox"] {
     appearance: none;
