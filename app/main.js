@@ -27,58 +27,90 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 }).addTo(map);
 
 // =============================================
-// COMMUNES UV (GeoJSON servi par Caddy)
-// Endpoint : /DATA_API/communes_uv.geojson
+// COMMUNES UV 
 // =============================================
 
-const COMMUNES_UV_URL = "/DATA_API/communes_uv.geojson";
-
-function getUvColor(uv) {
-
-  if (uv === null || uv === undefined) return "#e0e0e0"; // gris (aucune donnée)
-
-  if (uv < 2) return "#8bc34a";       // faible
-  if (uv < 5) return "#ffeb3b";       // modéré
-  if (uv < 7) return "#ff9800";       // élevé
-  if (uv < 10) return "#f44336";      // très élevé
-  return "#9c27b0";                   // extrême
+function getColor(uv) {
+  return uv > 11 ? '#7e0023' :
+         uv > 8  ? '#ff0000' :
+         uv > 6  ? '#ff7f00' :
+         uv > 3  ? '#ffff00' :
+         uv > 1  ? '#00ff00' :
+                   '#a0ffa0';
 }
 
-function styleCommunes(feature) {
+// fetch("http://localhost:8000/uvCommunes")
+//   .then(res => res.json())
+//   .then(communesGeojson => {
 
-  const uv = feature.properties?.uv_max;
+//     L.geoJSON(communesGeojson, {
 
-  return {
-    fillColor: getUvColor(uv),
-    weight: 1,
-    opacity: 1,
-    color: "#555",
-    fillOpacity: 0.6
-  };
-}
+//       style: feature => ({
+//         fillColor: getColor(feature.properties.uv),
+//         weight: 1,
+//         color: "white",
+//         fillOpacity: 0.7
+//       }),
 
-async function loadCommunesUV() {
-  try {
-    const res = await fetch(COMMUNES_UV_URL, { cache: "no-store" });
-    if (!res.ok) throw new Error(`GeoJSON HTTP ${res.status}`);
-    const geojson = await res.json();
-    L.geoJSON(geojson, {
-      style: styleCommunes
-    }).addTo(map);
-    console.log("[UV COMMUNES] couche chargée");
-  } catch (err) {
-    console.error("[UV COMMUNES] erreur :", err);
-  }
-}
+//       onEachFeature: (feature, layer) => {
+//         layer.bindPopup(
+//           `<b>${feature.properties.nom}</b><br>UV: ${feature.properties.uv}`
+//         );
+//       }
+//     }).addTo(map);
+//   });
 
-loadCommunesUV();
+// // Barre d'échelle en bas à gauche (unités métriques uniquement)
+// L.control.scale({ position: 'bottomleft', imperial: false }).addTo(map);
 
-// Barre d'échelle en bas à gauche (unités métriques uniquement)
-L.control.scale({ position: 'bottomleft', imperial: false }).addTo(map);
-
-// LayerGroup qui accueille les marqueurs et la polyligne de l'itinéraire.
-// Effacé à chaque nouvelle recherche.
+// // LayerGroup qui accueille les marqueurs et la polyligne de l'itinéraire.
+// // Effacé à chaque nouvelle recherche.
 const routingLayer = L.layerGroup().addTo(map);
+
+let uvLayer = null; // variable globale pour la couche UV
+
+// Fonction pour récupérer les données UV et créer la couche GeoJSON
+async function loadUvLayer() {
+  const res = await fetch("http://localhost:8000/uvCommunes");
+  const communesGeojson = await res.json();
+
+  uvLayer = L.geoJSON(communesGeojson, {
+    style: feature => {
+      const uv = feature.properties.uv;
+      return {
+        fillColor: getColor(uv), // ta fonction pour définir la couleur selon l'UV
+        weight: 1,
+        color: "#555",
+        fillOpacity: 0.7
+      };
+    },
+    onEachFeature: (feature, layer) => {
+      layer.bindPopup(`Commune: ${feature.properties.nom}<br>UV: ${feature.properties.uv}`);
+    }
+  });
+
+  // Affichage initial si la checkbox est cochée
+  const checkbox = document.querySelector('.layer-checkbox[data-layer="uvLayer"]');
+  if (checkbox.checked) {
+    uvLayer.addTo(map);
+  }
+
+  // Listener pour la checkbox
+  checkbox.addEventListener('change', function() {
+    if (!uvLayer) return;
+    if (this.checked) {
+      uvLayer.addTo(map);
+    } else {
+      map.removeLayer(uvLayer);
+    }
+  });
+}
+
+// Charger la couche au démarrage
+loadUvLayer();
+
+
+
 
 // =============================================
 // ICÔNES MARQUEURS PERSONNALISÉES
@@ -139,35 +171,6 @@ L.TileLayer.BetterWMS = L.TileLayer.WMS.extend({
       .catch(err => show(err));
   },
 
-  // // Construit les paramètres WMS GetFeatureInfo
-  // // Adapte les paramètres i/j ou x/y selon la version WMS (1.1.1 vs 1.3.0)
-  // getFeatureInfoUrl: function (latlng) {
-  //   const point = this._map.latLngToContainerPoint(latlng, this._map.getZoom());
-  //   const size  = this._map.getSize();
-  //   const v     = this.wmsParams.version;
-
-  //   const params = {
-  //     request:       'GetFeatureInfo',
-  //     service:       'WMS',
-  //     srs:           'EPSG:4326',
-  //     styles:        this.wmsParams.styles,
-  //     transparent:   this.wmsParams.transparent,
-  //     version:       v,
-  //     format:        this.wmsParams.format,
-  //     bbox:          this._map.getBounds().toBBoxString(),
-  //     height:        size.y,
-  //     width:         size.x,
-  //     layers:        this.wmsParams.layers,
-  //     query_layers:  this.wmsParams.layers,
-  //     info_format:   'application/json',
-  //     feature_count: 1,
-  //   };
-
-  //   params[v === '1.3.0' ? 'i' : 'x'] = Math.round(point.x);
-  //   params[v === '1.3.0' ? 'j' : 'y'] = Math.round(point.y);
-
-  //   return this._url + L.Util.getParamString(params, this._url, true);
-  // },
 
   // Affiche la valeur numérique de la couche dans une popup Leaflet
   // Utilise LAYER_LABELS et LAYER_UNITS pour formater l'affichage
@@ -248,69 +251,66 @@ const LAYER_UNITS = {
 const GEOSERVER_URL = "http://localhost:8081/geoserver/wms";
 const GEOSERVER_WFS = "http://localhost:8081/geoserver/wfs";
 
-const layerInstances = {};                                                   // Cache des instances de couches déjà chargées
+// =============================================
+// GESTION DES COUCHES (WMS + WFS + UV)
+// Une seule couche active à la fois
+// =============================================
 
-// Crée une couche WMS avec support GetFeatureInfo (BetterWMS)
+const layerInstances = {}; // Cache des instances déjà initialisées
+
+// Raccourci pour créer une couche WMS avec BetterWMS
 function createWMSLayer(layerName) {
   return L.tileLayer.betterWms(GEOSERVER_URL, {
-    layers:      layerName,
+    layers: layerName,
     transparent: true,
-    format:      "image/png",
-    opacity:     0.7,
-    version:     "1.1.1",
+    format: "image/png",
+    opacity: 0.7,
+    version: "1.1.1",
   });
 }
 
-// Récupère les features WFS depuis GeoServer et crée un layer GeoJSON
-// Utilisé uniquement pour les couches bruit aérien (data-type="wfs")
+// Crée la couche WFS (GeoJSON) — uniquement pour les UV si tu veux remplacer par WFS plus tard
 async function createWFSLayer(layerName) {
   const params = new URLSearchParams({
-    service:      "WFS",
-    version:      "2.0.0",
-    request:      "GetFeature",
-    typeNames:    layerName,
+    service: "WFS",
+    version: "2.0.0",
+    request: "GetFeature",
+    typeNames: layerName,
     outputFormat: "application/json",
-    srsName:      "EPSG:4326"
+    srsName: "EPSG:4326"
   });
-
   const url = `${GEOSERVER_WFS}?${params}`;
-  console.log(`[WFS] Requête : ${url}`);
-
   const response = await fetch(url);
   if (!response.ok) throw new Error(`[WFS] Erreur HTTP ${response.status} pour ${layerName}`);
-
   const geojson = await response.json();
-  if (!geojson.features || geojson.features.length === 0) return L.geoJSON();
-
   return L.geoJSON(geojson, {
     style: { color: "#5b6eae", weight: 1.5, opacity: 0.9, fillColor: "#7f8c8d", fillOpacity: 0.4 }
   });
 }
 
-// Sélectionne WMS ou WFS selon le type de la couche
-async function initLayer(layerName, isWFS) {
+// Sélectionne le type de couche à initialiser
+async function initLayer(layerName, isWFS = false) {
+  if (layerName === "uvLayer") return uvLayer; // UV = GeoJSON local
   return isWFS ? await createWFSLayer(layerName) : createWMSLayer(layerName);
 }
 
-// Écoute les changements sur les checkboxes de couches.
-// Au cochage : retire toutes les autres couches, ajoute la nouvelle.
-// Au décochage : retire la couche de la carte.
+// Gestion des checkboxes : une seule couche active à la fois
 document.querySelectorAll('.layer-checkbox').forEach(checkbox => {
   const layerName = checkbox.dataset.layer;
-  const isWFS     = checkbox.dataset.type === "wfs";
+  const isWFS = checkbox.dataset.type === "wfs";
 
-  checkbox.addEventListener('change', async function () {
+  checkbox.addEventListener('change', async function() {
     if (this.checked) {
-      // Décoche et retire toutes les autres couches actives
+      // Décoche et retire toutes les autres couches
       document.querySelectorAll('.layer-checkbox').forEach(other => {
         if (other !== this && other.checked) {
           other.checked = false;
-          if (layerInstances[other.dataset.layer]) {
-            map.removeLayer(layerInstances[other.dataset.layer]);
-          }
+          const otherLayer = layerInstances[other.dataset.layer];
+          if (otherLayer) map.removeLayer(otherLayer);
         }
       });
-      // Initialise la couche si pas encore en cache, puis l'ajoute
+
+      // Initialise la couche si pas encore en cache
       if (!layerInstances[layerName]) layerInstances[layerName] = await initLayer(layerName, isWFS);
       map.addLayer(layerInstances[layerName]);
     } else {
@@ -318,6 +318,12 @@ document.querySelectorAll('.layer-checkbox').forEach(checkbox => {
     }
   });
 });
+
+// Affiche la couche UV si la checkbox est déjà cochée au chargement
+const uvCheckbox = document.querySelector('.layer-checkbox[data-layer="uvLayer"]');
+if (uvCheckbox && uvCheckbox.checked && uvLayer) {
+  map.addLayer(uvLayer);
+}
 
 // Accordéon : un seul groupe ouvert à la fois.
 // Cliquer sur un groupe ouvert le referme.
@@ -345,85 +351,6 @@ document.getElementById("layers-toggle").addEventListener("click", () => {
   document.getElementById("layers-panel").classList.toggle("hidden");
 });
 
-
-// =============================================
-// DONNÉES UV
-// Récupère chaque jour l'indice UV max depuis
-// un fichier JSON servi par Caddy.
-// Endpoint : /data/openmeteo_uv_meteofrance.json
-// Source : Météo-France via Open-Meteo
-// =============================================
-
-const UV_JSON_URL = "/data/openmeteo_uv_meteofrance.json";                   // URL du fichier JSON contenant les données UV
-
-// Récupère le JSON UV sans cache (données fraîches à chaque appel)
-async function fetchUvJson() {
-  const res = await fetch(UV_JSON_URL, { cache: "no-store" });               // Récupère le JSON sans utiliser le cache
-  if (!res.ok) throw new Error(`UV JSON HTTP ${res.status}`);                // Gère les erreurs HTTP
-  return res.json();                                                         // Retourne le JSON parsé
-}
-
-// Retourne le point UV le plus proche d'une coordonnée (distance euclidienne)
-function closestUvPoint(points, lat, lon) {
-  let best   = null;                                                         // Variable pour stocker le meilleur point
-  let bestD2 = Infinity;                                                     // Variable pour stocker la meilleure distance au carré
-  for (const p of points) {
-    const pLat = p?.latitude;                                                // Récupère la latitude du point
-    const pLon = p?.longitude;                                               // Récupère la longitude du point
-    if (typeof pLat !== "number" || typeof pLon !== "number") continue;      // Ignore si les coordonnées ne sont pas des nombres
-    const dLat = pLat - lat;                                                 // Calcule la différence de latitude
-    const dLon = pLon - lon;                                                 // Calcule la différence de longitude
-    const d2   = dLat * dLat + dLon * dLon;                                 // Calcule la distance au carré (euclidienne)
-    if (d2 < bestD2) { bestD2 = d2; best = p; }                             // Met à jour le meilleur point si distance plus petite
-  }
-  return best;                                                               // Retourne le point le plus proche
-}
-
-// Extrait l'indice UV max du jour depuis la structure Open-Meteo
-function extractUvMax(point) {
-  const uv = point?.daily?.uv_index_max?.[0];                               // Récupère l'indice UV max (peut être null)
-  return { uv };
-}
-
-// Met à jour l'élément #uv-status avec l'indice UV du point
-// le plus proche du centre visible de la carte
-async function updateUvFromMapCenter(map) {
-  try {
-    const points = await fetchUvJson();                                      // Récupère les points UV
-    const center = map.getCenter();                                          // Récupère le centre de la carte
-    const p      = closestUvPoint(points, center.lat, center.lng);          // Trouve le point UV le plus proche
-
-    if (!p) {                                                                // Si aucun point trouvé
-      console.warn("[UV] Aucun point UV trouvé dans le JSON.");
-      const el = document.getElementById("uv-status");
-      if (el) el.textContent = "Aucune donnée UV.";
-      return;
-    }
-
-    const { uv } = extractUvMax(p);                                         // Extrait la valeur UV max
-
-    console.log("[UV] Point le plus proche du centre:", {                   // Log les infos du point UV le plus proche
-      center: { lat: center.lat, lon: center.lng },
-      point:  { lat: p.latitude, lon: p.longitude, location_id: p.location_id ?? null },
-      uv_max: uv
-    });
-
-    const el = document.getElementById("uv-status");                        // Récupère l'élément DOM pour afficher le statut UV
-    if (el) {
-      el.textContent = (uv === null || uv === undefined)                    // Met à jour le texte en fonction de la valeur UV
-        ? `UV max : très faible`
-        : `UV max : ${uv}`;
-    }
-  } catch (err) {
-    console.error("[UV] Erreur de chargement UV:", err);                    // Log l'erreur
-    const el = document.getElementById("uv-status");
-    if (el) el.textContent = "Erreur de chargement des UV.";
-  }
-}
-
-// Charge les UV au démarrage puis à chaque déplacement de la carte
-updateUvFromMapCenter(map);
-map.on("moveend", () => updateUvFromMapCenter(map));
 
 
 // =============================================

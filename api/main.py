@@ -251,3 +251,77 @@ async def get_point_data(coord: Coord):
         data = await fetch_point_data(client, coord.latitude, coord.longitude)
     return data
 
+###############
+
+import asyncio
+import httpx
+from shapely.geometry import shape
+
+WFS_COMMUNES_URL = "https://data.grandlyon.com/geoserver/metropole-de-lyon/ows"
+UV_URL = "https://api.open-meteo.com/v1/forecast"
+
+# -------- récupération des communes --------
+async def fetch_communes():
+    params = {
+        "SERVICE": "WFS",
+        "VERSION": "2.0.0",
+        "REQUEST": "GetFeature",
+        "TYPENAME": "metropole-de-lyon:adr_voie_lieu.adrcomgl_2024",
+        "OUTPUTFORMAT": "application/json",
+        "SRSNAME": "EPSG:4326",
+        "startIndex": 0,
+        "count": 100
+    }
+
+    async with httpx.AsyncClient(timeout=30) as client:
+        r = await client.get(WFS_COMMUNES_URL, params=params)
+        r.raise_for_status()
+        return r.json()
+
+# -------- récupération UV avec retry --------
+async def get_uv(client, lat, lon, retries=3):
+    for _ in range(retries):
+        try:
+            r = await client.get(
+                UV_URL,
+                params={
+                    "latitude": lat,
+                    "longitude": lon,
+                    "current": "uv_index"
+                }
+            )
+            if r.status_code == 200:
+                uv = r.json().get("current", {}).get("uv_index")
+                if uv is not None:
+                    return uv
+        except Exception:
+            pass
+        await asyncio.sleep(0.5)
+    return None
+
+
+# -------- enrichissement des communes --------
+async def enrich_with_uv(communes_geojson):
+    async with httpx.AsyncClient(timeout=30) as client:
+        tasks = []
+
+        for feature in communes_geojson["features"]:
+            geom = shape(feature["geometry"])
+            lat, lon = geom.centroid.y, geom.centroid.x
+            tasks.append(get_uv(client, lat, lon))
+
+        uv_values = await asyncio.gather(*tasks)
+
+        for feature, uv in zip(communes_geojson["features"], uv_values):
+            feature["properties"]["uv"] = uv
+
+    return communes_geojson
+
+# -------- endpoint API --------
+@app.get("/uvCommunes")
+async def uv_communes():
+
+    communes = await fetch_communes()
+    communes_uv = await enrich_with_uv(communes)
+
+    return communes_uv
