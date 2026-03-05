@@ -61,6 +61,7 @@ Valeur guide OMS PM2.5 : 5 µg.m-3</abstract>
   <enabled>true</enabled>
   <metadata>
     <entry key="OTHER_SRS">EPSG:2154,CRS:84,EPSG:3857,EPSG:4326,EPSG:900913</entry>
+    <entry key="cachingEnabled">false</entry>
   </metadata>
   <store class="wmsStore">
     <id>WMSStoreInfoImpl--11320b8a:19c94ef6cfa:-7ffa</id>
@@ -69,7 +70,121 @@ Valeur guide OMS PM2.5 : 5 µg.m-3</abstract>
   <simpleConversionEnabled>false</simpleConversionEnabled>
   <internationalTitle/>
   <internationalAbstract/>
-  <forcedRemoteStyle></forcedRemoteStyle>
+  <forcedRemoteStyle>Style_pm25_dep_oms</forcedRemoteStyle>
   <preferredFormat>image/png</preferredFormat>
   <metadataBBoxRespected>false</metadataBBoxRespected>
+  <allAvailableRemoteStyles>
+    <style>
+      <name>moyan_pm25</name>
+      <format>sld</format>
+      <languageVersion>
+        <version>1.0.0</version>
+      </languageVersion>
+      <legend>
+        <width>20</width>
+        <height>20</height>
+        <format>image/png</format>
+        <onlineResource>https://sig.atmo-auvergnerhonealpes.fr/geoserver/mod_aura_region_2024/ows?service=WMS&amp;request=GetLegendGraphic&amp;format=image%2Fpng&amp;width=20&amp;height=20&amp;layer=mod_aura_2024_pm25_moyan</onlineResource>
+      </legend>
+      <metadata>
+        <entry key="isRemote">true</entry>
+      </metadata>
+    </style>
+    <style>
+      <name>moyan_pm25_vl2030</name>
+      <format>sld</format>
+      <languageVersion>
+        <version>1.0.0</version>
+      </languageVersion>
+      <legend>
+        <width>20</width>
+        <height>20</height>
+        <format>image/png</format>
+        <onlineResource>https://sig.atmo-auvergnerhonealpes.fr/geoserver/mod_aura_region_2024/ows?service=WMS&amp;request=GetLegendGraphic&amp;format=image%2Fpng&amp;width=20&amp;height=20&amp;layer=mod_aura_2024_pm25_moyan&amp;style=moyan_pm25_vl2030</onlineResource>
+      </legend>
+      <metadata>
+        <entry key="isRemote">true</entry>
+      </metadata>
+    </style>
+    <style>
+      <name>moyan_pm25_vl2030_boolean</name>
+      <format>sld</format>
+      <languageVersion>
+        <version>1.0.0</version>
+      </languageVersion>
+      <legend>
+        <width>20</width>
+        <height>20</height>
+        <format>image/png</format>
+        <onlineResource>https://sig.atmo-auvergnerhonealpes.fr/geoserver/mod_aura_region_2024/ows?service=WMS&amp;request=GetLegendGraphic&amp;format=image%2Fpng&amp;width=20&amp;height=20&amp;layer=mod_aura_2024_pm25_moyan&amp;style=moyan_pm25_vl2030_boolean</onlineResource>
+      </legend>
+      <metadata>
+        <entry key="isRemote">true</entry>
+      </metadata>
+    </style>
+    <style>
+      <name>moyan_pm25_oms_boolean</name>
+      <format>sld</format>
+      <languageVersion>
+        <version>1.0.0</version>
+      </languageVersion>
+      <legend>
+        <width>20</width>
+        <height>20</height>
+        <format>image/png</format>
+        <onlineResource>https://sig.atmo-auvergnerhonealpes.fr/geoserver/mod_aura_region_2024/ows?service=WMS&amp;request=GetLegendGraphic&amp;format=image%2Fpng&amp;width=20&amp;height=20&amp;layer=mod_aura_2024_pm25_moyan&amp;style=moyan_pm25_oms_boolean</onlineResource>
+      </legend>
+      <metadata>
+        <entry key="isRemote">true</entry>
+      </metadata>
+    </style>
+    <style>
+      <name>Style_pm25_dep_oms_lineaire</name>
+      <format>sld</format>
+      <languageVersion>
+        <version>1.0.0</version>
+      </languageVersion>
+      <legend>
+        <width>20</width>
+        <height>20</height>
+        <format>image/png</format>
+        <onlineResource>https://sig.atmo-auvergnerhonealpes.fr/geoserver/mod_aura_region_2024/ows?service=WMS&amp;request=GetLegendGraphic&amp;format=image%2Fpng&amp;width=20&amp;height=20&amp;layer=mod_aura_2024_pm25_moyan&amp;style=Style_pm25_dep_oms_lineaire</onlineResource>
+      </legend>
+      <metadata>
+        <entry key="isRemote">true</entry>
+      </metadata>
+    </style>
+    <style>
+      <name>moyan_pm25_boolean</name>
+      <format>sld</format>
+      <languageVersion>
+        <version>1.0.0</version>
+      </languageVersion>
+      <legend>
+        <width>20</width>
+        <height>20</height>
+        <format>image/png</format>
+        <onlineResource>https://sig.atmo-auvergnerhonealpes.fr/geoserver/mod_aura_region_2024/ows?service=WMS&amp;request=GetLegendGraphic&amp;format=image%2Fpng&amp;width=20&amp;height=20&amp;layer=mod_aura_2024_pm25_moyan&amp;style=moyan_pm25_boolean</onlineResource>
+      </legend>
+      <metadata>
+        <entry key="isRemote">true</entry>
+      </metadata>
+    </style>
+    <style>
+      <name>Style_pm25_dep_oms</name>
+      <format>sld</format>
+      <languageVersion>
+        <version>1.0.0</version>
+      </languageVersion>
+      <legend>
+        <width>20</width>
+        <height>20</height>
+        <format>image/png</format>
+        <onlineResource>https://sig.atmo-auvergnerhonealpes.fr/geoserver/styles/https://depot.atmo-aura.fr/modelisation//legendes/oms/legende_oms_pm25_reduit.png</onlineResource>
+      </legend>
+      <metadata>
+        <entry key="isRemote">true</entry>
+      </metadata>
+    </style>
+  </allAvailableRemoteStyles>
 </wmsLayer>

@@ -1,26 +1,15 @@
 /* =============================================
-   POLICES LOCALES
-   ============================================= */
-@font-face {
-    font-family: 'Jost';
-    src: url('./fonts/Jost-VariableFont_wght.woff2') format('woff2');
-    font-weight: 100 900;
-    font-style: normal;
-    font-display: swap;
-}
-
-@font-face {
-    font-family: 'Jost';
-    src: url('./fonts/Jost-Italic-VariableFont_wght.woff2') format('woff2');
-    font-weight: 100 900;
-    font-style: italic;
-    font-display: swap;
-}
+    POLICES
+    Import de la police Jost depuis Google Fonts
+    Utilisée sur toute l'interface
+    ============================================= */
+@import url('https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,100..900;1,100..900&display=swap');
 
 /* =============================================
-   BASE
-   ============================================= */
-/* HTML et BODY : flex colonne pour la page */
+    BASE
+    Reset des marges/paddings, mise en page
+    colonne pour empiler le bandeau + la carte
+    ============================================= */
 html, body {
     margin: 0;
     padding: 0;
@@ -31,12 +20,22 @@ html, body {
 }
 
 /* =============================================
-   POP-UP DE BIENVENUE
-   ============================================= */
+    UTILITAIRES
+    Classe générique .hidden utilisée par le JS
+    pour masquer/afficher les panels et couches
+    ============================================= */
+.hidden {
+    display: none !important;
+}
 
-/* Overlay semi-transparent */
+/* =============================================
+    POP-UP DE BIENVENUE
+    Overlay plein écran semi-transparent +
+    boîte blanche centrée. Affichée au
+    chargement, fermée via le bouton ✖
+    ============================================= */
 #welcome-overlay {
-    display: none; /* caché par défaut, JS le rend visible */
+    display: none;
     position: fixed;
     top: 0;
     left: 0;
@@ -48,7 +47,6 @@ html, body {
     align-items: center;
 }
 
-/* Pop-up centrale */
 #welcome-popup {
     background: #fff;
     border-radius: 12px;
@@ -58,9 +56,9 @@ html, body {
     text-align: center;
     position: relative;
     box-shadow: 0 6px 30px rgba(0,0,0,0.25);
+    border-left: 4px solid #1A4E72;
 }
 
-/* Bouton de fermeture */
 #welcome-close {
     position: absolute;
     top: 12px;
@@ -76,14 +74,12 @@ html, body {
     color: #1A4E72;
 }
 
-/* Titre pop-up */
 #welcome-popup h2 {
     margin: 0 0 15px 0;
     font-size: 1.5rem;
     color: #1A4E72;
 }
 
-/* Texte pop-up */
 #welcome-popup p {
     font-size: 1rem;
     line-height: 1.6;
@@ -91,32 +87,31 @@ html, body {
 }
 
 /* =============================================
-   BANDEAU HAUT
-   ============================================= */
-/* Conteneur principal de la bannière */
+    BANDEAU HAUT
+    Barre fixe en haut de page avec logo
+    Cartozome à gauche et logo Léon Bérard
+    à droite
+    ============================================= */
 #top-banner {
     display: flex;
     align-items: center;
-    justify-content: space-between; 
+    justify-content: space-between;
     padding: 15px 20px;
     background-color: #FFFFFF;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    flex: 0 0 70px;
+    flex: 0 0 55px; /* hauteur fixe, ne s'étire pas */
 }
 
-/* Conteneur gauche : logo Cartozome + texte */
 #banner-left {
     display: flex;
     align-items: center;
     gap: 10px;
 }
 
-/* Logo Cartozome (gauche) */
 #banner-logo {
     height: 50px;
 }
 
-/* Texte Cartozome */
 #banner-left h1 {
     margin: 0;
     font-size: 1.8rem;
@@ -124,104 +119,276 @@ html, body {
     text-transform: uppercase;
 }
 
-/* Logo Centre Léon Bérard (droite) */
 #banner-logo-right {
     height: 50px;
 }
 
 /* =============================================
-   CONTENEUR PRINCIPAL
-   ============================================= */
+    CONTENEUR PRINCIPAL
+    Prend tout l'espace restant sous le bandeau.
+    Position relative pour ancrer les éléments
+    flottants (carte, panels, boutons)
+    ============================================= */
 #main-container {
-    display: flex;
-    flex: 1;
-    min-height: 0;
-}
-
-/* =============================================
-   CARTE
-   ============================================= */
-/* Carte principale Leaflet */
-#map {
-    flex: 1;
-    min-height: 0;
     position: relative;
+    flex: 1;
 }
 
 /* =============================================
-   PANNEAU LATÉRAL
-   ============================================= */
-/* Conteneur du panneau des couches */
-#side-panel {
-    width: 280px;
-    background-color: #f8f8f8;
-    padding: 12px;
+    CARTE LEAFLET
+    Occupe tout le conteneur principal.
+    z-index: 0 pour passer sous les panels
+    ============================================= */
+#map {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+}
+
+/* =============================================
+    BOUTONS FLOTTANTS
+    Style de base partagé par le bouton couches
+    et les boutons Adresse/Itinéraire
+    ============================================= */
+.floating-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    border: none;
+    background: white;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+    cursor: pointer;
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
+.floating-btn:hover {
+background: #f5f5f5;
+}
+/* =============================================
+    RECHERCHE : ADRESSE / ITINÉRAIRE
+    Conteneur positionné en haut à gauche.
+    Contient les deux boutons toggle (Adresse /
+    Itinéraire) et le panel de saisie qui
+    s'affiche en dessous
+    ============================================= */
+#search-controls {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    z-index: 1000;
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+}
+
+/* Boutons Adresse / Itinéraire : style pill */
+.search-btn {
+    width: auto !important;
+    height: 36px !important;
+    padding: 0 16px;
+    border-radius: 20px !important;
+    font-size: 0.82rem !important;
+    font-weight: 600;
+    font-family: 'Jost', sans-serif;
+    color: #1A4E72;
+    margin-bottom: 0 !important;
+    letter-spacing: 0.03em;
+}
+
+/* État actif du bouton sélectionné */
+.search-btn.active {
+    background-color: #1A4E72;
+    color: #fff;
+}
+
+/* Boîte blanche qui contient les champs de saisie */
+#search-panel {
+    position: absolute;
+    top: 46px;
+    left: 0;
+    width: 300px;
+    background: white;
+    border-radius: 16px;
+    padding: 14px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+}
+
+/* Champs de saisie d'adresse */
+#search-panel input {
+    width: 100%;
+    padding: 10px 16px;
+    margin-bottom: 8px;
+    border-radius: 24px;
+    border: 1.5px solid #ddd;
+    font-family: 'Jost', sans-serif;
+    font-size: 0.85rem;
+    color: #333;
     box-sizing: border-box;
-    border-right: 1px solid #ddd;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+#search-panel input:focus {
+    border-color: #1A4E72;
+}
+
+/* Bouton Valider — s'applique à tous les boutons
+    du panel sauf .geolocate-btn (voir :not()) */
+#search-panel button:not(.geolocate-btn) {
+    width: 100%;
+    padding: 10px;
+    background-color: #1A4E72;
+    color: #fff;
+    border: none;
+    border-radius: 24px;
+    cursor: pointer;
+    font-family: 'Jost', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    transition: background 0.15s;
+}
+
+#search-panel button:not(.geolocate-btn):hover {
+    background-color: #1A4E72;
+    box-shadow: inset 0 0 0 1000px rgba(255,255,255,0.1);
+}
+
+/* =============================================
+    BOUTON GÉOLOCALISATION
+    Petit bouton rond à droite du champ de
+    saisie. Remplit le champ avec l'adresse
+    correspondant à la position GPS de
+    l'utilisateur via l'API gouvernementale
+    ============================================= */
+.search-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 8px;
+}
+
+.search-row input {
+    flex: 1;
+    margin-bottom: 0 !important;
+}
+
+.geolocate-btn {
+    width: 36px !important;
+    height: 36px !important;
+    border-radius: 50% !important;
+    border: 1.5px solid #e0e0e0;
+    background: white;
+    color: #1A4E72;
+    cursor: pointer;
+    font-size: 14px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0 !important;
+    transition: border-color 0.2s, color 0.2s, background 0.2s;
+}
+
+.geolocate-btn:hover {
+    border-color: #1A4E72;
+    background: #f0f5fa;
+}
+
+/* =============================================
+    AUTOCOMPLÉTION
+    Liste déroulante qui apparaît sous le champ
+    de saisie pendant la frappe. Les suggestions
+    viennent de l'API géocodage gouvernementale,
+    filtrées sur les bounds de la métropole de Lyon
+    ============================================= */
+.autocomplete-list {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    list-style: none;
+    margin: 0;
+    padding: 4px 0;
+    z-index: 2000;
+    overflow: hidden;
+}
+
+.autocomplete-list li {
+    padding: 10px 16px;
+    font-size: 0.84rem;
+    color: #333;
+    cursor: pointer;
+    border-bottom: 1px solid #f0f0f0;
+    font-family: 'Jost', sans-serif;
+}
+
+.autocomplete-list li:last-child {
+    border-bottom: none;
+}
+
+.autocomplete-list li:hover {
+    background: #f0f5fa;
+    color: #1A4E72;
+}
+
+/* =============================================
+    SÉLECTEUR DE COUCHES
+    Bouton flottant en haut à droite qui ouvre
+    le panneau de sélection des couches
+    ============================================= */
+#layers-control {
+    position: fixed;
+    top: 95px;
+    right: 10px;
+    z-index: 1000;
+}
+
+/* Panneau scrollable contenant les groupes
+    de couches (Air, Pollen, Bruit, UV) */
+#layers-panel {
+    position: absolute;
+    top: 50px;
+    right: 0;
+    width: 200px;
+    background: #f5f7f9;
+    border-radius: 12px;
+    padding: 10px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    max-height: 70vh;
     overflow-y: auto;
 }
 
 /* =============================================
-   ADRESSES
-   ============================================= */
-.input-and-button {
-    display: flex;
-    gap: 4px;
-    margin-top: 4px;
-    margin-bottom: 4px;
-}
-
-.input-and-button input[type="text"] {
-    flex: 1;
-    padding: 6px 10px;
-    border: 1px solid #dde4ea;
-    border-radius: 6px;
-    font-size: 0.84rem;
-    height: 36px;
-    box-sizing: border-box;
-    background-color: #fff;
-}
-
-.input-and-button button {
-    width: 36px;
-    height: 36px;
-    border-radius: 6px;
-    border: 1px solid #dde4ea;
-    background-color: #fff;
-    color: #1A4E72;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s ease;
-}
-
-.input-and-button button:hover {
-    background-color: #1A4E72;
-    color: #fff;
-    border-color: #1A4E72;
-}
-
-/* =============================================
-   CATÉGORIES (accordéon)
-   ============================================= */
-/* Conteneur d’une catégorie */
-.category {
+    GROUPES DE COUCHES
+    Chaque groupe est un accordéon : un header
+    cliquable (bleu foncé) qui affiche/masque
+    la liste des couches. Un seul groupe peut
+    être ouvert à la fois (géré dans main.js)
+    ============================================= */
+.layer-group {
     margin-bottom: 6px;
     border-radius: 8px;
     overflow: hidden;
     border: 1px solid #dde4ea;
 }
 
-/* Header de la catégorie : bouton + info */
-.category-header {
+/* Header : bouton toggle + bouton ℹ */
+.layer-group-header {
     display: flex;
     align-items: stretch;
     background-color: #1A4E72;
 }
 
-/* Bouton principal pour ouvrir/fermer la catégorie */
-.category-toggle {
+/* Bouton toggle (titre de la catégorie) */
+.layer-group-toggle {
     flex: 1;
     display: flex;
     align-items: center;
@@ -240,32 +407,29 @@ html, body {
     transition: background 0.15s;
 }
 
-/* Hover sur le bouton de catégorie */
-.category-toggle:hover {
+.layer-group-toggle:hover {
     background-color: rgba(255,255,255,0.1);
 }
 
-/* Icone dans le bouton catégorie */
-.category-toggle .cat-icon img {
-    width: 24px;  /* ou la taille que tu veux */
-    height: 24px;
+.layer-group-toggle .cat-icon {
+    width: 20px;
+    height: 20px;
     object-fit: contain;
 }
 
-/* Chevron de la catégorie */
-.category-toggle .chevron {
-    margin-left: auto;
+/* Chevron : tourne quand le groupe est fermé */
+.layer-group-toggle .chevron {
+    margin-right: 8px;
     font-size: 0.85rem;
     transition: transform 0.2s;
 }
 
-/* Rotation du chevron quand fermé */
-.category-toggle.closed .chevron {
+.layer-group-toggle.closed .chevron {
     transform: rotate(-90deg);
 }
 
-/* Bouton d’info ℹ️ */
-.category-info-btn {
+/* Bouton ℹ : ouvre la popup d'information */
+.info-btn {
     background: none;
     border: none;
     border-left: 1px solid rgba(255,255,255,0.2);
@@ -277,54 +441,49 @@ html, body {
     flex-shrink: 0;
 }
 
-.category-info-btn:hover {
+.info-btn:hover {
     background-color: rgba(255,255,255,0.15);
 }
 
-/* Conteneur des couches dans la catégorie */
-.category-layers {
+/* Contenu du groupe (liste des couches) */
+.layer-group-content {
     background: #fff;
     padding: 4px 0;
 }
 
-.category-layers.hidden {
+.layer-group-content.hidden {
     display: none;
 }
 
 /* =============================================
-   ITEMS DE COUCHE
-   ============================================= */
-/* Conteneur d’un item de couche */
-.layer-item {
-    padding: 8px 12px;
-    border-bottom: 1px solid #f0f0f0;
-}
-
-.layer-item:last-child {
-    border-bottom: none;
-}
-
-/* Label et checkbox */
-.layer-item label {
+    ITEMS DE COUCHE
+    Chaque couche est un label cliquable avec
+    un toggle switch personnalisé (CSS only).
+    Une seule couche peut être active à la fois
+    (géré dans main.js)
+    ============================================= */
+.layer-group-content label {
     display: flex;
     align-items: center;
     gap: 9px;
+    padding: 8px 12px;
     cursor: pointer;
     font-size: 0.84rem;
     color: #333;
     user-select: none;
+    border-bottom: 1px solid #f0f0f0;
 }
 
-/* Hover sur le label */
-.layer-item label:hover {
+.layer-group-content label:last-of-type {
+    border-bottom: none;
+}
+
+.layer-group-content label:hover {
     color: #1A4E72;
 }
 
-/* =============================================
-   TOGGLE SWITCH MODERNE (remplace checkbox)
-   ============================================= */
-
-.layer-item input[type="checkbox"] {
+/* Toggle switch (checkbox stylisée) */
+.layer-group-content input[type="checkbox"] {
     appearance: none;
     -webkit-appearance: none;
     width: 38px;
@@ -337,8 +496,8 @@ html, body {
     flex-shrink: 0;
 }
 
-/* Le petit rond */
-.layer-item input[type="checkbox"]::before {
+/* Rond blanc du toggle */
+.layer-group-content input[type="checkbox"]::before {
     content: "";
     position: absolute;
     width: 16px;
@@ -351,117 +510,174 @@ html, body {
     box-shadow: 0 1px 3px rgba(0,0,0,0.3);
 }
 
-/* Quand activé */
-.layer-item input[type="checkbox"]:checked {
+/* État coché : fond bleu + rond décalé à droite */
+.layer-group-content input[type="checkbox"]:checked {
     background-color: #1A4E72;
 }
 
-/* Déplacement du rond */
-.layer-item input[type="checkbox"]:checked::before {
+.layer-group-content input[type="checkbox"]:checked::before {
     transform: translateX(18px);
 }
 
 /* =============================================
-   SOUS-CATÉGORIES DANS BRUIT
-   ============================================= */
-/* Conteneur sous-catégorie */
-.subcategory {
-    margin: 2px 0 6px 0;
-    overflow: hidden;
-}
-
-/* Header sous-catégorie : bouton */
-.subcategory-header {
-    display: flex;
-    align-items: center;
+    SOUS-LABELS JOURNÉE / NUIT
+    Séparateurs visuels dans la catégorie Bruit
+    pour distinguer les indicateurs Lden (jour)
+    et Ln (nuit)
+    ============================================= */
+.sublabel {
+    margin: 4px 0 0 0;
+    padding: 4px 12px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #fff;
     background-color: #5dade2;
 }
 
-/* Bouton sous-catégorie */
-.subcategory-toggle {
-    flex: 1;
+/* =============================================
+    POPUP D'INFORMATION
+    Overlay + boîte blanche avec animation
+    d'entrée. Affichée au clic sur un bouton ℹ,
+    son contenu est injecté dynamiquement
+    depuis #info-contents par popups.js
+    ============================================= */
+#info-popup {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    z-index: 2000;
+    justify-content: center;
+    align-items: center;
+}
+
+#info-popup.visible {
+    display: flex;
+}
+
+#popup-inner {
+    background: #fff;
+    border-radius: 12px;
+    padding: 30px 40px;
+    max-width: 500px;
+    width: 90%;
+    position: relative;
+    box-shadow: 0 6px 30px rgba(0,0,0,0.25);
+    border-left: 4px solid #1A4E72;
+    animation: slideIn 0.2s ease;
+}
+
+/* Zone de contenu scrollable */
+#popup-content {
+    max-height: 60vh;
+    overflow-y: auto;
+    padding-right: 6px;
+    margin-top: 10px;
+}
+
+#popup-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+#popup-content::-webkit-scrollbar-thumb {
+    background-color: #1A4E72;
+    border-radius: 3px;
+}
+
+/* Animation d'entrée de la popup */
+@keyframes slideIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+#popup-close {
+    position: absolute;
+    top: 12px;
+    right: 14px;
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    color: #888;
+}
+
+#popup-close:hover {
+    color: #1A4E72;
+}
+
+/* Titre de la popup avec icône de catégorie */
+#popup-content h3 {
     display: flex;
     align-items: center;
-    gap: 6px;
-    padding: 8px 10px;
-    background: none;
-    color: #fff;
-    border: none;
-    cursor: pointer;
-    font-family: 'Jost', sans-serif;
-    font-size: 0.78rem;
-    font-weight: 600;
-    text-align: left;
-    transition: background 0.15s;
+    gap: 8px;
+    margin: 0 0 12px 0;
+    font-size: 1rem;
+    color: #1A4E72;
+    font-weight: 700;
 }
 
-.subcategory-toggle:hover {
-    background-color: rgba(255,255,255,0.15);
+#popup-content h3 img {
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
 }
 
-/* Chevron sous-catégorie */
-.subcategory-toggle .chevron {
-    margin-left: auto;
-    font-size: 0.75rem;
-    transition: transform 0.2s;
-}
-
-.subcategory-toggle.closed .chevron {
-    transform: rotate(-90deg);
-}
-
-/* Conteneur des couches dans sous-catégorie */
-.subcategory-layers {
-    background: #fefefe;
-    padding: 3px 0;
-}
-
-.subcategory-layers.hidden {
-    display: none;
-}
-
-/* Items dans sous-catégorie */
-.subcategory-layers .layer-item {
-    padding: 6px 12px;
-    border-bottom: 1px solid #f0f0f0;
-}
-
-.subcategory-layers .layer-item:last-child {
-    border-bottom: none;
+#popup-content p,
+#popup-content ul,
+#popup-content li {
+    font-size: 0.85rem;
+    line-height: 1.8;
+    color: #444;
 }
 
 /* =============================================
-   BOUTONS ZOOM
-   ============================================= */
-/* Zoom Leaflet */
+    CONTRÔLES LEAFLET — STYLES GLOBAUX
+    Override des styles natifs de Leaflet pour
+    harmoniser avec la charte graphique
+    ============================================= */
+.leaflet-control {
+    font-family: 'Jost', sans-serif !important;
+    font-weight: 500 !important;
+    font-size: 0.75rem !important;
+    color: #1A4E72 !important;
+}
+
+/* Suppression des bordures natives Leaflet */
 .leaflet-control-zoom,
 .leaflet-control {
     border: none !important;
     box-shadow: none !important;
 }
 
-/* Position des boutons */
-.leaflet-bottom.leaflet-right {
-    bottom: 20px;
-    right: 20px;
-    display: flex;
-    flex-direction: column-reverse;
-    gap: 10px;
-    position: absolute !important;
+/* =============================================
+    BOUTONS ZOOM
+    Déplacés en bas à droite (au lieu du
+    comportement par défaut en haut à gauche)
+    ============================================= */
+.leaflet-top.leaflet-left .leaflet-control-zoom {
+    position: fixed !important;
+    bottom: 40px !important;
+    right: 5px !important;
+    top: auto !important;
+    left: auto !important;
+    z-index: 1000;
 }
 
-/* Boutons + et - */
 .leaflet-control-zoom a {
+    width: 32px !important;
+    height: 32px !important;
     background: white !important;
-    color: #333 !important;
+    color: #1A4E72 !important;
     border: none !important;
-    width: 36px;
-    height: 36px;
     line-height: 36px;
     font-size: 18px;
     font-weight: 500;
     border-radius: 12px !important;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2) !important;
+    display: block;
     margin-bottom: 6px;
     transition: all 0.2s ease;
 }
@@ -475,90 +691,10 @@ html, body {
 }
 
 /* =============================================
-   POPUP D'INFORMATION
-   ============================================= */
-/* Conteneur popup */
-#info-popup {
-    display: none;
-    position: fixed;
-    top: 110px;
-    right: 16px;
-    z-index: 1000;
-    width: 320px;
-    max-width: 90vw;
-    background: #fff;
-    border-radius: 12px;
-    padding: 20px 24px;
-    box-shadow: 0 4px 24px rgba(0,0,0,0.15);
-    border-left: 4px solid #1A4E72;
-    animation: slideIn 0.2s ease;
-}
-
-/* Animation popup */
-@keyframes slideIn {
-    from { opacity: 0; transform: translateY(-10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-#info-popup.visible {
-    display: block;
-}
-
-/* Titre du popup */
-#popup-box h3 {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin: 0 0 12px 0;
-    font-size: 1rem;
-    color: #1A4E72;
-    padding-right: 24px;
-}
-
-/* Icône dans le titre */
-#popup-box h3 img {
-    width: 20px;
-    height: 20px;
-    object-fit: contain;
-}
-
-/* Texte du popup */
-#popup-box p {
-    margin: 0;
-    font-size: 0.85rem;
-    line-height: 1.8;
-    color: #444;
-}
-
-#info-popup p,
-#info-popup ul,
-#info-popup li {
-    font-size: 0.85rem;
-    line-height: 1.8;
-    color: #444;
-}
-
-/* Bouton fermeture */
-#popup-close {
-    position: absolute;
-    top: 12px;
-    right: 14px;
-    background: none;
-    border: none;
-    font-size: 1rem;
-    cursor: pointer;
-    color: #888;
-    line-height: 1;
-}
-
-#popup-close:hover {
-    color: #1A4E72;
-}
-
-/* =============================================
-   ÉCHELLE
-   ============================================= */
-
+    ÉCHELLE
+    Barre d'échelle en bas à gauche,
+    stylisée pour correspondre à la charte
+    ============================================= */
 .leaflet-control-scale {
     background: rgba(255,255,255,0.9) !important;
     padding: 4px 8px !important;
@@ -567,15 +703,9 @@ html, body {
     font-family: 'Jost', sans-serif !important;
     font-size: 0.75rem !important;
     font-weight: 500 !important;
-    color: #1A4E72 !important; 
+    color: #1A4E72 !important;
 }
 
-.leaflet-bottom.leaflet-right {
-    bottom: 5px !important;
-    right: 5px !important;
-}
-
-/* Texte */
 .leaflet-control-scale-line {
     background: none !important;
     color: #1A4E72 !important;
@@ -584,9 +714,10 @@ html, body {
 }
 
 /* =============================================
-   CREDITS
-   ============================================= */
-
+    CRÉDITS OPENSTREETMAP
+    Bandeau de crédits en bas à droite,
+    stylisé pour correspondre à la charte
+    ============================================= */
 .leaflet-control-attribution {
     background: rgba(255,255,255,0.9) !important;
     padding: 6px 10px !important;
@@ -598,66 +729,17 @@ html, body {
     color: #1A4E72 !important;
 }
 
-/* Liens dans les crédits */
 .leaflet-control-attribution a {
     color: #1A4E72 !important;
     text-decoration: none !important;
     font-weight: 600 !important;
 }
 
+.leaflet-bottom.leaflet-right {
+    bottom: 5px !important;
+    right: 5px !important;
+}
+
 .leaflet-control-attribution a:hover {
     text-decoration: underline !important;
-}
-
-/* =============================================
-   BOUTON CALCUL EXPOSOME
-   ============================================= */
-
-#calc-exposome-btn {
-    width: 100%;
-    padding: 10px 12px;
-    background-color: rgb(10, 161, 128);
-    color: #fff;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    transition: background 0.15s ease;
-    position: relative;
-    overflow: hidden;
-}
-
-/* voile blanc au survol */
-#calc-exposome-btn::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background-color: rgba(255,255,255,0);
-    transition: background-color 0.15s ease;
-}
-
-#calc-exposome-btn:hover::after {
-    background-color: rgba(255,255,255,0.1);
-}
-
-#exposome-results {
-    margin-top: 8px;
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    font-size: 0.84rem;
-}
-
-.exposome-pastille {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-}
-
-.exposome-pastille .color-dot {
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
 }
