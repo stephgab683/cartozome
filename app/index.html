@@ -11,6 +11,85 @@
     <link rel="stylesheet" href="./style.css" />
   </head>
 
+  <!-- ============================================= -->
+  <!-- TEMPLATES DES ICÔNES DE MARQUEURS            -->
+  <!-- Point unique : pin bleu + rond blanc         -->
+  <!-- Comparaison point A : pin vert + lettre A    -->
+  <!-- Comparaison point B : pin rouge + lettre B   -->
+  <!-- Itinéraire départ : pin vert + lettre D      -->
+  <!-- Itinéraire arrivée : pin rouge + lettre A    -->
+  <!-- ============================================= -->
+
+  <!-- Marker Point -->
+  <template id="tpl-marker-point">
+    <svg width="32" height="40" viewBox="0 0 32 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+          <feDropShadow dx="0" dy="3" stdDeviation="3" flood-color="rgba(0,0,0,0.4)"/>
+        </filter>
+      </defs>
+      <rect x="0" y="0" width="32" height="32" rx="16" fill="#1A4E72" filter="url(#shadow)"/>
+      <polygon points="10,30 22,30 16,40" fill="#1A4E72" filter="url(#shadow)"/>
+      <circle cx="16" cy="16" r="6" fill="white"/>
+    </svg>
+  </template>
+
+  <!-- Marker Compare A -->
+  <template id="tpl-marker-compare-a">
+    <svg width="32" height="40" viewBox="0 0 32 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+          <feDropShadow dx="0" dy="3" stdDeviation="3" flood-color="rgba(0,0,0,0.4)"/>
+        </filter>
+      </defs>
+      <rect x="0" y="0" width="32" height="32" rx="16" fill="#27ae60" filter="url(#shadow)"/>
+      <polygon points="10,30 22,30 16,40" fill="#27ae60" filter="url(#shadow)"/>
+      <text x="16" y="21" text-anchor="middle" fill="white" font-family="Jost,sans-serif" font-size="14" font-weight="700">A</text>
+    </svg>
+  </template>
+
+  <!-- Marker Compare B -->
+  <template id="tpl-marker-compare-b">
+    <svg width="32" height="40" viewBox="0 0 32 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+          <feDropShadow dx="0" dy="3" stdDeviation="3" flood-color="rgba(0,0,0,0.4)"/>
+        </filter>
+      </defs>
+      <rect x="0" y="0" width="32" height="32" rx="16" fill="#e74c3c" filter="url(#shadow)"/>
+      <polygon points="10,30 22,30 16,40" fill="#e74c3c" filter="url(#shadow)"/>
+      <text x="16" y="21" text-anchor="middle" fill="white" font-family="Jost,sans-serif" font-size="14" font-weight="700">B</text>
+    </svg>
+  </template>
+
+  <!-- Marker Départ A -->
+  <template id="tpl-marker-depart">
+    <svg width="32" height="40" viewBox="0 0 32 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+          <feDropShadow dx="0" dy="3" stdDeviation="3" flood-color="rgba(0,0,0,0.4)"/>
+        </filter>
+      </defs>
+      <rect x="0" y="0" width="32" height="32" rx="16" fill="#27ae60" filter="url(#shadow)"/>
+      <polygon points="10,30 22,30 16,40" fill="#27ae60" filter="url(#shadow)"/>
+      <text x="16" y="21" text-anchor="middle" fill="white" font-family="Jost,sans-serif" font-size="14" font-weight="700">D</text>
+    </svg>
+  </template>
+
+  <!-- Marker Arrivée A -->
+  <template id="tpl-marker-arrivee">
+    <svg width="32" height="40" viewBox="0 0 32 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+          <feDropShadow dx="0" dy="3" stdDeviation="3" flood-color="rgba(0,0,0,0.4)"/>
+        </filter>
+      </defs>
+      <rect x="0" y="0" width="32" height="32" rx="16" fill="#e74c3c" filter="url(#shadow)"/>
+      <polygon points="10,30 22,30 16,40" fill="#e74c3c" filter="url(#shadow)"/>
+      <text x="16" y="21" text-anchor="middle" fill="white" font-family="Jost,sans-serif" font-size="14" font-weight="700">A</text>
+    </svg>
+  </template>
+
   <body>
 
     <!-- ================================ -->
@@ -29,20 +108,20 @@
     <div id="main-container">
 
       <!-- ================================ -->
-      <!-- RECHERCHE : ADRESSE / ITINÉRAIRE -->
-      <!--                                  -->
-      <!-- Deux boutons toggles (Adresse /  -->
-      <!-- Itinéraire) affichent le panel   -->
-      <!-- correspondant. La logique        -->
-      <!-- d'affichage est gérée dans       -->
-      <!-- main.js (setAddressMode /        -->
-      <!-- setRouteMode).                   -->
+      <!-- RECHERCHE : ADRESSE / COMPARAISON / ITINÉRAIRE -->
+      <!--                                                -->
+      <!-- Trois boutons toggles (Où je suis /            -->
+      <!-- Comparer / Mon chemin) affichent le panel      -->
+      <!-- correspondant. La logique d'affichage est      -->
+      <!-- gérée dans main.js (setAddressMode /           -->
+      <!-- setCompareMode / setRouteMode).                -->
       <!-- ================================ -->
       <div id="search-controls">
 
         <!-- Boutons de sélection du mode -->
-        <button class="floating-btn search-btn" id="btn-address">Adresse</button>
-        <button class="floating-btn search-btn" id="btn-route">Itinéraire</button>
+        <button class="floating-btn search-btn" id="btn-address">Où je suis</button>
+        <button class="floating-btn search-btn" id="btn-compare">Comparer</button>
+        <button class="floating-btn search-btn" id="btn-route">Mon chemin</button>
 
         <!-- Panel de recherche (caché par défaut) -->
         <div id="search-panel" class="hidden">
@@ -61,6 +140,28 @@
             </div>
             <!-- Déclenche le géocodage et place un marqueur sur la carte -->
             <button id="calc-point-btn">Valider</button>
+          </div>
+
+          <!-- Panel MODE COMPARAISON -->
+          <!-- Affiché quand l'utilisateur clique sur "Comparer" -->
+          <div id="panel-compare" class="hidden">
+            <div class="search-row">
+              <input type="text" id="compare-a" placeholder="Point A">
+              <button class="geolocate-btn" id="geolocate-compare-a" title="Utiliser ma position">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M2 12L21 3L12 22L10 14L2 12Z"/>
+                </svg>
+              </button>
+            </div>
+            <div class="search-row">
+              <input type="text" id="compare-b" placeholder="Point B">
+              <button class="geolocate-btn" id="geolocate-compare-b" title="Utiliser ma position">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M2 12L21 3L12 22L10 14L2 12Z"/>
+                </svg>
+              </button>
+            </div>
+            <button id="calc-compare-btn">Valider</button>
           </div>
 
           <!-- Panel MODE ITINÉRAIRE -->
@@ -87,9 +188,21 @@
             <!-- Déclenche le géocodage départ/arrivée et trace l'itinéraire sur la carte -->
             <button id="calc-route-btn">Valider</button>
           </div>
-
         </div>
       </div>
+
+      <!-- ================================ -->
+      <!-- PANEL DE RÉSULTATS               -->
+      <!-- S'affiche sous le panel de       -->
+      <!-- recherche après validation.      -->
+      <!-- Contenu injecté par main.js      -->
+      <!-- selon le mode actif.             -->
+      <!-- ================================ -->
+      <div id="results-panel" class="hidden">
+        <button id="results-close">✖</button>
+        <div id="results-content"></div>
+      </div>
+
       
       <!-- ================================ -->
       <!-- SÉLECTEUR DE COUCHES             -->
@@ -146,7 +259,11 @@
           </div>
       
           <!-- ---- CATÉGORIE : Pollen ---- -->
-          <!-- Couche WMS : Ambroisie 2024  -->
+          <!-- Couche WMS disponible : Ambroisie 2024   -->
+          <!-- Couches à venir (flux WMS non disponible -->
+          <!-- pour l'instant) : Multi-taxons,          -->
+          <!-- Graminées, Olivier, Bouleau, Aulne,      -->
+          <!-- Armoise                                  -->
           <div class="layer-group">
             <div class="layer-group-header">
               <button class="layer-group-toggle closed">
@@ -163,7 +280,15 @@
               </button>
             </div>
             <div class="layer-group-content hidden">
+              <!-- Couche disponible -->
               <label><input type="checkbox" class="layer-checkbox" data-layer="cartozome:Ambroisie_2024_AURA"> Ambroisie</label>
+              <!-- Couches à venir — data-layer à renseigner quand le flux sera disponible -->
+              <label class="layer-disabled"><input type="checkbox" class="layer-checkbox" data-layer="" disabled> Multi-taxons</label>
+              <label class="layer-disabled"><input type="checkbox" class="layer-checkbox" data-layer="" disabled> Graminées</label>
+              <label class="layer-disabled"><input type="checkbox" class="layer-checkbox" data-layer="" disabled> Olivier</label>
+              <label class="layer-disabled"><input type="checkbox" class="layer-checkbox" data-layer="" disabled> Bouleau</label>
+              <label class="layer-disabled"><input type="checkbox" class="layer-checkbox" data-layer="" disabled> Aulne</label>
+              <label class="layer-disabled"><input type="checkbox" class="layer-checkbox" data-layer="" disabled> Armoise</label>
             </div>
           </div>
       
@@ -200,10 +325,10 @@
           </div>
       
           <!-- ---- CATÉGORIE : UV ---- -->
-          <!-- Couche WMS : index UV                          -->
-          <!-- Valeur dynamique récupérée depuis un JSON      -->
+          <!-- Couche WMS : index UV                                 -->
+          <!-- Valeur dynamique récupérée depuis un JSON             -->
           <!-- servi par Caddy : /data/openmeteo_uv_meteofrance.json -->
-          <!-- Mise à jour quotidienne par Météo-France       -->
+          <!-- Mise à jour quotidienne par Météo-France              -->
           <div class="layer-group">
             <div class="layer-group-header">
               <button class="layer-group-toggle closed">

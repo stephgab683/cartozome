@@ -20,7 +20,7 @@ const map = L.map('map', {
   maxBoundsViscosity: 1.0,                                                   // Empêche de sortir des bounds
   minZoom:            10,
   maxZoom:            18,
-}).setView([45.757295, 4.832391], 11);                                       // Vue initiale centrée sur Lyon
+}).fitBounds(METROPOLE_BOUNDS);                                      // Vue initiale centrée sur Lyon
 
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   attribution: '&copy; OpenStreetMap contributors'
@@ -32,6 +32,33 @@ L.control.scale({ position: 'bottomleft', imperial: false }).addTo(map);
 // LayerGroup qui accueille les marqueurs et la polyligne de l'itinéraire.
 // Effacé à chaque nouvelle recherche.
 const routingLayer = L.layerGroup().addTo(map);
+
+// =============================================
+// ICÔNES MARQUEURS PERSONNALISÉES
+// Les SVG sont définis dans des <template> dans
+// le HTML. markerIcon() clone le contenu du template 
+// et crée une icône Leaflet de type divIcon.
+// iconAnchor [16,40] : pointe du pin sur le sol
+// popupAnchor [0,-40] : popup au-dessus du pin
+// =============================================
+
+// Crée une icône Leaflet à partir d'un <template> HTML
+function markerIcon(templateId) {
+  const svg = document.getElementById(templateId).innerHTML; // Récupère le SVG du template
+  return L.divIcon({
+    className:   '',          // Pas de classe CSS par défaut (évite le carré blanc Leaflet)
+    html:        svg,
+    iconSize:    [32, 40],
+    iconAnchor:  [16, 40],    // Point d'ancrage : bas centre du pin
+    popupAnchor: [0, -40],    // Popup s'affiche au-dessus du pin
+  });
+}
+
+const iconPoint   = markerIcon('tpl-marker-point');   // Pin bleu, point unique
+const iconCompareA = markerIcon('tpl-marker-compare-a'); // Pin vert, point A comparaison
+const iconCompareB = markerIcon('tpl-marker-compare-b'); // Pin rouge, point B comparaison
+const iconDepart  = markerIcon('tpl-marker-depart');  // Pin vert, départ itinéraire
+const iconArrivee = markerIcon('tpl-marker-arrivee'); // Pin rouge, arrivée itinéraire
 
 
 // =============================================
@@ -144,6 +171,12 @@ const LAYER_LABELS = {
   "cartozome:mod_aura_2024_no2_moyan":   "NO2",
   "cartozome:mod_aura_2024_o3_somo35":   "O3 SOMO35",
   "cartozome:Ambroisie_2024_AURA":       "Ambroisie",
+  // Multi-taxons
+  // Graminées
+  // Olivier
+  // Bouleau
+  // Aulne
+  // Armoise
   "cartozome:GL_Fer_Lden":               "Bruit ferroviaire LDEN",
   "cartozome:GL_Fer_Ln":                 "Bruit ferroviaire LN",
   "cartozome:GL_Rte_Lden":               "Bruit routier LDEN",
@@ -158,6 +191,12 @@ const LAYER_UNITS = {
   "cartozome:mod_aura_2024_no2_moyan":   "µg/m³",
   "cartozome:mod_aura_2024_o3_somo35":   "µg/m³·j",
   "cartozome:Ambroisie_2024_AURA":       "grains/m³",
+  // Multi-taxons
+  // Graminées
+  // Olivier
+  // Bouleau
+  // Aulne
+  // Armoise
   "cartozome:GL_Fer_Lden":               "dB(A)",
   "cartozome:GL_Fer_Ln":                 "dB(A)",
   "cartozome:GL_Rte_Lden":               "dB(A)",
@@ -399,35 +438,79 @@ async function getRoute(start, end) {
   }
 }
 
+// =============================================
+// PANEL DE RÉSULTATS
+// S'affiche après validation d'une recherche
+// (point, comparaison, itinéraire).
+// Positionné dynamiquement sous le search-panel.
+// Fermé au clic sur la croix ou au changement
+// de mode.
+// =============================================
+const resultsPanel = document.getElementById("results-panel");
+
+// Positionne et affiche le panel sous le search-panel
+function openResultsPanel() {
+  const container   = document.getElementById("main-container");
+  const panel       = document.getElementById("search-panel");
+  const panelRect   = panel.getBoundingClientRect();
+  const contRect    = container.getBoundingClientRect();
+  resultsPanel.style.top = `${panelRect.bottom - contRect.top + 10}px`;
+  resultsPanel.classList.remove("hidden");
+}
+
+// Ferme le panel au clic sur la croix
+document.getElementById("results-close").addEventListener("click", () => {
+  resultsPanel.classList.add("hidden");
+});
 
 // =============================================
-// RECHERCHE : ADRESSE / ITINÉRAIRE
-// Deux modes gérés par toggle de classes .hidden
+// RECHERCHE : ADRESSE / COMPARAISON / ITINÉRAIRE
+// Trois modes gérés par toggle de classes .hidden
 // sur les panels définis dans le HTML.
 // Comprend : affichage des panels, géolocalisation,
 // autocomplétion et validation des formulaires.
+// setAddressMode / setCompareMode / setRouteMode
 // =============================================
 
 const btnAddress  = document.getElementById("btn-address");
-const btnRoute    = document.getElementById("btn-route");
+const btnCompare = document.getElementById("btn-compare");
+const btnRoute = document.getElementById("btn-route");
 const searchPanel = document.getElementById("search-panel");
 
-// Affiche le panel adresse, cache le panel itinéraire
+// Affiche le panel adresse, cache les autres
 function setAddressMode() {
   document.getElementById('panel-address').classList.remove('hidden');
+  document.getElementById('panel-compare').classList.add('hidden');
   document.getElementById('panel-route').classList.add('hidden');
   searchPanel.classList.remove('hidden');
   btnAddress.classList.add('active');
+  btnCompare.classList.remove('active');
   btnRoute.classList.remove('active');
+  resultsPanel.classList.add("hidden");
 }
 
-// Affiche le panel itinéraire, cache le panel adresse
+// Affiche le panel comparaison, cache les autres
+function setCompareMode() {
+  document.getElementById('panel-compare').classList.remove('hidden');
+  document.getElementById('panel-address').classList.add('hidden');
+  document.getElementById('panel-route').classList.add('hidden');
+  searchPanel.classList.remove('hidden');
+  btnCompare.classList.add('active');
+  btnAddress.classList.remove('active');
+  btnRoute.classList.remove('active');
+  resultsPanel.classList.add("hidden");
+}
+
+// Affiche le panel itinéraire, cache les autres
 function setRouteMode() {
   document.getElementById('panel-route').classList.remove('hidden');
   document.getElementById('panel-address').classList.add('hidden');
+  document.getElementById('panel-compare').classList.add('hidden');
   searchPanel.classList.remove('hidden');
   btnRoute.classList.add('active');
   btnAddress.classList.remove('active');
+  btnCompare.classList.remove('active');
+  resultsPanel.classList.add("hidden");
 }
 
 // Branche les boutons de géolocalisation sur chaque champ.
@@ -435,6 +518,8 @@ function setRouteMode() {
 function attachGeolocate() {
   const geoButtons = [
     { btn: "geolocate-point", input: "point-start" },
+    { btn: "geolocate-compare-a", input: "compare-a" },
+    { btn: "geolocate-compare-b", input: "compare-b" },
     { btn: "geolocate-start", input: "route-start" },
     { btn: "geolocate-end",   input: "route-end"   }
   ];
@@ -478,10 +563,43 @@ document.getElementById("calc-point-btn").addEventListener("click", async () => 
   if (!coords) { alert("Adresse introuvable"); return; }
 
   const latLng = L.latLng(coords[1], coords[0]);
-  L.marker(latLng).addTo(routingLayer).bindPopup("Point sélectionné").openPopup();
+  L.marker(latLng, { icon: iconPoint }).addTo(routingLayer).bindPopup("Point sélectionné").openPopup();
   map.setView(latLng, 16);
 
   console.log("[POINT] Coordonnées :", { lat: coords[1], lon: coords[0] });
+  openResultsPanel();
+});
+
+// Validation comparaison : géocode les deux points et place deux marqueurs.
+// TODO : interroger les couches actives pour chaque point et afficher
+// les valeurs d'exposition en comparaison dans le panel de résultats
+document.getElementById("calc-compare-btn").addEventListener("click", async () => {
+  routingLayer.clearLayers();
+
+  const inputA = document.getElementById("compare-a").value.trim();
+  const inputB = document.getElementById("compare-b").value.trim();
+  if (!inputA) { alert("Veuillez saisir le Point A"); return; }
+  if (!inputB) { alert("Veuillez saisir le Point B"); return; }
+
+  const coordsA = await geocodeAddress(inputA);
+  if (!coordsA) { alert("Point A introuvable"); return; }
+
+  const coordsB = await geocodeAddress(inputB);
+  if (!coordsB) { alert("Point B introuvable"); return; }
+
+  const latLngA = L.latLng(coordsA[1], coordsA[0]);
+  const latLngB = L.latLng(coordsB[1], coordsB[0]);
+
+  L.marker(latLngA, { icon: iconCompareA }).addTo(routingLayer).bindPopup("Point A").openPopup();
+  L.marker(latLngB, { icon: iconCompareB }).addTo(routingLayer).bindPopup("Point B");
+
+  // Centre la vue pour afficher les deux points
+  const bounds = L.latLngBounds([latLngA, latLngB]);
+  map.fitBounds(bounds, { padding: [80, 80] });
+
+  console.log("[COMPARAISON] Point A :", { lat: coordsA[1], lon: coordsA[0] });
+  console.log("[COMPARAISON] Point B :", { lat: coordsB[1], lon: coordsB[0] });
+  openResultsPanel();
 });
 
 // Validation itinéraire : géocode départ et arrivée, trace la route piétonne.
@@ -497,23 +615,24 @@ document.getElementById("calc-route-btn").addEventListener("click", async () => 
   const startCoords = await geocodeAddress(routeStart);
   if (!startCoords) { alert("Adresse de départ introuvable"); return; }
   const startLatLng = L.latLng(startCoords[1], startCoords[0]);
-  L.marker(startLatLng).addTo(routingLayer).bindPopup("Départ").openPopup();
+  L.marker(startLatLng, { icon: iconDepart }).addTo(routingLayer).bindPopup("Départ").openPopup();
 
   if (!routeEnd) { map.setView(startLatLng, 16); return; }
 
   const endCoords = await geocodeAddress(routeEnd);
   if (!endCoords) { alert("Adresse d'arrivée introuvable"); return; }
   const endLatLng = L.latLng(endCoords[1], endCoords[0]);
-  L.marker(endLatLng).addTo(routingLayer).bindPopup("Arrivée");
+  L.marker(endLatLng, { icon: iconArrivee }).addTo(routingLayer).bindPopup("Arrivée");
 
   const routeCoords = await getRoute(startCoords, endCoords);
   if (!routeCoords) { alert("Impossible de calculer l'itinéraire"); return; }
 
   const latLngs   = routeCoords.map(c => [c[1], c[0]]);
-  const routeLine = L.polyline(latLngs, { color: "red", weight: 4 }).addTo(routingLayer);
+  const routeLine = L.polyline(latLngs, { color: "#1A4E72", weight: 4, opacity: 1 }).addTo(routingLayer);
   map.fitBounds(routeLine.getBounds(), { padding: [50, 50] });
 
   console.log("[ITINÉRAIRE] Coordonnées :", routeCoords);
+  openResultsPanel();
 });
 
 // Autocomplétion : affiche des suggestions pendant la frappe (délai 250ms).
@@ -575,8 +694,12 @@ function attachAutocomplete(inputId) {
 setAddressMode();
 attachGeolocate();
 attachAutocomplete('point-start');
+attachAutocomplete('compare-a');
+attachAutocomplete('compare-b');
 attachAutocomplete('route-start');
 attachAutocomplete('route-end');
 
 btnAddress.addEventListener("click", setAddressMode);
+btnCompare.addEventListener("click", setCompareMode);
 btnRoute.addEventListener("click", setRouteMode);
+
