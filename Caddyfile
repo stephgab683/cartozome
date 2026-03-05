@@ -1,5 +1,5 @@
 :80 {
-    handle_path /api_XXXXX/* {
+    handle_path /api/* {
         uri strip_prefix /api
         reverse_proxy api:8000
     }

@@ -562,29 +562,33 @@ document.addEventListener("DOMContentLoaded", () => {                         //
 
 const API_BASE_URL = "http://127.0.0.1:8000";
 
-// Au clic sur la carte
 map.on("click", async function (e) {
-
   const lat = e.latlng.lat;
   const lon = e.latlng.lng;
 
-  try {
+  // Crée un popup vide immédiatement
+  const popup = L.popup()
+    .setLatLng(e.latlng)
+    .setContent("<b>Chargement...</b>")
+    .openOn(map);
 
-    const response = await fetch(`${API_BASE_URL}/indicateurs`, {  // attention : endpoint mis à jour
+  try {
+    const response = await fetch(`${API_BASE_URL}/indicateurs`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ latitude: lat, longitude: lon })
     });
+
+    if (!response.ok) {
+      popup.setContent(`<b>Erreur HTTP</b> : ${response.status}`);
+      return;
+    }
 
     const data = await response.json();
 
     let content = "<b>Valeurs des couches :</b><br>";
-
     let hasData = false;
 
-    // Boucle sur toutes les couches
     for (const [layer, value] of Object.entries(data)) {
       if (value !== null && !value.toString().startsWith("Erreur")) {
         hasData = true;
@@ -596,22 +600,10 @@ map.on("click", async function (e) {
       }
     }
 
-    if (!hasData) {
-      content = "<b>Aucun résultat pour toutes les couches</b>";
-    }
+    if (!hasData) content = "<b>Aucun résultat pour toutes les couches</b>";
 
-    L.popup()
-      .setLatLng(e.latlng)
-      .setContent(content)
-      .openOn(map);
-
+    popup.setContent(content);  // Met à jour le popup
   } catch (error) {
-
-    L.popup()
-      .setLatLng(e.latlng)
-      .setContent(`<b>Erreur ❌</b><br>${error}`)
-      .openOn(map);
-
+    popup.setContent(`<b>Erreur ❌</b><br>${error}`);
   }
-
 });
