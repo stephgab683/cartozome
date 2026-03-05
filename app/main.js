@@ -58,27 +58,16 @@ function styleCommunes(feature) {
 }
 
 async function loadCommunesUV() {
-
   try {
-
     const res = await fetch(COMMUNES_UV_URL, { cache: "no-store" });
-
     if (!res.ok) throw new Error(`GeoJSON HTTP ${res.status}`);
-
     const geojson = await res.json();
-
     L.geoJSON(geojson, {
-
       style: styleCommunes
-
     }).addTo(map);
-
     console.log("[UV COMMUNES] couche chargée");
-
   } catch (err) {
-
     console.error("[UV COMMUNES] erreur :", err);
-
   }
 }
 
@@ -235,11 +224,7 @@ const LAYER_LABELS = {
   // Bouleau
   // Aulne
   // Armoise
-  "cartozome:GL_Fer_Lden":               "Bruit ferroviaire LDEN",
-  "cartozome:GL_Fer_Ln":                 "Bruit ferroviaire LN",
-  "cartozome:GL_Rte_Lden":               "Bruit routier LDEN",
-  "cartozome:GL_Rte_Ln":                 "Bruit routier LN",
-  "cartozome:Indus_GL_E4_Lden":          "Bruit industriel LDEN",
+  "cartozome:sous_indice_multibruit_orhane_2023":"Bruit",
 };
 
 // Unités affichées dans la popup de clic
@@ -255,11 +240,8 @@ const LAYER_UNITS = {
   // Bouleau
   // Aulne
   // Armoise
-  "cartozome:GL_Fer_Lden":               "dB(A)",
-  "cartozome:GL_Fer_Ln":                 "dB(A)",
-  "cartozome:GL_Rte_Lden":               "dB(A)",
-  "cartozome:GL_Rte_Ln":                 "dB(A)",
-  "cartozome:Indus_GL_E4_Lden":          "dB(A)",
+  "cartozome:sous_indice_multibruit_orhane_2023":"dB(A)",
+
 };
 
 // URLs GeoServer local (WMS pour les rasters, WFS pour le bruit aérien)
