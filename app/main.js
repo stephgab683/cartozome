@@ -743,3 +743,42 @@ btnAddress.addEventListener("click", setAddressMode);
 btnCompare.addEventListener("click", setCompareMode);
 btnRoute.addEventListener("click", setRouteMode);
 
+// =============================================
+// CLIC SUR LA CARTE -> POPUP INDICATEURS
+// =============================================
+map.on("click", async (e) => {
+  const { lat, lng } = e.latlng;
+
+  try {
+    const res = await fetch("http://localhost:8000/indicateurs", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ latitude: lat, longitude: lng })
+    });
+
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+    const data = await res.json();
+
+    // Construire le contenu HTML de la popup
+    let content = `<div style="font-family:'Jost',sans-serif;font-size:0.85rem;line-height:1.4;">`;
+    content += `<b style="color:#1A4E72;">Coordonnées :</b> ${lat.toFixed(6)}, ${lng.toFixed(6)}<br>`;
+    
+    for (const [key, value] of Object.entries(data)) {
+      content += `<b>${key}</b> : ${value ?? "n/a"}<br>`;
+    }
+    content += `</div>`;
+
+    L.popup({ maxWidth: 300 })
+      .setLatLng([lat, lng])
+      .setContent(content)
+      .openOn(map);
+
+  } catch (err) {
+    console.error("Erreur API indicateurs :", err);
+    L.popup()
+      .setLatLng([lat, lng])
+      .setContent(`<b>Erreur</b> lors de la récupération des indicateurs : ${err.message}`)
+      .openOn(map);
+  }
+});
