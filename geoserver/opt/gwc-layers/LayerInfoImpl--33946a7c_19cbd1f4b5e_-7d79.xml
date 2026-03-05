@@ -9,10 +9,26 @@
   </mimeFormats>
   <gridSubsets>
     <gridSubset>
-      <gridSetName>EPSG:4326</gridSetName>
+      <gridSetName>EPSG:900913</gridSetName>
+      <extent>
+        <coords>
+          <double>-1392279.5333428592</double>
+          <double>4923708.255128904</double>
+          <double>1336151.9721577847</double>
+          <double>6837906.623562302</double>
+        </coords>
+      </extent>
     </gridSubset>
     <gridSubset>
-      <gridSetName>EPSG:900913</gridSetName>
+      <gridSetName>EPSG:4326</gridSetName>
+      <extent>
+        <coords>
+          <double>-12.507059845686852</double>
+          <double>40.39635820978022</double>
+          <double>12.002857384957794</double>
+          <double>52.208464444442946</double>
+        </coords>
+      </extent>
     </gridSubset>
   </gridSubsets>
   <metaWidthHeight>
@@ -26,7 +42,7 @@
       <key>STYLES</key>
       <defaultValue></defaultValue>
       <availableStyles class="sorted-set"/>
-      <defaultStyle>cartozome:orhane_2023_multibruit</defaultStyle>
+      <defaultStyle>cartozome:sous_indice_multi_bruit</defaultStyle>
     </styleParameterFilter>
   </parameterFilters>
   <gutter>0</gutter>
