@@ -29,7 +29,7 @@ WMS_LAYERS = [
     "cartozome:mod_aura_2024_o3_somo35 ",
     "cartozome:mod_aura_2024_pm10_moyan ",
     "cartozome:mod_aura_2024_pm25_moyan", 
-
+    "cartozome:sous_indice_multibruit_orhane_2023",
 ]
 
 WMS_URL = "http://localhost:8081/geoserver/cartozome/ows"
