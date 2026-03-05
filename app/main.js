@@ -33,6 +33,31 @@ L.control.scale({ position: 'bottomleft', imperial: false }).addTo(map);
 // Effacé à chaque nouvelle recherche.
 const routingLayer = L.layerGroup().addTo(map);
 
+// =============================================
+// ICÔNES MARQUEURS PERSONNALISÉES
+// Les SVG sont définis dans des <template> dans
+// le HTML. markerIcon() clone le contenu du template 
+// et crée une icône Leaflet de type divIcon.
+// iconAnchor [16,40] : pointe du pin sur le sol
+// popupAnchor [0,-40] : popup au-dessus du pin
+// =============================================
+
+// Crée une icône Leaflet à partir d'un <template> HTML
+function markerIcon(templateId) {
+  const svg = document.getElementById(templateId).innerHTML; // Récupère le SVG du template
+  return L.divIcon({
+    className:   '',          // Pas de classe CSS par défaut (évite le carré blanc Leaflet)
+    html:        svg,
+    iconSize:    [32, 40],
+    iconAnchor:  [16, 40],    // Point d'ancrage : bas centre du pin
+    popupAnchor: [0, -40],    // Popup s'affiche au-dessus du pin
+  });
+}
+
+const iconPoint   = markerIcon('tpl-marker-point');   // Pin bleu, point unique
+const iconDepart  = markerIcon('tpl-marker-depart');  // Pin vert, départ itinéraire
+const iconArrivee = markerIcon('tpl-marker-arrivee'); // Pin rouge, arrivée itinéraire
+
 
 // =============================================
 // EXTENSION BETTERWMS
@@ -478,7 +503,7 @@ document.getElementById("calc-point-btn").addEventListener("click", async () => 
   if (!coords) { alert("Adresse introuvable"); return; }
 
   const latLng = L.latLng(coords[1], coords[0]);
-  L.marker(latLng).addTo(routingLayer).bindPopup("Point sélectionné").openPopup();
+  L.marker(latLng, { icon: iconPoint }).addTo(routingLayer).bindPopup("Point sélectionné").openPopup();
   map.setView(latLng, 16);
 
   console.log("[POINT] Coordonnées :", { lat: coords[1], lon: coords[0] });
@@ -497,37 +522,86 @@ document.getElementById("calc-route-btn").addEventListener("click", async () => 
   const startCoords = await geocodeAddress(routeStart);
   if (!startCoords) { alert("Adresse de départ introuvable"); return; }
   const startLatLng = L.latLng(startCoords[1], startCoords[0]);
-  L.marker(startLatLng).addTo(routingLayer).bindPopup("Départ").openPopup();
+  L.marker(startLatLng, { icon: iconDepart }).addTo(routingLayer).bindPopup("Départ").openPopup();
 
   if (!routeEnd) { map.setView(startLatLng, 16); return; }
 
-    const endCoords = await geocodeAddress(routeEnd);                         // Géocode l'adresse d'arrivée
-    if (!endCoords) {                                                         // Si pas de coordonnées trouvées
-      alert("Adresse d'arrivée introuvable");                                 // Affiche une alerte
-      return;                                                                 // Quitte la fonction
-    }
+  const endCoords = await geocodeAddress(routeEnd);
+  if (!endCoords) { alert("Adresse d'arrivée introuvable"); return; }
+  const endLatLng = L.latLng(endCoords[1], endCoords[0]);
+  L.marker(endLatLng, { icon: iconArrivee }).addTo(routingLayer).bindPopup("Arrivée");
 
-    const endLatLng = L.latLng(endCoords[1], endCoords[0]);                  // Crée un objet LatLng pour l'arrivée
+  const routeCoords = await getRoute(startCoords, endCoords);
+  if (!routeCoords) { alert("Impossible de calculer l'itinéraire"); return; }
 
-    L.marker(endLatLng)                                                      // Crée un marqueur pour l'arrivée
-      .addTo(routingLayer)                                                    // Ajoute le marqueur à la couche
-      .bindPopup("Arrivée");                                                  // Ajoute une popup
+  const latLngs   = routeCoords.map(c => [c[1], c[0]]);
+  const routeLine = L.polyline(latLngs, { color: "#1A4E72", weight: 4, opacity: 1 }).addTo(routingLayer);
+  map.fitBounds(routeLine.getBounds(), { padding: [50, 50] });
 
-    const routeCoords = await getRoute(startCoords, endCoords);               // Calcule l'itinéraire
+  console.log("[ITINÉRAIRE] Coordonnées :", routeCoords);
+});
 
-    if (!routeCoords) {                                                       // Si pas d'itinéraire trouvé
-      alert("Impossible de calculer l'itinéraire");                           // Affiche une alerte
-      return;                                                                 // Quitte la fonction
-    }
+// Autocomplétion : affiche des suggestions pendant la frappe (délai 250ms).
+// Appelle l'API géocodage avec limit=50, filtre côté client sur les bounds métropole.
+function attachAutocomplete(inputId) {
+  const input = document.getElementById(inputId);
+  if (!input) return;
 
-    const latLngs = routeCoords.map(coord => [coord[1], coord[0]]);            // Convertit les coordonnées en LatLng
+  // Crée la liste de suggestions et l'accroche au parent du champ
+  const list = document.createElement('ul');
+  list.className = 'autocomplete-list hidden';
+  input.parentNode.style.position = 'relative';
+  input.parentNode.appendChild(list);
 
-    const routeLine = L.polyline(latLngs, {                                    // Crée une polyligne pour l'itinéraire
-      color: "red",                                                            // Couleur rouge
-      weight: 4                                                                // Épaisseur de 4px
-    }).addTo(routingLayer);                                                    // Ajoute la polyligne à la couche
+  let debounceTimer;
 
-    map.fitBounds(routeLine.getBounds(), { padding: [50, 50] });               // Ajuste la vue pour afficher tout l'itinéraire
+  input.addEventListener('input', () => {
+    clearTimeout(debounceTimer);
+    const query = input.value.trim();
 
+    if (query.length < 3) { list.classList.add('hidden'); return; }          // Pas de recherche sous 3 caractères
+
+    debounceTimer = setTimeout(async () => {                                  // Délai anti-spam avant d'appeler l'API
+      const res  = await fetch(`https://data.geopf.fr/geocodage/search?q=${encodeURIComponent(query)}&limit=50`);
+      const data = await res.json();
+
+      list.innerHTML = '';
+      if (!data.features || data.features.length === 0) { list.classList.add('hidden'); return; }
+
+      // Filtre les résultats hors bounds de la métropole de Lyon
+      const filtered = data.features.filter(f => {
+        const [lon, lat] = f.geometry.coordinates;
+        return lat >= 45.45 && lat <= 46.00 && lon >= 4.65 && lon <= 5.25;
+      });
+
+      if (filtered.length === 0) { list.classList.add('hidden'); return; }
+
+      filtered.forEach(f => {                                                 // Crée un <li> par suggestion
+        const li = document.createElement('li');
+        li.textContent = f.properties.label;
+        li.addEventListener('mousedown', () => {                              // mousedown avant blur pour que le clic se déclenche
+          input.value = f.properties.label;
+          list.classList.add('hidden');
+        });
+        list.appendChild(li);
+      });
+
+      list.classList.remove('hidden');
+    }, 250);
   });
 
+  // Délai de 150ms pour laisser le mousedown se déclencher avant de cacher
+  input.addEventListener('blur', () => {
+    setTimeout(() => list.classList.add('hidden'), 150);
+  });
+}
+
+// Initialisation au chargement
+setAddressMode();
+attachGeolocate();
+attachAutocomplete('point-start');
+attachAutocomplete('route-start');
+attachAutocomplete('route-end');
+
+btnAddress.addEventListener("click", setAddressMode);
+btnRoute.addEventListener("click", setRouteMode);
