@@ -1,3 +1,5 @@
 fastapi
 uvicorn
 rasterio
+requests 
+pyproj

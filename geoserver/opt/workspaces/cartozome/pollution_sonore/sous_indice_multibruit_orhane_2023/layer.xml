@@ -1,0 +1,21 @@
+<layer>
+  <name>sous_indice_multibruit_orhane_2023</name>
+  <id>LayerInfoImpl--5339f5e4:19cbd9f196e:-7e1f</id>
+  <type>WMS</type>
+  <defaultStyle>
+    <name></name>
+  </defaultStyle>
+  <styles class="linked-hash-set">
+    <style>
+      <name>orhane:orhane_2023_multibruit</name>
+    </style>
+  </styles>
+  <resource class="wmsLayer">
+    <id>WMSLayerInfoImpl--5339f5e4:19cbd9f196e:-7e20</id>
+  </resource>
+  <attribution>
+    <logoWidth>0</logoWidth>
+    <logoHeight>0</logoHeight>
+  </attribution>
+  <dateCreated>2026-03-05 13:52:44.632 UTC</dateCreated>
+</layer>
