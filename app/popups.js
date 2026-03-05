@@ -24,8 +24,10 @@ if (!infoPopup) {
   infoPopup = document.createElement('div');
   infoPopup.id = 'info-popup';
   infoPopup.innerHTML = `
-      <button id="popup-close">✕</button>
-      <div id="popup-content"></div>
+    <div id="popup-inner">
+        <button id="popup-close">✖</button>
+        <div id="popup-content"></div>
+    </div>
   `;
   document.body.appendChild(infoPopup);
 }
@@ -48,7 +50,7 @@ popupClose.addEventListener('click', () => {
 });
 
 // Clic sur les boutons ℹ️ des catégories
-document.querySelectorAll('.category-info-btn').forEach(btn => {
+document.querySelectorAll('.info-btn').forEach(btn => {
   btn.addEventListener('click', e => {
       e.stopPropagation();
       const catId = btn.dataset.cat; // ex: "cat-air"

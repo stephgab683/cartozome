@@ -1,0 +1,430 @@
+/* =============================================
+   PANNEAU LATÉRAL
+   ============================================= */
+/* Conteneur du panneau des couches */
+#side-panel {
+    width: 280px;
+    background-color: #f8f8f8;
+    padding: 12px;
+    box-sizing: border-box;
+    border-right: 1px solid #ddd;
+    overflow-y: auto;
+}
+
+/* =============================================
+   ADRESSES
+   ============================================= */
+.input-and-button {
+    display: flex;
+    gap: 4px;
+    margin-top: 4px;
+    margin-bottom: 4px;
+}
+
+.input-and-button input[type="text"] {
+    flex: 1;
+    padding: 6px 10px;
+    border: 1px solid #dde4ea;
+    border-radius: 6px;
+    font-size: 0.84rem;
+    height: 36px;
+    box-sizing: border-box;
+    background-color: #fff;
+}
+
+.input-and-button button {
+    width: 36px;
+    height: 36px;
+    border-radius: 6px;
+    border: 1px solid #dde4ea;
+    background-color: #fff;
+    color: #1A4E72;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.input-and-button button:hover {
+    background-color: #1A4E72;
+    color: #fff;
+    border-color: #1A4E72;
+}
+
+/* =============================================
+   CATÉGORIES (accordéon)
+   ============================================= */
+/* Conteneur d’une catégorie */
+.category {
+    margin-bottom: 6px;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #dde4ea;
+}
+
+/* Header de la catégorie : bouton + info */
+.category-header {
+    display: flex;
+    align-items: stretch;
+    background-color: #1A4E72;
+}
+
+/* Bouton principal pour ouvrir/fermer la catégorie */
+.category-toggle {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 12px;
+    background: none;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    font-family: 'Jost', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    text-align: left;
+    transition: background 0.15s;
+}
+
+/* Hover sur le bouton de catégorie */
+.category-toggle:hover {
+    background-color: rgba(255,255,255,0.1);
+}
+
+/* Icone dans le bouton catégorie */
+.category-toggle .cat-icon img {
+    width: 24px;  /* ou la taille que tu veux */
+    height: 24px;
+    object-fit: contain;
+}
+
+/* Chevron de la catégorie */
+.category-toggle .chevron {
+    margin-left: auto;
+    font-size: 0.85rem;
+    transition: transform 0.2s;
+}
+
+/* Rotation du chevron quand fermé */
+.category-toggle.closed .chevron {
+    transform: rotate(-90deg);
+}
+
+/* Bouton d’info ℹ️ */
+.category-info-btn {
+    background: none;
+    border: none;
+    border-left: 1px solid rgba(255,255,255,0.2);
+    color: #fff;
+    cursor: pointer;
+    padding: 0 12px;
+    font-size: 1rem;
+    transition: background 0.15s;
+    flex-shrink: 0;
+}
+
+.category-info-btn:hover {
+    background-color: rgba(255,255,255,0.15);
+}
+
+/* Conteneur des couches dans la catégorie */
+.category-layers {
+    background: #fff;
+    padding: 4px 0;
+}
+
+.category-layers.hidden {
+    display: none;
+}
+
+/* =============================================
+   ITEMS DE COUCHE
+   ============================================= */
+/* Conteneur d’un item de couche */
+.layer-item {
+    padding: 8px 12px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.layer-item:last-child {
+    border-bottom: none;
+}
+
+/* Label et checkbox */
+.layer-item label {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    cursor: pointer;
+    font-size: 0.84rem;
+    color: #333;
+    user-select: none;
+}
+
+/* Hover sur le label */
+.layer-item label:hover {
+    color: #1A4E72;
+}
+
+/* =============================================
+   TOGGLE SWITCH MODERNE (remplace checkbox)
+   ============================================= */
+
+.layer-item input[type="checkbox"] {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 38px;
+    height: 20px;
+    background-color: #ddd;
+    border-radius: 20px;
+    position: relative;
+    cursor: pointer;
+    transition: background-color 0.25s ease;
+    flex-shrink: 0;
+}
+
+/* Le petit rond */
+.layer-item input[type="checkbox"]::before {
+    content: "";
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    top: 2px;
+    left: 2px;
+    background-color: white;
+    border-radius: 50%;
+    transition: transform 0.25s ease;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+}
+
+/* Quand activé */
+.layer-item input[type="checkbox"]:checked {
+    background-color: #1A4E72;
+}
+
+/* Déplacement du rond */
+.layer-item input[type="checkbox"]:checked::before {
+    transform: translateX(18px);
+}
+
+/* =============================================
+   SOUS-CATÉGORIES DANS BRUIT
+   ============================================= */
+/* Conteneur sous-catégorie */
+.subcategory {
+    margin: 2px 0 6px 0;
+    overflow: hidden;
+}
+
+/* Header sous-catégorie : bouton */
+.subcategory-header {
+    display: flex;
+    align-items: center;
+    background-color: #5dade2;
+}
+
+/* Bouton sous-catégorie */
+.subcategory-toggle {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 10px;
+    background: none;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    font-family: 'Jost', sans-serif;
+    font-size: 0.78rem;
+    font-weight: 600;
+    text-align: left;
+    transition: background 0.15s;
+}
+
+.subcategory-toggle:hover {
+    background-color: rgba(255,255,255,0.15);
+}
+
+/* Chevron sous-catégorie */
+.subcategory-toggle .chevron {
+    margin-left: auto;
+    font-size: 0.75rem;
+    transition: transform 0.2s;
+}
+
+.subcategory-toggle.closed .chevron {
+    transform: rotate(-90deg);
+}
+
+/* Conteneur des couches dans sous-catégorie */
+.subcategory-layers {
+    background: #fefefe;
+    padding: 3px 0;
+}
+
+.subcategory-layers.hidden {
+    display: none;
+}
+
+/* Items dans sous-catégorie */
+.subcategory-layers .layer-item {
+    padding: 6px 12px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.subcategory-layers .layer-item:last-child {
+    border-bottom: none;
+}
+
+
+
+/* =============================================
+   POPUP D'INFORMATION
+   ============================================= */
+#info-popup {
+    display: none;
+    position: fixed;
+    top: 110px;
+    right: 16px;
+    z-index: 1000;
+    width: 320px;
+    max-width: 90vw;
+    background: #fff;
+    border-radius: 12px;
+    padding: 20px 24px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.15);
+    border-left: 4px solid #1A4E72;
+    animation: slideIn 0.2s ease;
+}
+
+/* Contenu scrollable */
+#popup-content {
+    max-height: 60vh;
+    overflow-y: auto;
+    padding-top: 6px;
+    padding-right: 20px;
+    margin-top: 28px;
+}
+
+/* Scrollbar */
+#popup-content::-webkit-scrollbar {
+    width: 6px;
+    
+}
+
+#popup-content::-webkit-scrollbar-thumb {
+    background-color: #1A4E72;
+    border-radius: 3px;
+}
+
+/* Animation */
+@keyframes slideIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Affichage */
+#info-popup.visible {
+    display: block;
+}
+
+/* Titre */
+#info-popup h3 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 12px 0;
+    font-size: 1rem;
+    color: #1A4E72;
+    font-weight: 700;
+}
+
+#info-popup h3 img {
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
+}
+
+/* Texte */
+#info-popup p,
+#info-popup ul,
+#info-popup li {
+    font-size: 0.85rem;
+    line-height: 1.8;
+    color: #444;
+}
+
+/* Bouton fermeture */
+#popup-close {
+    position: absolute;
+    top: 18px;
+    right: 14px;
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    color: #1A4E72;
+    line-height: 1;
+}
+
+#popup-close:hover {
+    color: #0d2f50;
+}
+
+
+/* =============================================
+   BOUTON CALCUL EXPOSOME
+   ============================================= */
+
+#calc-exposome-btn {
+    width: 100%;
+    padding: 10px 12px;
+    background-color: rgb(10, 161, 128);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    transition: background 0.15s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+/* voile blanc au survol */
+#calc-exposome-btn::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-color: rgba(255,255,255,0);
+    transition: background-color 0.15s ease;
+}
+
+#calc-exposome-btn:hover::after {
+    background-color: rgba(255,255,255,0.1);
+}
+
+#exposome-results {
+    margin-top: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 0.84rem;
+}
+
+.exposome-pastille {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.exposome-pastille .color-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+}

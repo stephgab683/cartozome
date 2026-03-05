@@ -1,12 +1,12 @@
 /* =============================================
    POLICES
    ============================================= */
-   @import url('https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,100..900;1,100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,100..900;1,100..900&display=swap');
 
 /* =============================================
    BASE
    ============================================= */
-/* HTML et BODY : flex colonne pour la page */
+/* HTML et BODY */
 html, body {
     margin: 0;
     padding: 0;
@@ -87,7 +87,7 @@ html, body {
     padding: 15px 20px;
     background-color: #FFFFFF;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    flex: 0 0 70px;
+    flex: 0 0 55px;
 }
 
 /* Conteneur gauche : logo Cartozome + texte */
@@ -119,95 +119,194 @@ html, body {
    CONTENEUR PRINCIPAL
    ============================================= */
 #main-container {
-    display: flex;
+    position: relative;
     flex: 1;
-    min-height: 0;
 }
 
 /* =============================================
    CARTE
    ============================================= */
-/* Carte principale Leaflet */
 #map {
-    flex: 1;
-    min-height: 0;
-    position: relative;
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
 }
 
 /* =============================================
-   PANNEAU LATÉRAL
+   BOUTONS FLOTTANTS
    ============================================= */
-/* Conteneur du panneau des couches */
-#side-panel {
-    width: 280px;
-    background-color: #f8f8f8;
-    padding: 12px;
+.floating-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    border: none;
+    background: white;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+    cursor: pointer;
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
+/* =============================================
+   ADRESSE / ITINERAIRE
+   ============================================= */
+#search-controls {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    z-index: 1000;
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+}
+
+.search-btn {
+    width: auto !important;
+    height: 36px !important;
+    padding: 0 16px;
+    border-radius: 20px !important; /* bien rond */
+    font-size: 0.82rem !important;
+    font-weight: 600;
+    font-family: 'Jost', sans-serif;
+    color: #1A4E72;
+    margin-bottom: 0 !important;
+    letter-spacing: 0.03em;
+}
+
+.search-btn.active {
+    background-color: #1A4E72;
+    color: #fff;
+}
+
+#search-panel {
+    position: absolute;
+    top: 46px;
+    left: 0;
+    width: 300px;
+    background: white;
+    border-radius: 16px;
+    padding: 14px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+}
+
+#search-panel input {
+    width: 100%;
+    padding: 10px 16px;
+    margin-bottom: 8px;
+    border-radius: 24px; /* rond à la Google Maps */
+    border: 1.5px solid #ddd;
+    font-family: 'Jost', sans-serif;
+    font-size: 0.85rem;
+    color: #333;
     box-sizing: border-box;
-    border-right: 1px solid #ddd;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+#search-panel input:focus {
+    border-color: #1A4E72;
+}
+
+#search-panel button {
+    width: 100%;
+    padding: 10px;
+    background-color: #1A4E72;
+    color: #fff;
+    border: none;
+    border-radius: 24px;
+    cursor: pointer;
+    font-family: 'Jost', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    transition: background 0.15s;
+}
+
+#search-panel button:hover {
+    background-color: #1A4E72;
+    box-shadow: inset 0 0 0 1000px rgba(255,255,255,0.1);
+}
+
+/* =============================================
+   BOUTON GEOLOCALISATION
+   ============================================= */
+.search-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 8px;
+}
+
+.search-row input {
+    flex: 1;
+    margin-bottom: 0 !important;
+}
+
+.geolocate-btn {
+    width: 36px !important;
+    height: 36px !important;
+    border-radius: 50% !important;
+    border: none;
+    background: white;
+    box-shadow: none; /* supprime l'ombre */
+    cursor: pointer;
+    font-size: 14px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0 !important;
+}
+
+.geolocate-btn:hover {
+    background: #1A4E72;
+}
+
+/* =============================================
+   COUCHES
+   ============================================= */
+#layers-control {
+    position: fixed;
+    top: 95px;
+    right: 10px;
+    bottom: auto;
+    z-index: 1000;
+}
+
+#layers-panel {
+    position: absolute;
+    top: 50px;
+    bottom: auto;
+    right: 0;
+    width: 240px;
+    background: #f5f7f9;
+    border-radius: 12px;
+    padding: 8px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    max-height: 70vh;
     overflow-y: auto;
 }
 
 /* =============================================
-   ADRESSES
+   GROUPES DE COUCHES
    ============================================= */
-.input-and-button {
-    display: flex;
-    gap: 4px;
-    margin-top: 4px;
-    margin-bottom: 4px;
-}
-
-.input-and-button input[type="text"] {
-    flex: 1;
-    padding: 6px 10px;
-    border: 1px solid #dde4ea;
-    border-radius: 6px;
-    font-size: 0.84rem;
-    height: 36px;
-    box-sizing: border-box;
-    background-color: #fff;
-}
-
-.input-and-button button {
-    width: 36px;
-    height: 36px;
-    border-radius: 6px;
-    border: 1px solid #dde4ea;
-    background-color: #fff;
-    color: #1A4E72;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s ease;
-}
-
-.input-and-button button:hover {
-    background-color: #1A4E72;
-    color: #fff;
-    border-color: #1A4E72;
-}
-
-/* =============================================
-   CATÉGORIES (accordéon)
-   ============================================= */
-/* Conteneur d’une catégorie */
-.category {
+.layer-group {
     margin-bottom: 6px;
     border-radius: 8px;
     overflow: hidden;
     border: 1px solid #dde4ea;
 }
 
-/* Header de la catégorie : bouton + info */
-.category-header {
+.layer-group-header {
     display: flex;
     align-items: stretch;
     background-color: #1A4E72;
 }
 
-/* Bouton principal pour ouvrir/fermer la catégorie */
-.category-toggle {
+.layer-group-toggle {
     flex: 1;
     display: flex;
     align-items: center;
@@ -226,32 +325,28 @@ html, body {
     transition: background 0.15s;
 }
 
-/* Hover sur le bouton de catégorie */
-.category-toggle:hover {
+.layer-group-toggle:hover {
     background-color: rgba(255,255,255,0.1);
 }
 
-/* Icone dans le bouton catégorie */
-.category-toggle .cat-icon img {
-    width: 24px;  /* ou la taille que tu veux */
-    height: 24px;
+.layer-group-toggle .cat-icon {
+    width: 20px;
+    height: 20px;
     object-fit: contain;
 }
 
-/* Chevron de la catégorie */
-.category-toggle .chevron {
-    margin-left: auto;
+.layer-group-toggle .chevron {
+    margin-left: 0;
+    margin-right: 8px;
     font-size: 0.85rem;
     transition: transform 0.2s;
 }
 
-/* Rotation du chevron quand fermé */
-.category-toggle.closed .chevron {
+.layer-group-toggle.closed .chevron {
     transform: rotate(-90deg);
 }
 
-/* Bouton d’info ℹ️ */
-.category-info-btn {
+.info-btn {
     background: none;
     border: none;
     border-left: 1px solid rgba(255,255,255,0.2);
@@ -263,54 +358,44 @@ html, body {
     flex-shrink: 0;
 }
 
-.category-info-btn:hover {
+.info-btn:hover {
     background-color: rgba(255,255,255,0.15);
 }
 
-/* Conteneur des couches dans la catégorie */
-.category-layers {
+.layer-group-content {
     background: #fff;
     padding: 4px 0;
 }
 
-.category-layers.hidden {
+.layer-group-content.hidden {
     display: none;
 }
 
 /* =============================================
    ITEMS DE COUCHE
    ============================================= */
-/* Conteneur d’un item de couche */
-.layer-item {
-    padding: 8px 12px;
-    border-bottom: 1px solid #f0f0f0;
-}
-
-.layer-item:last-child {
-    border-bottom: none;
-}
-
-/* Label et checkbox */
-.layer-item label {
+.layer-group-content label {
     display: flex;
     align-items: center;
     gap: 9px;
+    padding: 8px 12px;
     cursor: pointer;
     font-size: 0.84rem;
     color: #333;
     user-select: none;
+    border-bottom: 1px solid #f0f0f0;
 }
 
-/* Hover sur le label */
-.layer-item label:hover {
+.layer-group-content label:last-of-type {
+    border-bottom: none;
+}
+
+.layer-group-content label:hover {
     color: #1A4E72;
 }
 
-/* =============================================
-   TOGGLE SWITCH MODERNE (remplace checkbox)
-   ============================================= */
-
-.layer-item input[type="checkbox"] {
+/* Toggle switch */
+.layer-group-content input[type="checkbox"] {
     appearance: none;
     -webkit-appearance: none;
     width: 38px;
@@ -323,8 +408,7 @@ html, body {
     flex-shrink: 0;
 }
 
-/* Le petit rond */
-.layer-item input[type="checkbox"]::before {
+.layer-group-content input[type="checkbox"]::before {
     content: "";
     position: absolute;
     width: 16px;
@@ -337,117 +421,67 @@ html, body {
     box-shadow: 0 1px 3px rgba(0,0,0,0.3);
 }
 
-/* Quand activé */
-.layer-item input[type="checkbox"]:checked {
+.layer-group-content input[type="checkbox"]:checked {
     background-color: #1A4E72;
 }
 
-/* Déplacement du rond */
-.layer-item input[type="checkbox"]:checked::before {
+.layer-group-content input[type="checkbox"]:checked::before {
     transform: translateX(18px);
 }
 
 /* =============================================
-   SOUS-CATÉGORIES DANS BRUIT
+   SOUS-LABELS JOURNÉE / NUIT
    ============================================= */
-/* Conteneur sous-catégorie */
-.subcategory {
-    margin: 2px 0 6px 0;
-    overflow: hidden;
-}
-
-/* Header sous-catégorie : bouton */
-.subcategory-header {
-    display: flex;
-    align-items: center;
+.sublabel {
+    margin: 4px 0 0 0;
+    padding: 4px 12px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #fff;
     background-color: #5dade2;
 }
 
-/* Bouton sous-catégorie */
-.subcategory-toggle {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    padding: 8px 10px;
-    background: none;
-    color: #fff;
-    border: none;
-    cursor: pointer;
-    font-family: 'Jost', sans-serif;
-    font-size: 0.78rem;
-    font-weight: 600;
-    text-align: left;
-    transition: background 0.15s;
-}
-
-.subcategory-toggle:hover {
-    background-color: rgba(255,255,255,0.15);
-}
-
-/* Chevron sous-catégorie */
-.subcategory-toggle .chevron {
-    margin-left: auto;
-    font-size: 0.75rem;
-    transition: transform 0.2s;
-}
-
-.subcategory-toggle.closed .chevron {
-    transform: rotate(-90deg);
-}
-
-/* Conteneur des couches dans sous-catégorie */
-.subcategory-layers {
-    background: #fefefe;
-    padding: 3px 0;
-}
-
-.subcategory-layers.hidden {
-    display: none;
-}
-
-/* Items dans sous-catégorie */
-.subcategory-layers .layer-item {
-    padding: 6px 12px;
-    border-bottom: 1px solid #f0f0f0;
-}
-
-.subcategory-layers .layer-item:last-child {
-    border-bottom: none;
+/* =============================================
+   STYLES GÉNÉRAUX POUR TOUS LES CONTRÔLES
+   ============================================= */
+.leaflet-control {
+    font-family: 'Jost', sans-serif !important;
+    font-weight: 500 !important;
+    font-size: 0.75rem !important;
+    color: #1A4E72 !important;
 }
 
 /* =============================================
    BOUTONS ZOOM
    ============================================= */
-/* Zoom Leaflet */
 .leaflet-control-zoom,
 .leaflet-control {
     border: none !important;
     box-shadow: none !important;
 }
 
-/* Position des boutons */
-.leaflet-bottom.leaflet-right {
-    bottom: 20px;
-    right: 20px;
-    display: flex;
-    flex-direction: column-reverse;
-    gap: 10px;
-    position: absolute !important;
+.leaflet-top.leaflet-left .leaflet-control-zoom {
+    position: fixed !important;
+    bottom: 40px !important;
+    right: 5px !important;
+    top: auto !important;
+    left: auto !important;
+    z-index: 1000;
 }
 
 /* Boutons + et - */
 .leaflet-control-zoom a {
+    width: 32px !important;
+    height: 32px !important;
     background: white !important;
-    color: #333 !important;
+    color: #1A4E72 !important;
     border: none !important;
-    width: 36px;
-    height: 36px;
     line-height: 36px;
     font-size: 18px;
     font-weight: 500;
     border-radius: 12px !important;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2) !important;
+    display: block;
     margin-bottom: 6px;
     transition: all 0.2s ease;
 }
@@ -461,102 +495,8 @@ html, body {
 }
 
 /* =============================================
-   POPUP D'INFORMATION
-   ============================================= */
-#info-popup {
-    display: none;
-    position: fixed;
-    top: 110px;
-    right: 16px;
-    z-index: 1000;
-    width: 320px;
-    max-width: 90vw;
-    background: #fff;
-    border-radius: 12px;
-    padding: 20px 24px;
-    box-shadow: 0 4px 24px rgba(0,0,0,0.15);
-    border-left: 4px solid #1A4E72;
-    animation: slideIn 0.2s ease;
-}
-
-/* Contenu scrollable */
-#popup-content {
-    max-height: 60vh;
-    overflow-y: auto;
-    padding-top: 6px;
-    padding-right: 20px;
-    margin-top: 28px;
-}
-
-/* Scrollbar */
-#popup-content::-webkit-scrollbar {
-    width: 6px;
-    
-}
-
-#popup-content::-webkit-scrollbar-thumb {
-    background-color: #1A4E72;
-    border-radius: 3px;
-}
-
-/* Animation */
-@keyframes slideIn {
-    from { opacity: 0; transform: translateY(-10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-/* Affichage */
-#info-popup.visible {
-    display: block;
-}
-
-/* Titre */
-#info-popup h3 {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin: 0 0 12px 0;
-    font-size: 1rem;
-    color: #1A4E72;
-    font-weight: 700;
-}
-
-#info-popup h3 img {
-    width: 20px;
-    height: 20px;
-    object-fit: contain;
-}
-
-/* Texte */
-#info-popup p,
-#info-popup ul,
-#info-popup li {
-    font-size: 0.85rem;
-    line-height: 1.8;
-    color: #444;
-}
-
-/* Bouton fermeture */
-#popup-close {
-    position: absolute;
-    top: 18px;
-    right: 14px;
-    background: none;
-    border: none;
-    font-size: 1.2rem;
-    cursor: pointer;
-    color: #1A4E72;
-    line-height: 1;
-}
-
-#popup-close:hover {
-    color: #0d2f50;
-}
-
-/* =============================================
    ÉCHELLE
    ============================================= */
-
 .leaflet-control-scale {
     background: rgba(255,255,255,0.9) !important;
     padding: 4px 8px !important;
@@ -566,11 +506,6 @@ html, body {
     font-size: 0.75rem !important;
     font-weight: 500 !important;
     color: #1A4E72 !important; 
-}
-
-.leaflet-bottom.leaflet-right {
-    bottom: 5px !important;
-    right: 5px !important;
 }
 
 /* Texte */
@@ -584,7 +519,6 @@ html, body {
 /* =============================================
    CREDITS
    ============================================= */
-
 .leaflet-control-attribution {
     background: rgba(255,255,255,0.9) !important;
     padding: 6px 10px !important;
@@ -603,59 +537,110 @@ html, body {
     font-weight: 600 !important;
 }
 
+.leaflet-bottom.leaflet-right {
+    bottom: 5px !important;
+    right: 5px !important;
+}
+
 .leaflet-control-attribution a:hover {
     text-decoration: underline !important;
 }
 
 /* =============================================
-   BOUTON CALCUL EXPOSOME
+   POPUP D'INFORMATION
    ============================================= */
 
-#calc-exposome-btn {
+/* Overlay */
+#info-popup {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
     width: 100%;
-    padding: 10px 12px;
-    background-color: rgb(10, 161, 128);
-    color: #fff;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    transition: background 0.15s ease;
-    position: relative;
-    overflow: hidden;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    z-index: 2000;
+    justify-content: center;
+    align-items: center;
 }
 
-/* voile blanc au survol */
-#calc-exposome-btn::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background-color: rgba(255,255,255,0);
-    transition: background-color 0.15s ease;
-}
-
-#calc-exposome-btn:hover::after {
-    background-color: rgba(255,255,255,0.1);
-}
-
-#exposome-results {
-    margin-top: 8px;
+#info-popup.visible {
     display: flex;
-    flex-direction: column;
-    gap: 4px;
-    font-size: 0.84rem;
 }
 
-.exposome-pastille {
+/* Boîte blanche */
+#popup-inner {
+    background: #fff;
+    border-radius: 12px;
+    padding: 30px 40px;
+    max-width: 500px;
+    width: 90%;
+    position: relative;
+    box-shadow: 0 6px 30px rgba(0,0,0,0.25);
+    border-left: 4px solid #1A4E72;
+    animation: slideIn 0.2s ease;
+}
+
+/* Contenu scrollable */
+#popup-content {
+    max-height: 60vh;
+    overflow-y: auto;
+    padding-right: 6px;
+    margin-top: 10px;
+}
+
+#popup-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+#popup-content::-webkit-scrollbar-thumb {
+    background-color: #1A4E72;
+    border-radius: 3px;
+}
+
+@keyframes slideIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Croix */
+#popup-close {
+    position: absolute;
+    top: 12px;
+    right: 14px;
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    color: #888;
+}
+
+#popup-close:hover {
+    color: #1A4E72;
+}
+
+/* Titre avec logo */
+#popup-content h3 {
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
+    margin: 0 0 12px 0;
+    font-size: 1rem;
+    color: #1A4E72;
+    font-weight: 700;
 }
 
-.exposome-pastille .color-dot {
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
+#popup-content h3 img {
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
+}
+
+/* Texte */
+#popup-content p,
+#popup-content ul,
+#popup-content li {
+    font-size: 0.85rem;
+    line-height: 1.8;
+    color: #444;
 }
