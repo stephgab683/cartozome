@@ -1,14 +1,14 @@
 <wmsLayer>
-  <id>WMSLayerInfoImpl--11320b8a:19c94ef6cfa:-7f72</id>
-  <name>GL_Rte_Ln</name>
-  <nativeName>GL_Rte_Ln</nativeName>
+  <id>WMSLayerInfoImpl--5c532a87:19cbe89adc5:-7ff9</id>
+  <name>sous_indice_multibruit_orhane_2023</name>
+  <nativeName>sous_indice_multibruit_orhane_2023</nativeName>
   <namespace>
     <id>NamespaceInfoImpl--11320b8a:19c94ef6cfa:-7ffb</id>
   </namespace>
-  <title>Bruit routier 2022 LN</title>
+  <title>sous_indice_multibruit_orhane_2023</title>
   <description></description>
   <keywords>
-    <string>GL_Rte_Ln</string>
+    <string>sous_indice_multibruit_aura</string>
     <string>WCS</string>
     <string>GeoTIFF</string>
   </keywords>
@@ -37,41 +37,53 @@
   AUTHORITY[&quot;EPSG&quot;,&quot;2154&quot;]]</nativeCRS>
   <srs>EPSG:2154</srs>
   <nativeBoundingBox>
-    <minx>-378305.8099675195</minx>
-    <maxx>1320649.571233652</maxx>
-    <miny>6008151.219241469</miny>
-    <maxy>7235612.7247730335</maxy>
+    <minx>626130.0</minx>
+    <maxx>1027320.0</maxx>
+    <miny>6338300.0</miny>
+    <maxy>6633790.0</maxy>
     <crs class="projected">EPSG:2154</crs>
   </nativeBoundingBox>
   <latLonBoundingBox>
-    <minx>-12.507059845686852</minx>
-    <maxx>12.002857384957794</maxx>
-    <miny>40.39635820978022</miny>
-    <maxy>52.208464444442946</maxy>
+    <minx>2.0314119439673126</minx>
+    <maxx>7.287836031616315</maxx>
+    <miny>44.06743579845864</miny>
+    <maxy>46.803730588040985</maxy>
     <crs>EPSG:4326</crs>
   </latLonBoundingBox>
   <projectionPolicy>FORCE_DECLARED</projectionPolicy>
   <enabled>true</enabled>
   <metadata>
-    <entry key="OTHER_SRS">EPSG:2154,CRS:84,EPSG:4171,EPSG:4326,EPSG:27572,EPSG:27562,EPSG:3946,EPSG:3857,EPSG:4258</entry>
+    <entry key="OTHER_SRS">EPSG:2154,CRS:84,EPSG:3857,EPSG:3942,EPSG:3943,EPSG:3944,EPSG:3945,EPSG:3946,EPSG:3947,EPSG:3948,EPSG:3949,EPSG:3950,EPSG:4171,EPSG:4258,EPSG:4326,EPSG:23030,EPSG:23031,EPSG:23032,EPSG:27561,EPSG:27562,EPSG:27563,EPSG:27564,EPSG:27571,EPSG:27572,EPSG:27573,EPSG:27574,EPSG:32630,EPSG:32631,EPSG:32632,EPSG:900913</entry>
     <entry key="cachingEnabled">false</entry>
   </metadata>
   <store class="wmsStore">
-    <id>WMSStoreInfoImpl--11320b8a:19c94ef6cfa:-7f75</id>
+    <id>WMSStoreInfoImpl--5c532a87:19cbe89adc5:-7ffa</id>
   </store>
   <serviceConfiguration>false</serviceConfiguration>
   <simpleConversionEnabled>false</simpleConversionEnabled>
   <internationalTitle/>
   <internationalAbstract/>
-  <forcedRemoteStyle>raster</forcedRemoteStyle>
+  <forcedRemoteStyle>orhane:orhane_2023_multibruit</forcedRemoteStyle>
   <preferredFormat>image/png</preferredFormat>
+  <selectedRemoteFormats>
+    <string>image/png</string>
+    <string>image/png; mode=8bit</string>
+    <string>image/vnd.jpeg-png</string>
+    <string>image/jpeg</string>
+    <string>image/tiff</string>
+    <string>image/vnd.jpeg-png8</string>
+    <string>image/gif</string>
+    <string>image/geotiff</string>
+    <string>image/tiff8</string>
+    <string>image/geotiff8</string>
+  </selectedRemoteFormats>
   <selectedRemoteStyles>
-    <string>raster</string>
+    <string>orhane:orhane_2023_multibruit</string>
   </selectedRemoteStyles>
   <metadataBBoxRespected>false</metadataBBoxRespected>
   <allAvailableRemoteStyles>
     <style>
-      <name>raster</name>
+      <name>orhane:orhane_2023_multibruit</name>
       <format>sld</format>
       <languageVersion>
         <version>1.0.0</version>
@@ -80,7 +92,7 @@
         <width>20</width>
         <height>20</height>
         <format>image/png</format>
-        <onlineResource>https://data.grandlyon.com/geoserver/grandlyon/ows?service=WMS&amp;version=1.3.0&amp;request=GetLegendGraphic&amp;format=image%2Fpng&amp;width=20&amp;height=20&amp;layer=GL_Rte_Ln</onlineResource>
+        <onlineResource>https://sig.atmo-auvergnerhonealpes.fr/geoserver/orhane/ows?service=WMS&amp;request=GetLegendGraphic&amp;format=image%2Fpng&amp;width=20&amp;height=20&amp;layer=sous_indice_multibruit_orhane_2023</onlineResource>
       </legend>
       <metadata>
         <entry key="isRemote">true</entry>

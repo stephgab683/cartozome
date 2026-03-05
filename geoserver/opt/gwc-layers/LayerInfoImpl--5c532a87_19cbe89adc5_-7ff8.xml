@@ -1,8 +1,8 @@
 <GeoServerTileLayer>
-  <id>LayerInfoImpl--11320b8a:19c94ef6cfa:-7f71</id>
+  <id>LayerInfoImpl--5c532a87:19cbe89adc5:-7ff8</id>
   <enabled>true</enabled>
   <inMemoryCached>true</inMemoryCached>
-  <name>cartozome:GL_Rte_Ln</name>
+  <name>cartozome:sous_indice_multibruit_orhane_2023</name>
   <mimeFormats>
     <string>image/png</string>
     <string>image/jpeg</string>
@@ -26,7 +26,7 @@
       <key>STYLES</key>
       <defaultValue></defaultValue>
       <availableStyles class="sorted-set"/>
-      <defaultStyle>raster</defaultStyle>
+      <defaultStyle>orhane:orhane_2023_multibruit</defaultStyle>
     </styleParameterFilter>
   </parameterFilters>
   <gutter>0</gutter>

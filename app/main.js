@@ -31,32 +31,33 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 // Endpoint : /DATA_API/communes_uv.geojson
 // =============================================
 
-async function fetchUvJson() {                                               // Fonction asynchrone pour récupérer le JSON des UV
-  const res = await fetch(UV_JSON_URL, { cache: "no-store" });               // Récupère le JSON sans utiliser le cache
-  if (!res.ok) throw new Error(`UV JSON HTTP ${res.status}`);                // Gère les erreurs HTTP
-  return res.json();                                                         // Retourne le JSON parsé
+const COMMUNES_UV_URL = "/DATA_API/communes_uv.geojson";
+
+function getUvColor(uv) {
+
+  if (uv === null || uv === undefined) return "#e0e0e0"; // gris (aucune donnée)
+
+  if (uv < 2) return "#8bc34a";       // faible
+  if (uv < 5) return "#ffeb3b";       // modéré
+  if (uv < 7) return "#ff9800";       // élevé
+  if (uv < 10) return "#f44336";      // très élevé
+  return "#9c27b0";                   // extrême
 }
 
-// Retourne le point UV le plus proche d'une coordonnée (lat/lon).
-// On fait simple (distance euclidienne sur lat/lon), suffisant à l'échelle de la métropole.
+function styleCommunes(feature) {
 
-function closestUvPoint(points, lat, lon) {                                   // Trouve le point UV le plus proche d'une coordonnée
-  let best = null;                                                            // Variable pour stocker le meilleur point
-  let bestD2 = Infinity;                                                      // Variable pour stocker la meilleure distance au carré
-  for (const p of points) {                                                    // Parcourt tous les points
-    const pLat = p?.latitude;                                                 // Récupère la latitude du point
-    const pLon = p?.longitude;                                                // Récupère la longitude du point
-    if (typeof pLat !== "number" || typeof pLon !== "number") continue;       // Ignore si les coordonnées ne sont pas des nombres
-    const dLat = pLat - lat;                                                  // Calcule la différence de latitude
-    const dLon = pLon - lon;                                                  // Calcule la différence de longitude
-    const d2 = dLat * dLat + dLon * dLon;                                    // Calcule la distance au carré (euclidienne)
-    if (d2 < bestD2) { bestD2 = d2; best = p; }                               // Met à jour le meilleur point si la distance est plus petite
-  }
-  return best;                                                                // Retourne le point le plus proche
+  const uv = feature.properties?.uv_max;
+
+  return {
+    fillColor: getUvColor(uv),
+    weight: 1,
+    opacity: 1,
+    color: "#555",
+    fillOpacity: 0.6
+  };
 }
 
 // Extrait une valeur UV max (si dispo) et une date à partir d'un objet point.
-
 function extractUvMax(point) {                                                // Extrait la valeur UV max d'un point
   const uv = point?.daily?.uv_index_max?.[0];                                 // Récupère l'indice UV max (peut être null)
   return { uv };                                                              // Retourne un objet avec la valeur UV
@@ -67,37 +68,64 @@ function extractUvMax(point) {                                                //
 
 async function updateUvFromMapCenter(map) {                                   // Met à jour l'affichage des UV en fonction du centre de la carte
   try {
-    const points = await fetchUvJson();                                       // Récupère les points UV
-    const center = map.getCenter();                                           // Récupère le centre de la carte
-    const p = closestUvPoint(points, center.lat, center.lng);                 // Trouve le point UV le plus proche
 
-    if (!p) {                                                                 // Si aucun point trouvé
-      console.warn("[UV] Aucun point UV trouvé dans le JSON.");               // Log un avertissement
-      const el = document.getElementById("uv-status");                        // Récupère l'élément DOM pour afficher le statut UV
-      if (el) el.textContent = "Aucune donnée UV.";                           // Met à jour le texte si l'élément existe
-      return;                                                                 // Quitte la fonction
-    }
+    const res = await fetch(COMMUNES_UV_URL, { cache: "no-store" });
 
-    const { uv } = extractUvMax(p);                                          // Extrait la valeur UV max
+    if (!res.ok) throw new Error(`GeoJSON HTTP ${res.status}`);
 
-    console.log("[UV] Point le plus proche du centre:", {                    // Log les infos du point UV le plus proche
-      center: { lat: center.lat, lon: center.lng },
-      point: { lat: p.latitude, lon: p.longitude, location_id: p.location_id ?? null },
-      uv_max: uv
-    });
+    const geojson = await res.json();
 
-    const el = document.getElementById("uv-status");                          // Récupère l'élément DOM pour afficher le statut UV
-    if (el) {                                                                 // Si l'élément existe
-      el.textContent = (uv === null || uv === undefined)                      // Met à jour le texte en fonction de la valeur UV
-        ? `UV max : très faible`
-        : `UV max : ${uv}`;
-    }
-  } catch (err) {                                                            // Gère les erreurs
-    console.error("[UV] Erreur de chargement UV:", err);                     // Log l'erreur
-    const el = document.getElementById("uv-status");                         // Récupère l'élément DOM pour afficher le statut UV
-    if (el) el.textContent = "Erreur de chargement des UV.";                 // Met à jour le texte en cas d'erreur
+    L.geoJSON(geojson, {
+
+      style: styleCommunes
+
+    }).addTo(map);
+
+    console.log("[UV COMMUNES] couche chargée");
+
+  } catch (err) {
+
+    console.error("[UV COMMUNES] erreur :", err);
+
   }
 }
+
+loadCommunesUV();
+
+// Barre d'échelle en bas à gauche (unités métriques uniquement)
+L.control.scale({ position: 'bottomleft', imperial: false }).addTo(map);
+
+// LayerGroup qui accueille les marqueurs et la polyligne de l'itinéraire.
+// Effacé à chaque nouvelle recherche.
+const routingLayer = L.layerGroup().addTo(map);
+
+// =============================================
+// ICÔNES MARQUEURS PERSONNALISÉES
+// Les SVG sont définis dans des <template> dans
+// le HTML. markerIcon() clone le contenu du template 
+// et crée une icône Leaflet de type divIcon.
+// iconAnchor [16,40] : pointe du pin sur le sol
+// popupAnchor [0,-40] : popup au-dessus du pin
+// =============================================
+
+// Crée une icône Leaflet à partir d'un <template> HTML
+function markerIcon(templateId) {
+  const svg = document.getElementById(templateId).innerHTML; // Récupère le SVG du template
+  return L.divIcon({
+    className:   '',          // Pas de classe CSS par défaut (évite le carré blanc Leaflet)
+    html:        svg,
+    iconSize:    [32, 40],
+    iconAnchor:  [16, 40],    // Point d'ancrage : bas centre du pin
+    popupAnchor: [0, -40],    // Popup s'affiche au-dessus du pin
+  });
+}
+
+const iconPoint   = markerIcon('tpl-marker-point');   // Pin bleu, point unique
+const iconCompareA = markerIcon('tpl-marker-compare-a'); // Pin vert, point A comparaison
+const iconCompareB = markerIcon('tpl-marker-compare-b'); // Pin rouge, point B comparaison
+const iconDepart  = markerIcon('tpl-marker-depart');  // Pin vert, départ itinéraire
+const iconArrivee = markerIcon('tpl-marker-arrivee'); // Pin rouge, arrivée itinéraire
+
 
 // =============================================
 // EXTENSION BETTERWMS
@@ -606,7 +634,6 @@ document.getElementById("calc-point-btn").addEventListener("click", async () => 
 
   console.log("[POINT] Coordonnées :", { lat: coords[1], lon: coords[0] });
   openResultsPanel();
-  updateResultsForPoint(coords[1], coords[0], pointInput);
 });
 
 // Validation comparaison : géocode les deux points et place deux marqueurs.
@@ -639,7 +666,6 @@ document.getElementById("calc-compare-btn").addEventListener("click", async () =
   console.log("[COMPARAISON] Point A :", { lat: coordsA[1], lon: coordsA[0] });
   console.log("[COMPARAISON] Point B :", { lat: coordsB[1], lon: coordsB[0] });
   openResultsPanel();
-  updateResultsForPoint(coordsA[1], coordsA[0], inputA);
 });
 
 // Validation itinéraire : géocode départ et arrivée, trace la route piétonne.
@@ -673,7 +699,6 @@ document.getElementById("calc-route-btn").addEventListener("click", async () => 
 
   console.log("[ITINÉRAIRE] Coordonnées :", routeCoords);
   openResultsPanel();
-  updateResultsForPoint(startCoords[1], startCoords[0], routeStart);
 });
 
 // Autocomplétion : affiche des suggestions pendant la frappe (délai 250ms).
@@ -693,244 +718,136 @@ function attachAutocomplete(inputId) {
   input.addEventListener('input', () => {
     clearTimeout(debounceTimer);
     const query = input.value.trim();
-    const endCoords = await geocodeAddress(routeEnd);                         // Géocode l'adresse d'arrivée
-    if (!endCoords) {                                                         // Si pas de coordonnées trouvées
-      alert("Adresse d'arrivée introuvable");                                 // Affiche une alerte
-      return;                                                                 // Quitte la fonction
-    }
 
-    const endLatLng = L.latLng(endCoords[1], endCoords[0]);                  // Crée un objet LatLng pour l'arrivée
+    if (query.length < 3) { list.classList.add('hidden'); return; }          // Pas de recherche sous 3 caractères
 
-    L.marker(endLatLng)                                                      // Crée un marqueur pour l'arrivée
-      .addTo(routingLayer)                                                    // Ajoute le marqueur à la couche
-      .bindPopup("Arrivée");                                                  // Ajoute une popup
+    debounceTimer = setTimeout(async () => {                                  // Délai anti-spam avant d'appeler l'API
+      const res  = await fetch(`https://data.geopf.fr/geocodage/search?q=${encodeURIComponent(query)}&limit=50`);
+      const data = await res.json();
 
-    const routeCoords = await getRoute(startCoords, endCoords);               // Calcule l'itinéraire
+      list.innerHTML = '';
+      if (!data.features || data.features.length === 0) { list.classList.add('hidden'); return; }
 
-    if (!routeCoords) {                                                       // Si pas d'itinéraire trouvé
-      alert("Impossible de calculer l'itinéraire");                           // Affiche une alerte
-      return;                                                                 // Quitte la fonction
-    }
+      // Filtre les résultats hors bounds de la métropole de Lyon
+      const filtered = data.features.filter(f => {
+        const [lon, lat] = f.geometry.coordinates;
+        return lat >= 45.45 && lat <= 46.00 && lon >= 4.65 && lon <= 5.25;
+      });
 
-    const latLngs = routeCoords.map(coord => [coord[1], coord[0]]);            // Convertit les coordonnées en LatLng
+      if (filtered.length === 0) { list.classList.add('hidden'); return; }
 
-    const routeLine = L.polyline(latLngs, {                                    // Crée une polyligne pour l'itinéraire
-      color: "red",                                                            // Couleur rouge
-      weight: 4                                                                // Épaisseur de 4px
-    }).addTo(routingLayer);                                                    // Ajoute la polyligne à la couche
+      filtered.forEach(f => {                                                 // Crée un <li> par suggestion
+        const li = document.createElement('li');
+        li.textContent = f.properties.label;
+        li.addEventListener('mousedown', () => {                              // mousedown avant blur pour que le clic se déclenche
+          input.value = f.properties.label;
+          list.classList.add('hidden');
+        });
+        list.appendChild(li);
+      });
 
-    map.fitBounds(routeLine.getBounds(), { padding: [50, 50] });               // Ajuste la vue pour afficher tout l'itinéraire
-
+      list.classList.remove('hidden');
+    }, 250);
   });
 
-// =============================================
-// MÉTADONNÉES POUR LE PANEL DE RÉSULTATS
-// min/max : valeurs approx. sur la métropole
-// oms     : seuil OMS (null si inexistant)
-// thresholds : [seuil_bon, seuil_modéré]
-// =============================================
-const LAYER_META = {
-  "cartozome:mod_aura_2024_pm10_moyan":  { label: "PM10",              unit: "µg/m³",   min: 5,  max: 50,    oms: 15,   thresholds: [15, 30]    },
-  "cartozome:mod_aura_2024_pm25_moyan":  { label: "PM2.5",             unit: "µg/m³",   min: 2,  max: 30,    oms: 5,    thresholds: [5, 15]     },
-  "cartozome:mod_aura_2024_no2_moyan":   { label: "NO₂",               unit: "µg/m³",   min: 5,  max: 80,    oms: 10,   thresholds: [10, 25]    },
-  "cartozome:mod_aura_2024_o3_somo35":   { label: "O₃",                unit: "µg/m³·j", min: 0,  max: 25000, oms: null, thresholds: [10000, 17500] },
-  "cartozome:Ambroisie_2024_AURA":       { label: "Ambroisie",         unit: "gr/m³",   min: 0,  max: 20,    oms: null, thresholds: [3, 10]     },
-  "cartozome:GL_Rte_Lden":               { label: "Routier (jour)",     unit: "dB",      min: 40, max: 80,    oms: 53,   thresholds: [53, 65]    },
-  "cartozome:GL_Fer_Lden":               { label: "Ferroviaire (jour)", unit: "dB",      min: 40, max: 80,    oms: 54,   thresholds: [54, 65]    },
-  "cartozome:Indus_GL_E4_Lden":          { label: "Industriel (jour)",  unit: "dB",      min: 40, max: 80,    oms: 70,   thresholds: [70, 75]    },
-  "cartozome:GL_Rte_Ln":                 { label: "Routier (nuit)",     unit: "dB",      min: 30, max: 70,    oms: 45,   thresholds: [45, 55]    },
-  "cartozome:GL_Fer_Ln":                 { label: "Ferroviaire (nuit)", unit: "dB",      min: 30, max: 70,    oms: 44,   thresholds: [44, 55]    },
 };
 
-// Structure des catégories affichées dans le panel
-const RESULT_CATEGORIES = [
-  {
-    label: "Air", icon: "🌫",
-    layers: [
-      "cartozome:mod_aura_2024_pm10_moyan",
-      "cartozome:mod_aura_2024_pm25_moyan",
-      "cartozome:mod_aura_2024_no2_moyan",
-      "cartozome:mod_aura_2024_o3_somo35",
-    ]
-  },
-  {
-    label: "Pollen", icon: "🌿",
-    layers: ["cartozome:Ambroisie_2024_AURA"]
-  },
-  {
-    label: "Bruit", icon: "🔊",
-    layers: [
-      "cartozome:GL_Rte_Lden",
-      "cartozome:GL_Fer_Lden",
-      "cartozome:Indus_GL_E4_Lden",
-      "cartozome:GL_Rte_Ln",
-      "cartozome:GL_Fer_Ln",
-    ]
-  },
-];
+// // ==============================
+// // TEST SIMPLE POST -> POPUP
+// // ==============================
 
-// Retourne le badge correspondant à la valeur
-function getBadge(val, thresholds) {
-  if (val <= thresholds[0]) return { label: "Bon",     cls: "badge-low"  };
-  if (val <= thresholds[1]) return { label: "Modéré",  cls: "badge-mid"  };
-  return                           { label: "Élevé",   cls: "badge-high" };
-}
+// const API_BASE_URL = "http://localhost:8000";
 
-// Construit la barre de légende avec marqueur OMS et marqueur valeur
-function buildLegendBar(val, meta) {
-  const { min, max, oms, unit } = meta;
-  const pct    = v  => Math.min(100, Math.max(0, ((v - min) / (max - min)) * 100));
-  const valPct = pct(val);
-  const omsPct = oms !== null ? pct(oms) : null;
+// async function testPostPopup() {
+//   try {
+//     const response = await fetch(`${API_BASE_URL}/pollution`, {
+//       method: "POST",
+//       headers: {
+//         "Content-Type": "application/json"
+//       },
+//       body: JSON.stringify({ test: "hello" })
+//     });
 
-  return `
-    <div class="legend-bar-wrap">
-      <div class="legend-bar"></div>
-      ${omsPct !== null ? `
-        <div class="marker-oms" style="left:${omsPct}%"></div>
-        <span class="label-oms" style="left:${omsPct}%">OMS ${oms}</span>
-      ` : ''}
-      <div class="marker-val" style="left:${valPct}%"></div>
-      <div class="legend-labels">
-        <span>${min}</span>
-        <span>${max} ${unit}</span>
-      </div>
-    </div>`;
-}
+//     const data = await response.json();
 
-// Interroge GeoServer en GetFeatureInfo pour un point donné
-// Retourne la valeur numérique de la couche, ou null si absent
-async function queryLayerAtPoint(layerName, lat, lon) {
-  const delta = 0.001; // Petite bbox autour du point
-  const bbox  = `${lon - delta},${lat - delta},${lon + delta},${lat + delta}`;
+//     L.popup()
+//       .setLatLng(map.getCenter())
+//       .setContent(`
+//         <b>Test POST réussi ✅</b><br><br>
+//         PM2.5 : ${data.pollution["PM2.5"]}<br>
+//         NO2 : ${data.pollution["NO2"]}<br>
+//         O3 : ${data.pollution["O3"]}
+//       `)
+//       .openOn(map);
 
-  const params = new URLSearchParams({
-    service:       "WMS",
-    version:       "1.1.1",
-    request:       "GetFeatureInfo",
-    layers:        layerName,
-    query_layers:  layerName,
-    styles:        "",
-    bbox:          bbox,
-    width:         101,
-    height:        101,
-    srs:           "EPSG:4326",
-    format:        "image/png",
-    transparent:   true,
-    info_format:   "application/json",
-    x:             50,
-    y:             50,
-    feature_count: 1,
-  });
+//   } catch (err) {
+
+//     L.popup()
+//       .setLatLng(map.getCenter())
+//       .setContent(`
+//         <b>Erreur POST ❌</b><br>
+//         ${err}
+//       `)
+//       .openOn(map);
+
+//   }
+// }
+
+// testPostPopup();
+
+
+const API_BASE_URL = "http://127.0.0.1:8000";
+
+// Au clic sur la carte
+map.on("click", async function (e) {
+
+  const lat = e.latlng.lat;
+  const lon = e.latlng.lng;
 
   try {
-    const res  = await fetch(`${GEOSERVER_URL}?${params}`);
-    if (!res.ok) return null;
-    const data = await res.json();
-    const features = data?.features;
-    if (!features || features.length === 0) return null;
-    const entry = Object.entries(features[0].properties).find(([, v]) => typeof v === "number");
-    return entry ? entry[1] : null;
-  } catch {
-    return null;
-  }
-}
 
-// Construit et injecte le HTML du panel de résultats
-// address    : adresse lisible affichée en titre
-// layerValues : { layerName: valeur | null }
-// uvValue    : indice UV (number | null)
-function renderResultsPanel(address, layerValues, uvValue) {
-  const content = document.getElementById("results-content");
-  const header  = document.getElementById("results-header");
+    const response = await fetch(`${API_BASE_URL}/indicateurs`, {  // attention : endpoint mis à jour
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ latitude: lat, longitude: lon })
+    });
 
-  document.getElementById("results-address").textContent = address;
-  document.getElementById("results-close").addEventListener("click", () => {
-      resultsPanel.classList.add("hidden");
-  });
+    const data = await response.json();
 
-  document.getElementById("results-close").addEventListener("click", () => {
-    resultsPanel.classList.add("hidden");
-  });
+    let content = "<b>Valeurs des couches :</b><br>";
 
-  let html = ``;
+    let hasData = false;
 
-  // Catégories Air, Pollen, Bruit
-  for (const cat of RESULT_CATEGORIES) {
-    html += `<div class="cat-card">
-      <div class="cat-header">${cat.icon} ${cat.label}</div>
-      <div class="cat-body">`;
-
-    for (const layerName of cat.layers) {
-      const meta = LAYER_META[layerName];
-      if (!meta) continue;
-      const val = layerValues[layerName];
-
-      html += `<div class="res-row"><div class="res-top">
-        <span class="res-label">${meta.label}</span>`;
-
-      if (val === null || val === undefined) {
-        html += `<span class="res-value no-data">Non disponible</span>`;
+    // Boucle sur toutes les couches
+    for (const [layer, value] of Object.entries(data)) {
+      if (value !== null && !value.toString().startsWith("Erreur")) {
+        hasData = true;
+        content += `${layer} : ${value}<br>`;
+      } else if (value && value.toString().startsWith("Erreur")) {
+        content += `${layer} : <span style="color:red;">${value}</span><br>`;
       } else {
-        const badge = getBadge(val, meta.thresholds);
-        html += `<div class="res-right">
-          <span class="res-value">${val.toFixed(1)} ${meta.unit}</span>
-          <span class="res-badge ${badge.cls}">${badge.label}</span>
-        </div>`;
+        content += `${layer} : Aucun résultat<br>`;
       }
-
-      html += `</div>`;
-      if (val !== null && val !== undefined) html += buildLegendBar(val, meta);
-      html += `</div>`;
     }
 
-    html += `</div></div>`;
+    if (!hasData) {
+      content = "<b>Aucun résultat pour toutes les couches</b>";
+    }
+
+    L.popup()
+      .setLatLng(e.latlng)
+      .setContent(content)
+      .openOn(map);
+
+  } catch (error) {
+
+    L.popup()
+      .setLatLng(e.latlng)
+      .setContent(`<b>Erreur ❌</b><br>${error}`)
+      .openOn(map);
+
   }
 
-  // Catégorie UV (données JSON Météo-France)
-  html += `<div class="cat-card">
-    <div class="cat-header">☀️ UV</div>
-    <div class="cat-body">
-      <div class="res-row"><div class="res-top">
-        <span class="res-label">Indice UV max</span>`;
-
-  if (uvValue === null || uvValue === undefined) {
-    html += `<span class="res-value no-data">Non disponible</span>`;
-  } else {
-    const badge = getBadge(uvValue, [2, 5]);
-    html += `<div class="res-right">
-      <span class="res-value">${uvValue}</span>
-      <span class="res-badge ${badge.cls}">${badge.label}</span>
-    </div>`;
-  }
-
-  html += `</div>`;
-  if (uvValue !== null && uvValue !== undefined) {
-    html += buildLegendBar(uvValue, { min: 0, max: 11, oms: null, unit: "" });
-  }
-  html += `</div></div></div>`;
-
-  content.innerHTML = html;
-}
-
-// Interroge toutes les couches pour un point et met à jour le panel
-async function updateResultsForPoint(lat, lon, address) {
-  // Lance toutes les requêtes en parallèle
-  const entries = await Promise.all(
-    Object.keys(LAYER_META).map(async layerName => {
-      const val = await queryLayerAtPoint(layerName, lat, lon);
-      return [layerName, val];
-    })
-  );
-  const layerValues = Object.fromEntries(entries);
-
-  // Récupère la valeur UV depuis le JSON déjà chargé
-  let uvValue = null;
-  try {
-    const points = await fetchUvJson();
-    const p      = closestUvPoint(points, lat, lon);
-    if (p) uvValue = extractUvMax(p).uv;
-  } catch { /* silencieux */ }
-
-  renderResultsPanel(address, layerValues, uvValue);
-}
+});
