@@ -11,6 +11,7 @@ services:
       - "8081:8080"
     volumes:
       - ./geoserver/opt:/opt/geoserver_data
+  
   uv_fetcher:
     container_name: cartozome_uv_fetcher
     build:
@@ -26,7 +27,7 @@ services:
       - "8000:8000"
     volumes:
       - ./api:/app
-    command: uvicorn main:app --host 0.0.0.0 --port 8000
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
 
   web:
     container_name: cartozome_web

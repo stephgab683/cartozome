@@ -6,27 +6,22 @@ from pyproj import Transformer
 import asyncio
 from shapely.geometry import shape
 
-
 app = FastAPI()
 
-# Autoriser le front
+# ======== Autoriser le front ========
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],  
+    allow_origins=["http://localhost:5173", "http://localhost","http://localhost:80","http://127.0.0.1"], 
     allow_methods=["*"],
     allow_headers=["*"],
     allow_credentials=True
 )
 
-# Conversion WGS84 -> Lambert 93
-transformer = Transformer.from_crs("EPSG:4326", "EPSG:2154", always_xy=True)
 
-class Coord(BaseModel):
-    latitude: float
-    longitude: float
-
-class CoordList(BaseModel):
-    coords: list[Coord]
+# ======== Constantes ========
+WMS_URL = "http://localhost:8081/geoserver/cartozome/ows"
+UV_URL = "https://api.open-meteo.com/v1/forecast"
+WFS_COMMUNES_URL = "https://data.grandlyon.com/geoserver/metropole-de-lyon/ows"
 
 WMS_LAYERS = {
     "Ambroisie": "cartozome:Ambroisie_2024_AURA",
@@ -37,8 +32,17 @@ WMS_LAYERS = {
     "Bruit": "cartozome:sous_indice_multibruit_orhane_2023"
 }
 
-WMS_URL = "http://localhost:8081/geoserver/cartozome/ows"
-UV_URL = "https://api.open-meteo.com/v1/forecast"
+
+
+# Conversion WGS84 -> Lambert 93
+transformer = Transformer.from_crs("EPSG:4326", "EPSG:2154", always_xy=True)
+
+class Coord(BaseModel):
+    latitude: float
+    longitude: float
+
+class CoordList(BaseModel):
+    coords: list[Coord]
 
 # ======== fonction WMS/UV pour un point ========
 async def fetch_point_data(client, lat, lon):
@@ -100,10 +104,6 @@ async def get_point_data(coord: Coord):
     return data
 
 # ======== fonction pour afficher les données des UV ========
-
-
-WFS_COMMUNES_URL = "https://data.grandlyon.com/geoserver/metropole-de-lyon/ows"
-UV_URL = "https://api.open-meteo.com/v1/forecast"
 
 # -------- récupération des communes --------
 async def fetch_communes():

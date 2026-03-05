@@ -31,12 +31,12 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 // =============================================
 
 function getColor(uv) {
-  return uv > 11 ? '#7e0023' :
-         uv > 8  ? '#ff0000' :
-         uv > 6  ? '#ff7f00' :
-         uv > 3  ? '#ffff00' :
-         uv > 1  ? '#00ff00' :
-                   '#a0ffa0';
+  if      (uv >= 11) return '#9c27b0'; // Extreme
+  else if (uv >= 8)  return '#f44336'; // Très Fort
+  else if (uv >= 6)  return '#ff9800'; // Fort
+  else if (uv >= 3)  return '#ffeb3b'; // Modéré
+  else if (uv >= 0) return '#8bc34a';  // Faible
+  else              return '#FFFFFF';
 }
 
 const routingLayer = L.layerGroup().addTo(map);
@@ -65,9 +65,6 @@ async function loadUvLayer() {
 
 // Charger la couche au démarrage
 loadUvLayer();
-
-
-
 
 // =============================================
 // ICÔNES MARQUEURS PERSONNALISÉES
