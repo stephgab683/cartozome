@@ -26,6 +26,64 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   attribution: '&copy; OpenStreetMap contributors'
 }).addTo(map);
 
+// =============================================
+// COMMUNES UV (GeoJSON servi par Caddy)
+// Endpoint : /DATA_API/communes_uv.geojson
+// =============================================
+
+const COMMUNES_UV_URL = "/DATA_API/communes_uv.geojson";
+
+function getUvColor(uv) {
+
+  if (uv === null || uv === undefined) return "#e0e0e0"; // gris (aucune donnée)
+
+  if (uv < 2) return "#8bc34a";       // faible
+  if (uv < 5) return "#ffeb3b";       // modéré
+  if (uv < 7) return "#ff9800";       // élevé
+  if (uv < 10) return "#f44336";      // très élevé
+  return "#9c27b0";                   // extrême
+}
+
+function styleCommunes(feature) {
+
+  const uv = feature.properties?.uv_max;
+
+  return {
+    fillColor: getUvColor(uv),
+    weight: 1,
+    opacity: 1,
+    color: "#555",
+    fillOpacity: 0.6
+  };
+}
+
+async function loadCommunesUV() {
+
+  try {
+
+    const res = await fetch(COMMUNES_UV_URL, { cache: "no-store" });
+
+    if (!res.ok) throw new Error(`GeoJSON HTTP ${res.status}`);
+
+    const geojson = await res.json();
+
+    L.geoJSON(geojson, {
+
+      style: styleCommunes
+
+    }).addTo(map);
+
+    console.log("[UV COMMUNES] couche chargée");
+
+  } catch (err) {
+
+    console.error("[UV COMMUNES] erreur :", err);
+
+  }
+}
+
+loadCommunesUV();
+
 // Barre d'échelle en bas à gauche (unités métriques uniquement)
 L.control.scale({ position: 'bottomleft', imperial: false }).addTo(map);
 
