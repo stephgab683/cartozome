@@ -54,6 +54,7 @@
   <enabled>true</enabled>
   <metadata>
     <entry key="OTHER_SRS">EPSG:2154,CRS:84,EPSG:4171,EPSG:4326,EPSG:27572,EPSG:27562,EPSG:3946,EPSG:3857,EPSG:4258</entry>
+    <entry key="cachingEnabled">false</entry>
   </metadata>
   <store class="wmsStore">
     <id>WMSStoreInfoImpl--11320b8a:19c94ef6cfa:-7f75</id>
@@ -62,7 +63,28 @@
   <simpleConversionEnabled>false</simpleConversionEnabled>
   <internationalTitle/>
   <internationalAbstract/>
-  <forcedRemoteStyle></forcedRemoteStyle>
+  <forcedRemoteStyle>raster</forcedRemoteStyle>
   <preferredFormat>image/png</preferredFormat>
+  <selectedRemoteStyles>
+    <string>raster</string>
+  </selectedRemoteStyles>
   <metadataBBoxRespected>false</metadataBBoxRespected>
+  <allAvailableRemoteStyles>
+    <style>
+      <name>raster</name>
+      <format>sld</format>
+      <languageVersion>
+        <version>1.0.0</version>
+      </languageVersion>
+      <legend>
+        <width>20</width>
+        <height>20</height>
+        <format>image/png</format>
+        <onlineResource>https://data.grandlyon.com/geoserver/grandlyon/ows?service=WMS&amp;version=1.3.0&amp;request=GetLegendGraphic&amp;format=image%2Fpng&amp;width=20&amp;height=20&amp;layer=GL_Rte_Ln</onlineResource>
+      </legend>
+      <metadata>
+        <entry key="isRemote">true</entry>
+      </metadata>
+    </style>
+  </allAvailableRemoteStyles>
 </wmsLayer>
