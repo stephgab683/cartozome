@@ -1,12 +1,15 @@
 /* =============================================
-   POLICES
-   ============================================= */
+    POLICES
+    Import de la police Jost depuis Google Fonts
+    Utilisée sur toute l'interface
+    ============================================= */
 @import url('https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,100..900;1,100..900&display=swap');
 
 /* =============================================
-   BASE
-   ============================================= */
-/* HTML et BODY */
+    BASE
+    Reset des marges/paddings, mise en page
+    colonne pour empiler le bandeau + la carte
+    ============================================= */
 html, body {
     margin: 0;
     padding: 0;
@@ -17,12 +20,22 @@ html, body {
 }
 
 /* =============================================
-   POP-UP DE BIENVENUE
-   ============================================= */
+    UTILITAIRES
+    Classe générique .hidden utilisée par le JS
+    pour masquer/afficher les panels et couches
+    ============================================= */
+.hidden {
+    display: none !important;
+}
 
-/* Overlay semi-transparent */
+/* =============================================
+    POP-UP DE BIENVENUE
+    Overlay plein écran semi-transparent +
+    boîte blanche centrée. Affichée au
+    chargement, fermée via le bouton ✖
+    ============================================= */
 #welcome-overlay {
-    display: none; /* caché par défaut, JS le rend visible */
+    display: none;
     position: fixed;
     top: 0;
     left: 0;
@@ -34,7 +47,6 @@ html, body {
     align-items: center;
 }
 
-/* Pop-up centrale */
 #welcome-popup {
     background: #fff;
     border-radius: 12px;
@@ -44,9 +56,9 @@ html, body {
     text-align: center;
     position: relative;
     box-shadow: 0 6px 30px rgba(0,0,0,0.25);
+    border-left: 4px solid #1A4E72;
 }
 
-/* Bouton de fermeture */
 #welcome-close {
     position: absolute;
     top: 12px;
@@ -62,14 +74,12 @@ html, body {
     color: #1A4E72;
 }
 
-/* Titre pop-up */
 #welcome-popup h2 {
     margin: 0 0 15px 0;
     font-size: 1.5rem;
     color: #1A4E72;
 }
 
-/* Texte pop-up */
 #welcome-popup p {
     font-size: 1rem;
     line-height: 1.6;
@@ -77,32 +87,31 @@ html, body {
 }
 
 /* =============================================
-   BANDEAU HAUT
-   ============================================= */
-/* Conteneur principal de la bannière */
+    BANDEAU HAUT
+    Barre fixe en haut de page avec logo
+    Cartozome à gauche et logo Léon Bérard
+    à droite
+    ============================================= */
 #top-banner {
     display: flex;
     align-items: center;
-    justify-content: space-between; 
+    justify-content: space-between;
     padding: 15px 20px;
     background-color: #FFFFFF;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     flex: 0 0 55px;
 }
 
-/* Conteneur gauche : logo Cartozome + texte */
 #banner-left {
     display: flex;
     align-items: center;
     gap: 10px;
 }
 
-/* Logo Cartozome (gauche) */
 #banner-logo {
     height: 50px;
 }
 
-/* Texte Cartozome */
 #banner-left h1 {
     margin: 0;
     font-size: 1.8rem;
@@ -110,22 +119,26 @@ html, body {
     text-transform: uppercase;
 }
 
-/* Logo Centre Léon Bérard (droite) */
 #banner-logo-right {
     height: 50px;
 }
 
 /* =============================================
-   CONTENEUR PRINCIPAL
-   ============================================= */
+    CONTENEUR PRINCIPAL
+    Prend tout l'espace restant sous le bandeau.
+    Position relative pour ancrer les éléments
+    flottants (carte, panels, boutons)
+    ============================================= */
 #main-container {
     position: relative;
     flex: 1;
 }
 
 /* =============================================
-   CARTE
-   ============================================= */
+    CARTE LEAFLET
+    Occupe tout le conteneur principal.
+    z-index: 0 pour passer sous les panels
+    ============================================= */
 #map {
     position: absolute;
     inset: 0;
@@ -135,8 +148,10 @@ html, body {
 }
 
 /* =============================================
-   BOUTONS FLOTTANTS
-   ============================================= */
+    BOUTONS FLOTTANTS
+    Style de base partagé par le bouton couches
+    et les boutons Adresse/Itinéraire
+    ============================================= */
 .floating-btn {
     width: 44px;
     height: 44px;
@@ -149,9 +164,16 @@ html, body {
     margin-bottom: 10px;
 }
 
+.floating-btn:hover {
+    background: #f5f5f5;
+}
+
 /* =============================================
-   ADRESSE / ITINERAIRE
-   ============================================= */
+    RECHERCHE : ADRESSE / COMPARAISON / ITINÉRAIRE
+    Conteneur positionné en haut à gauche.
+    Contient les trois boutons toggle et le
+    panel de saisie qui s'affiche en dessous
+    ============================================= */
 #search-controls {
     position: absolute;
     top: 20px;
@@ -162,11 +184,12 @@ html, body {
     gap: 8px;
 }
 
+/* Boutons Où je suis / Comparer / Mon chemin : style pill */
 .search-btn {
     width: auto !important;
     height: 36px !important;
-    padding: 0 16px;
-    border-radius: 20px !important; /* bien rond */
+    padding: 0 21px;
+    border-radius: 20px !important;
     font-size: 0.82rem !important;
     font-weight: 600;
     font-family: 'Jost', sans-serif;
@@ -175,27 +198,30 @@ html, body {
     letter-spacing: 0.03em;
 }
 
+/* État actif du bouton sélectionné */
 .search-btn.active {
     background-color: #1A4E72;
     color: #fff;
 }
 
+/* Boîte blanche qui contient les champs de saisie */
 #search-panel {
     position: absolute;
     top: 46px;
     left: 0;
-    width: 300px;
+    width: 320px;
     background: white;
     border-radius: 16px;
     padding: 14px;
     box-shadow: 0 4px 20px rgba(0,0,0,0.15);
 }
 
+/* Champs de saisie d'adresse */
 #search-panel input {
     width: 100%;
     padding: 10px 16px;
     margin-bottom: 8px;
-    border-radius: 24px; /* rond à la Google Maps */
+    border-radius: 24px;
     border: 1.5px solid #ddd;
     font-family: 'Jost', sans-serif;
     font-size: 0.85rem;
@@ -209,7 +235,8 @@ html, body {
     border-color: #1A4E72;
 }
 
-#search-panel button {
+/* Bouton Valider */
+#search-panel button:not(.geolocate-btn) {
     width: 100%;
     padding: 10px;
     background-color: #1A4E72;
@@ -225,14 +252,18 @@ html, body {
     transition: background 0.15s;
 }
 
-#search-panel button:hover {
+#search-panel button:not(.geolocate-btn):hover {
     background-color: #1A4E72;
     box-shadow: inset 0 0 0 1000px rgba(255,255,255,0.1);
 }
 
 /* =============================================
-   BOUTON GEOLOCALISATION
-   ============================================= */
+    BOUTON GÉOLOCALISATION
+    Petit bouton rond à droite du champ de
+    saisie. Remplit le champ avec l'adresse
+    correspondant à la position GPS de
+    l'utilisateur via l'API gouvernementale
+    ============================================= */
 .search-row {
     display: flex;
     align-items: center;
@@ -249,9 +280,9 @@ html, body {
     width: 36px !important;
     height: 36px !important;
     border-radius: 50% !important;
-    border: none;
+    border: 1.5px solid #e0e0e0;
     background: white;
-    box-shadow: none; /* supprime l'ombre */
+    color: #1A4E72;
     cursor: pointer;
     font-size: 14px;
     flex-shrink: 0;
@@ -259,40 +290,142 @@ html, body {
     align-items: center;
     justify-content: center;
     margin-bottom: 0 !important;
+    transition: border-color 0.2s, color 0.2s, background 0.2s;
 }
 
 .geolocate-btn:hover {
-    background: #1A4E72;
+    border-color: #1A4E72;
+    background: #f0f5fa;
 }
 
 /* =============================================
-   COUCHES
-   ============================================= */
+    AUTOCOMPLÉTION
+    Liste déroulante qui apparaît sous le champ
+    de saisie pendant la frappe. Les suggestions
+    viennent de l'API géocodage gouvernementale,
+    filtrées sur les bounds de la métropole de Lyon
+    ============================================= */
+.autocomplete-list {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    list-style: none;
+    margin: 0;
+    padding: 4px 0;
+    z-index: 2000;
+    overflow: hidden;
+}
+
+.autocomplete-list li {
+    padding: 10px 16px;
+    font-size: 0.84rem;
+    color: #333;
+    cursor: pointer;
+    border-bottom: 1px solid #f0f0f0;
+    font-family: 'Jost', sans-serif;
+}
+
+.autocomplete-list li:last-child {
+    border-bottom: none;
+}
+
+.autocomplete-list li:hover {
+    background: #f0f5fa;
+    color: #1A4E72;
+}
+
+/* =============================================
+    PANEL DE RÉSULTATS
+    S'affiche sous le panel de recherche après
+    validation. Même style que les popups
+    d'information (bordure bleue, ombre, arrondi).
+    Contenu injecté dynamiquement par main.js
+    selon le mode actif (point, comparaison,
+    itinéraire)
+    ============================================= */
+#results-panel {
+    position: absolute;
+    top: 130px; /* sous les boutons + le search-panel — à ajuster selon le mode */
+    left: 20px;
+    width: 305px;
+    background: white;
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    border-left: 4px solid #1A4E72;
+    z-index: 1000;
+    max-height: 60vh;
+    overflow-y: auto;
+    animation: slideIn 0.2s ease;
+}
+
+#results-panel::-webkit-scrollbar {
+    width: 6px;
+}
+
+#results-panel::-webkit-scrollbar-thumb {
+    background-color: #1A4E72;
+    border-radius: 3px;
+}
+
+#results-close {
+    position: absolute;
+    top: 12px;
+    right: 14px;
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    color: #888;
+}
+
+#results-close:hover {
+    color: #1A4E72;
+}
+
+#results-content {
+    margin-top: 8px;
+    font-size: 0.85rem;
+    line-height: 1.8;
+    color: #444;
+}
+
+/* =============================================
+    SÉLECTEUR DE COUCHES
+    Bouton flottant en haut à droite qui ouvre
+    le panneau de sélection des couches
+    ============================================= */
 #layers-control {
     position: fixed;
     top: 95px;
     right: 10px;
-    bottom: auto;
     z-index: 1000;
 }
 
 #layers-panel {
     position: absolute;
     top: 50px;
-    bottom: auto;
     right: 0;
-    width: 240px;
+    width: 210px;
     background: #f5f7f9;
     border-radius: 12px;
-    padding: 8px;
+    padding: 10px;
     box-shadow: 0 4px 20px rgba(0,0,0,0.15);
     max-height: 70vh;
     overflow-y: auto;
 }
 
 /* =============================================
-   GROUPES DE COUCHES
-   ============================================= */
+    GROUPES DE COUCHES
+    Chaque groupe est un accordéon : un header
+    cliquable (bleu foncé) qui affiche/masque
+    la liste des couches. Un seul groupe peut
+    être ouvert à la fois (géré dans main.js)
+    ============================================= */
 .layer-group {
     margin-bottom: 6px;
     border-radius: 8px;
@@ -336,7 +469,6 @@ html, body {
 }
 
 .layer-group-toggle .chevron {
-    margin-left: 0;
     margin-right: 8px;
     font-size: 0.85rem;
     transition: transform 0.2s;
@@ -372,8 +504,8 @@ html, body {
 }
 
 /* =============================================
-   ITEMS DE COUCHE
-   ============================================= */
+    ITEMS DE COUCHE
+    ============================================= */
 .layer-group-content label {
     display: flex;
     align-items: center;
@@ -394,7 +526,17 @@ html, body {
     color: #1A4E72;
 }
 
-/* Toggle switch */
+/* Couches non encore disponibles */
+.layer-disabled {
+    opacity: 0.4;
+    cursor: not-allowed !important;
+}
+
+.layer-disabled input {
+    cursor: not-allowed !important;
+}
+
+/* Toggle switch (checkbox stylisée) */
 .layer-group-content input[type="checkbox"] {
     appearance: none;
     -webkit-appearance: none;
@@ -430,8 +572,8 @@ html, body {
 }
 
 /* =============================================
-   SOUS-LABELS JOURNÉE / NUIT
-   ============================================= */
+    SOUS-LABELS JOURNÉE / NUIT
+    ============================================= */
 .sublabel {
     margin: 4px 0 0 0;
     padding: 4px 12px;
@@ -442,8 +584,100 @@ html, body {
 }
 
 /* =============================================
-   STYLES GÉNÉRAUX POUR TOUS LES CONTRÔLES
-   ============================================= */
+    POPUP D'INFORMATION
+    ============================================= */
+#info-popup {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    z-index: 2000;
+    justify-content: center;
+    align-items: center;
+}
+
+#info-popup.visible {
+    display: flex;
+}
+
+#popup-inner {
+    background: #fff;
+    border-radius: 12px;
+    padding: 30px 40px;
+    max-width: 500px;
+    width: 90%;
+    position: relative;
+    box-shadow: 0 6px 30px rgba(0,0,0,0.25);
+    border-left: 4px solid #1A4E72;
+    animation: slideIn 0.2s ease;
+}
+
+#popup-content {
+    max-height: 60vh;
+    overflow-y: auto;
+    padding-right: 6px;
+    margin-top: 10px;
+}
+
+#popup-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+#popup-content::-webkit-scrollbar-thumb {
+    background-color: #1A4E72;
+    border-radius: 3px;
+}
+
+@keyframes slideIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+#popup-close {
+    position: absolute;
+    top: 12px;
+    right: 14px;
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    color: #888;
+}
+
+#popup-close:hover {
+    color: #1A4E72;
+}
+
+#popup-content h3 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 12px 0;
+    font-size: 1rem;
+    color: #1A4E72;
+    font-weight: 700;
+}
+
+#popup-content h3 img {
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
+}
+
+#popup-content p,
+#popup-content ul,
+#popup-content li {
+    font-size: 0.85rem;
+    line-height: 1.8;
+    color: #444;
+}
+
+/* =============================================
+    CONTRÔLES LEAFLET — STYLES GLOBAUX
+    ============================================= */
 .leaflet-control {
     font-family: 'Jost', sans-serif !important;
     font-weight: 500 !important;
@@ -451,15 +685,15 @@ html, body {
     color: #1A4E72 !important;
 }
 
-/* =============================================
-   BOUTONS ZOOM
-   ============================================= */
 .leaflet-control-zoom,
 .leaflet-control {
     border: none !important;
     box-shadow: none !important;
 }
 
+/* =============================================
+    BOUTONS ZOOM
+    ============================================= */
 .leaflet-top.leaflet-left .leaflet-control-zoom {
     position: fixed !important;
     bottom: 40px !important;
@@ -469,7 +703,6 @@ html, body {
     z-index: 1000;
 }
 
-/* Boutons + et - */
 .leaflet-control-zoom a {
     width: 32px !important;
     height: 32px !important;
@@ -495,8 +728,8 @@ html, body {
 }
 
 /* =============================================
-   ÉCHELLE
-   ============================================= */
+    ÉCHELLE
+    ============================================= */
 .leaflet-control-scale {
     background: rgba(255,255,255,0.9) !important;
     padding: 4px 8px !important;
@@ -505,10 +738,9 @@ html, body {
     font-family: 'Jost', sans-serif !important;
     font-size: 0.75rem !important;
     font-weight: 500 !important;
-    color: #1A4E72 !important; 
+    color: #1A4E72 !important;
 }
 
-/* Texte */
 .leaflet-control-scale-line {
     background: none !important;
     color: #1A4E72 !important;
@@ -517,8 +749,8 @@ html, body {
 }
 
 /* =============================================
-   CREDITS
-   ============================================= */
+    CRÉDITS OPENSTREETMAP
+    ============================================= */
 .leaflet-control-attribution {
     background: rgba(255,255,255,0.9) !important;
     padding: 6px 10px !important;
@@ -530,7 +762,6 @@ html, body {
     color: #1A4E72 !important;
 }
 
-/* Liens dans les crédits */
 .leaflet-control-attribution a {
     color: #1A4E72 !important;
     text-decoration: none !important;
@@ -544,103 +775,4 @@ html, body {
 
 .leaflet-control-attribution a:hover {
     text-decoration: underline !important;
-}
-
-/* =============================================
-   POPUP D'INFORMATION
-   ============================================= */
-
-/* Overlay */
-#info-popup {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.5);
-    z-index: 2000;
-    justify-content: center;
-    align-items: center;
-}
-
-#info-popup.visible {
-    display: flex;
-}
-
-/* Boîte blanche */
-#popup-inner {
-    background: #fff;
-    border-radius: 12px;
-    padding: 30px 40px;
-    max-width: 500px;
-    width: 90%;
-    position: relative;
-    box-shadow: 0 6px 30px rgba(0,0,0,0.25);
-    border-left: 4px solid #1A4E72;
-    animation: slideIn 0.2s ease;
-}
-
-/* Contenu scrollable */
-#popup-content {
-    max-height: 60vh;
-    overflow-y: auto;
-    padding-right: 6px;
-    margin-top: 10px;
-}
-
-#popup-content::-webkit-scrollbar {
-    width: 6px;
-}
-
-#popup-content::-webkit-scrollbar-thumb {
-    background-color: #1A4E72;
-    border-radius: 3px;
-}
-
-@keyframes slideIn {
-    from { opacity: 0; transform: translateY(-10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-/* Croix */
-#popup-close {
-    position: absolute;
-    top: 12px;
-    right: 14px;
-    background: none;
-    border: none;
-    font-size: 1.2rem;
-    cursor: pointer;
-    color: #888;
-}
-
-#popup-close:hover {
-    color: #1A4E72;
-}
-
-/* Titre avec logo */
-#popup-content h3 {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin: 0 0 12px 0;
-    font-size: 1rem;
-    color: #1A4E72;
-    font-weight: 700;
-}
-
-#popup-content h3 img {
-    width: 20px;
-    height: 20px;
-    object-fit: contain;
-}
-
-/* Texte */
-#popup-content p,
-#popup-content ul,
-#popup-content li {
-    font-size: 0.85rem;
-    line-height: 1.8;
-    color: #444;
 }
