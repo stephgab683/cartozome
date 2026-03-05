@@ -139,35 +139,35 @@ L.TileLayer.BetterWMS = L.TileLayer.WMS.extend({
       .catch(err => show(err));
   },
 
-  // Construit les paramètres WMS GetFeatureInfo
-  // Adapte les paramètres i/j ou x/y selon la version WMS (1.1.1 vs 1.3.0)
-  getFeatureInfoUrl: function (latlng) {
-    const point = this._map.latLngToContainerPoint(latlng, this._map.getZoom());
-    const size  = this._map.getSize();
-    const v     = this.wmsParams.version;
+  // // Construit les paramètres WMS GetFeatureInfo
+  // // Adapte les paramètres i/j ou x/y selon la version WMS (1.1.1 vs 1.3.0)
+  // getFeatureInfoUrl: function (latlng) {
+  //   const point = this._map.latLngToContainerPoint(latlng, this._map.getZoom());
+  //   const size  = this._map.getSize();
+  //   const v     = this.wmsParams.version;
 
-    const params = {
-      request:       'GetFeatureInfo',
-      service:       'WMS',
-      srs:           'EPSG:4326',
-      styles:        this.wmsParams.styles,
-      transparent:   this.wmsParams.transparent,
-      version:       v,
-      format:        this.wmsParams.format,
-      bbox:          this._map.getBounds().toBBoxString(),
-      height:        size.y,
-      width:         size.x,
-      layers:        this.wmsParams.layers,
-      query_layers:  this.wmsParams.layers,
-      info_format:   'application/json',
-      feature_count: 1,
-    };
+  //   const params = {
+  //     request:       'GetFeatureInfo',
+  //     service:       'WMS',
+  //     srs:           'EPSG:4326',
+  //     styles:        this.wmsParams.styles,
+  //     transparent:   this.wmsParams.transparent,
+  //     version:       v,
+  //     format:        this.wmsParams.format,
+  //     bbox:          this._map.getBounds().toBBoxString(),
+  //     height:        size.y,
+  //     width:         size.x,
+  //     layers:        this.wmsParams.layers,
+  //     query_layers:  this.wmsParams.layers,
+  //     info_format:   'application/json',
+  //     feature_count: 1,
+  //   };
 
-    params[v === '1.3.0' ? 'i' : 'x'] = Math.round(point.x);
-    params[v === '1.3.0' ? 'j' : 'y'] = Math.round(point.y);
+  //   params[v === '1.3.0' ? 'i' : 'x'] = Math.round(point.x);
+  //   params[v === '1.3.0' ? 'j' : 'y'] = Math.round(point.y);
 
-    return this._url + L.Util.getParamString(params, this._url, true);
-  },
+  //   return this._url + L.Util.getParamString(params, this._url, true);
+  // },
 
   // Affiche la valeur numérique de la couche dans une popup Leaflet
   // Utilise LAYER_LABELS et LAYER_UNITS pour formater l'affichage
@@ -645,6 +645,37 @@ document.getElementById("calc-compare-btn").addEventListener("click", async () =
 // Validation itinéraire : géocode départ et arrivée, trace la route piétonne.
 // TODO : échantillonner des points le long de la polyligne et interroger les
 // couches actives pour calculer l'exposition moyenne sur le trajet
+// document.getElementById("calc-route-btn").addEventListener("click", async () => {
+//   routingLayer.clearLayers();
+
+//   const routeStart = document.getElementById("route-start").value.trim();
+//   const routeEnd   = document.getElementById("route-end").value.trim();
+//   if (!routeStart) { alert("Veuillez saisir une adresse de départ"); return; }
+
+//   const startCoords = await geocodeAddress(routeStart);
+//   if (!startCoords) { alert("Adresse de départ introuvable"); return; }
+//   const startLatLng = L.latLng(startCoords[1], startCoords[0]);
+//   L.marker(startLatLng, { icon: iconDepart }).addTo(routingLayer).bindPopup("Départ").openPopup();
+
+//   if (!routeEnd) { map.setView(startLatLng, 16); return; }
+
+//   const endCoords = await geocodeAddress(routeEnd);
+//   if (!endCoords) { alert("Adresse d'arrivée introuvable"); return; }
+//   const endLatLng = L.latLng(endCoords[1], endCoords[0]);
+//   L.marker(endLatLng, { icon: iconArrivee }).addTo(routingLayer).bindPopup("Arrivée");
+
+//   const routeCoords = await getRoute(startCoords, endCoords);
+//   if (!routeCoords) { alert("Impossible de calculer l'itinéraire"); return; }
+
+//   const latLngs   = routeCoords.map(c => [c[1], c[0]]);
+//   const routeLine = L.polyline(latLngs, { color: "#1A4E72", weight: 4, opacity: 1 }).addTo(routingLayer);
+//   map.fitBounds(routeLine.getBounds(), { padding: [50, 50] });
+
+//   console.log("[ITINÉRAIRE] Coordonnées :", routeCoords);
+//   openResultsPanel();
+// });
+
+
 document.getElementById("calc-route-btn").addEventListener("click", async () => {
   routingLayer.clearLayers();
 
@@ -667,13 +698,52 @@ document.getElementById("calc-route-btn").addEventListener("click", async () => 
   const routeCoords = await getRoute(startCoords, endCoords);
   if (!routeCoords) { alert("Impossible de calculer l'itinéraire"); return; }
 
-  const latLngs   = routeCoords.map(c => [c[1], c[0]]);
+  // Transformation en LatLng pour Leaflet
+  const latLngs = routeCoords.map(c => L.latLng(c[1], c[0]));
   const routeLine = L.polyline(latLngs, { color: "#1A4E72", weight: 4, opacity: 1 }).addTo(routingLayer);
   map.fitBounds(routeLine.getBounds(), { padding: [50, 50] });
+
+  // ========== échantillonnage ==========
+  function sampleRoutePoints(latlngs, step = 10) {
+    const sampled = [];
+    for (let i = 0; i < latlngs.length; i += step) {
+      sampled.push(latlngs[i]);
+    }
+    if (latlngs.length > 0 && !sampled.includes(latlngs[latlngs.length-1])) {
+      sampled.push(latlngs[latlngs.length-1]);
+    }
+    return sampled;
+  }
+
+  const sampledPoints = sampleRoutePoints(latLngs, 20); // tous les 20 points
+
+  // ========== appel à ton endpoint Python ==========
+  const exposures = await fetch("http://localhost:8000/indicateursItineraire", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      coords: sampledPoints.map(p => ({ latitude: p.lat, longitude: p.lng }))
+    })
+  }).then(r => r.json());
+
+  // ========== ajout des markers / popups ==========
+  sampledPoints.forEach((p, i) => {
+    const data = exposures[i];
+    if (!data) return;
+    const popupContent = Object.entries(data)
+      .filter(([k]) => k !== "latitude" && k !== "longitude")
+      .map(([k, v]) => `<b>${k}</b>: ${v}`)
+      .join("<br>");
+
+    L.circleMarker([p.lat, p.lng], { radius: 4, color: "#ff9800" })
+      .addTo(routingLayer)
+      .bindPopup(popupContent);
+  });
 
   console.log("[ITINÉRAIRE] Coordonnées :", routeCoords);
   openResultsPanel();
 });
+
 
 // Autocomplétion : affiche des suggestions pendant la frappe (délai 250ms).
 // Appelle l'API géocodage avec limit=50, filtre côté client sur les bounds métropole.
@@ -750,7 +820,7 @@ map.on("click", async (e) => {
   const { lat, lng } = e.latlng;
 
   try {
-    const res = await fetch("http://localhost:8000/indicateurs", {
+    const res = await fetch("http://localhost:8000/indicateursPoint", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ latitude: lat, longitude: lng })
@@ -782,3 +852,5 @@ map.on("click", async (e) => {
       .openOn(map);
   }
 });
+
+// //////////////////////////////////
