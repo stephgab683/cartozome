@@ -536,6 +536,160 @@ html, body {
 }
 
 /* ========================================================================================= */
+/* LÉGENDE DES COUCHES                                                                      */
+/* ========================================================================================= */
+
+/* Conteneur injecté dynamiquement dans le layer-group-content actif                       */
+.layer-legend {
+    padding: 10px 14px 14px 14px;
+    border-top: 1px solid #eef0f3;
+    background: #fafbfc;
+}
+
+/* ── Légende WMS (GetLegendGraphic — bruit) ── */
+.legend-wms { display: flex; justify-content: center; }
+.legend-wms img { max-width: 100%; height: auto; border-radius: 4px; }
+.legend-unavail { font-size: 0.75rem; color: #aaa; font-style: italic; }
+
+/* ── Barre segmentée couleurs pleines (Air, Ambroisie) ── */
+
+/* Conteneur global : position relative pour ancrer l'OMS et les labels en absolu          */
+.lgd-bar-outer {
+    position: relative;
+    padding-top: 28px;  /* réserve l'espace pour le label OMS au-dessus */
+    padding-bottom: 14px; /* réserve l'espace pour les labels de bordure en-dessous */
+}
+
+/* Rangée de cases colorées côte à côte                                                    */
+.lgd-seg-bar {
+    display: flex;
+    gap: 2px;
+    height: 12px;
+}
+
+/* Case individuelle                                                                        */
+.lgd-seg { height: 100%; }
+
+/* Conteneur des labels de bordure, positionné sous la barre                               */
+.lgd-border-labels {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 14px;
+}
+
+/* Label individuel ancré en absolu à la bordure de sa case                                */
+.lgd-border-label {
+    position: absolute;
+    transform: translateX(-50%);
+    font-size: 0.62rem;
+    color: #aaa;
+    font-family: 'Jost', sans-serif;
+    white-space: nowrap;
+}
+
+/* Premier label ancré au bord gauche sans translateX                                      */
+.lgd-border-label:first-child {
+    transform: none;
+    left: 0 !important;
+}
+
+/* Trait noir vertical : dépasse légèrement au-dessus et en-dessous de la barre           */
+.lgd-oms-line {
+    position: absolute;
+    top: 24px;       /* 4px au-dessus du début de la barre (28px - 4px) */
+    height: 20px;    /* 12px barre + 4px haut + 4px bas */
+    width: 2px;
+    background: #333;
+    transform: translateX(-50%);
+    border-radius: 2px;
+    pointer-events: none;
+}
+
+/* Bloc OMS ancré en absolu au-dessus de la barre                                          */
+.lgd-oms-above {
+    position: absolute;
+    top: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transform: translateX(-50%);
+}
+
+/* Label "Seuil OMS : val unité"                                                           */
+.lgd-seg-oms {
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: #444;
+    font-family: 'Jost', sans-serif;
+    white-space: nowrap;
+    text-align: center;
+    line-height: 1.3;
+}
+
+/* Flèche pointant vers la case                                                             */
+.lgd-seg-oms-arrow {
+    font-size: 0.75rem;
+    color: #444;
+    line-height: 1;
+}
+
+/* Rangée de cases colorées côte à côte, séparées par un gap blanc de 2px                 */
+.lgd-seg-bar {
+    display: flex;
+    gap: 2px;
+    height: 12px;
+}
+
+/* Case individuelle — flex:1 répartit uniformément, border-radius géré inline JS         */
+.lgd-seg {
+    height: 100%;
+}
+
+/* Rangée de labels sous chaque case, alignée sur la barre                                 */
+.lgd-seg-labels {
+    display: flex;
+    margin-top: 4px;
+}
+
+/* Cellule de label : même flex:1 que la case, centrage du texte                           */
+.lgd-seg-cell {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+}
+
+/* Label valeur neutre : gris clair, centré                                                 */
+.lgd-seg-val {
+    font-size: 0.6rem;
+    color: #bbb;
+    font-family: 'Jost', sans-serif;
+    white-space: nowrap;
+}
+
+/* Label seuil OMS : en gras, couleur foncée, s'étend sur plusieurs cases si besoin        */
+.lgd-seg-oms {
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: #444;
+    font-family: 'Jost', sans-serif;
+    white-space: nowrap;
+}
+
+/* ── Placeholder UV ── */
+.legend-placeholder {
+    font-size: 0.75rem;
+    color: #aaa;
+    font-style: italic;
+    text-align: center;
+    padding: 4px 0;
+    font-family: 'Jost', sans-serif;
+}
+/* Hover rose CLB sur les liens d'attribution                                               */
+.leaflet-control-attribution a:hover { color: #e71d73 !important; text-decoration: underline !important; }
+
+/* ========================================================================================= */
 /* POPUP D'INFORMATION — Même structure que la popup de bienvenue. Créée dynamiquement par  */
 /* popups.js. Rendue visible via la classe .visible. Contenu injecté depuis #info-contents. */
 /* ========================================================================================= */
@@ -748,160 +902,6 @@ html, body {
 .leaflet-bottom.leaflet-right { bottom: 5px !important; right: 5px !important; }
 
 .leaflet-control-attribution a:hover { text-decoration: underline !important; }
-
-/* ========================================================================================= */
-/* LÉGENDE DES COUCHES                                                                      */
-/* ========================================================================================= */
-
-/* Conteneur injecté dynamiquement dans le layer-group-content actif                       */
-.layer-legend {
-    padding: 10px 14px 14px 14px;
-    border-top: 1px solid #eef0f3;
-    background: #fafbfc;
-}
-
-/* ── Légende WMS (GetLegendGraphic — bruit) ── */
-.legend-wms { display: flex; justify-content: center; }
-.legend-wms img { max-width: 100%; height: auto; border-radius: 4px; }
-.legend-unavail { font-size: 0.75rem; color: #aaa; font-style: italic; }
-
-/* ── Barre segmentée couleurs pleines (Air, Ambroisie) ── */
-
-/* Conteneur global : position relative pour ancrer l'OMS et les labels en absolu          */
-.lgd-bar-outer {
-    position: relative;
-    padding-top: 28px;  /* réserve l'espace pour le label OMS au-dessus */
-    padding-bottom: 14px; /* réserve l'espace pour les labels de bordure en-dessous */
-}
-
-/* Rangée de cases colorées côte à côte                                                    */
-.lgd-seg-bar {
-    display: flex;
-    gap: 2px;
-    height: 12px;
-}
-
-/* Case individuelle                                                                        */
-.lgd-seg { height: 100%; }
-
-/* Conteneur des labels de bordure, positionné sous la barre                               */
-.lgd-border-labels {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 14px;
-}
-
-/* Label individuel ancré en absolu à la bordure de sa case                                */
-.lgd-border-label {
-    position: absolute;
-    transform: translateX(-50%);
-    font-size: 0.62rem;
-    color: #aaa;
-    font-family: 'Jost', sans-serif;
-    white-space: nowrap;
-}
-
-/* Premier label ancré au bord gauche sans translateX                                      */
-.lgd-border-label:first-child {
-    transform: none;
-    left: 0 !important;
-}
-
-/* Trait noir vertical : dépasse légèrement au-dessus et en-dessous de la barre           */
-.lgd-oms-line {
-    position: absolute;
-    top: 24px;       /* 4px au-dessus du début de la barre (28px - 4px) */
-    height: 20px;    /* 12px barre + 4px haut + 4px bas */
-    width: 2px;
-    background: #333;
-    transform: translateX(-50%);
-    border-radius: 2px;
-    pointer-events: none;
-}
-
-/* Bloc OMS ancré en absolu au-dessus de la barre                                          */
-.lgd-oms-above {
-    position: absolute;
-    top: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    transform: translateX(-50%);
-}
-
-/* Label "Seuil OMS : val unité"                                                           */
-.lgd-seg-oms {
-    font-size: 0.65rem;
-    font-weight: 700;
-    color: #444;
-    font-family: 'Jost', sans-serif;
-    white-space: nowrap;
-    text-align: center;
-    line-height: 1.3;
-}
-
-/* Flèche pointant vers la case                                                             */
-.lgd-seg-oms-arrow {
-    font-size: 0.75rem;
-    color: #444;
-    line-height: 1;
-}
-
-/* Rangée de cases colorées côte à côte, séparées par un gap blanc de 2px                 */
-.lgd-seg-bar {
-    display: flex;
-    gap: 2px;
-    height: 12px;
-}
-
-/* Case individuelle — flex:1 répartit uniformément, border-radius géré inline JS         */
-.lgd-seg {
-    height: 100%;
-}
-
-/* Rangée de labels sous chaque case, alignée sur la barre                                 */
-.lgd-seg-labels {
-    display: flex;
-    margin-top: 4px;
-}
-
-/* Cellule de label : même flex:1 que la case, centrage du texte                           */
-.lgd-seg-cell {
-    flex: 1;
-    display: flex;
-    justify-content: center;
-}
-
-/* Label valeur neutre : gris clair, centré                                                 */
-.lgd-seg-val {
-    font-size: 0.6rem;
-    color: #bbb;
-    font-family: 'Jost', sans-serif;
-    white-space: nowrap;
-}
-
-/* Label seuil OMS : en gras, couleur foncée, s'étend sur plusieurs cases si besoin        */
-.lgd-seg-oms {
-    font-size: 0.65rem;
-    font-weight: 700;
-    color: #444;
-    font-family: 'Jost', sans-serif;
-    white-space: nowrap;
-}
-
-/* ── Placeholder UV ── */
-.legend-placeholder {
-    font-size: 0.75rem;
-    color: #aaa;
-    font-style: italic;
-    text-align: center;
-    padding: 4px 0;
-    font-family: 'Jost', sans-serif;
-}
-/* Hover rose CLB sur les liens d'attribution                                               */
-.leaflet-control-attribution a:hover { color: #e71d73 !important; text-decoration: underline !important; }
 
 /* ========================================================================================= */
 /* ============================== PANEL RESULTATS ========================================== */
