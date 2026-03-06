@@ -1,4 +1,6 @@
+// =============================================
 // PILL DE PRESENTATION
+// =============================================
 
 // Clic sur le titre Cartozome — réouvre la popup de bienvenue
 document.getElementById('pill-title').addEventListener('click', () => {
