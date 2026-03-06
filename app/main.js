@@ -959,22 +959,18 @@ btnRoute.addEventListener("click", setRouteMode);
 // thresholds : [seuil_bon, seuil_modéré]
 // =============================================
 const LAYER_META = {
-  "cartozome:mod_aura_2024_pm10_moyan":  { label: "PM10",              unit: "µg/m³",   min: 5,  max: 50,    oms: 15,   thresholds: [15, 30]    },
-  "cartozome:mod_aura_2024_pm25_moyan":  { label: "PM2.5",             unit: "µg/m³",   min: 2,  max: 30,    oms: 5,    thresholds: [5, 15]     },
-  "cartozome:mod_aura_2024_no2_moyan":   { label: "NO₂",               unit: "µg/m³",   min: 5,  max: 80,    oms: 10,   thresholds: [10, 25]    },
-  "cartozome:mod_aura_2024_o3_somo35":   { label: "O₃",                unit: "µg/m³·j", min: 0,  max: 25000, oms: null, thresholds: [10000, 17500] },
-  "cartozome:Ambroisie_2024_AURA":       { label: "Ambroisie",         unit: "gr/m³",   min: 0,  max: 20,    oms: null, thresholds: [3, 10]     },
-  "cartozome:GL_Rte_Lden":               { label: "Routier (jour)",     unit: "dB",      min: 40, max: 80,    oms: 53,   thresholds: [53, 65]    },
-  "cartozome:GL_Fer_Lden":               { label: "Ferroviaire (jour)", unit: "dB",      min: 40, max: 80,    oms: 54,   thresholds: [54, 65]    },
-  "cartozome:Indus_GL_E4_Lden":          { label: "Industriel (jour)",  unit: "dB",      min: 40, max: 80,    oms: 70,   thresholds: [70, 75]    },
-  "cartozome:GL_Rte_Ln":                 { label: "Routier (nuit)",     unit: "dB",      min: 30, max: 70,    oms: 45,   thresholds: [45, 55]    },
-  "cartozome:GL_Fer_Ln":                 { label: "Ferroviaire (nuit)", unit: "dB",      min: 30, max: 70,    oms: 44,   thresholds: [44, 55]    },
+  "cartozome:mod_aura_2024_pm10_moyan":           { label: "PM10",           unit: "µg/m³",   oms: 15,  thresholds: [15, 30]    },
+  "cartozome:mod_aura_2024_pm25_moyan":           { label: "PM2.5",          unit: "µg/m³",   oms: 5,   thresholds: [5, 15]     },
+  "cartozome:mod_aura_2024_no2_moyan":            { label: "NO₂",            unit: "µg/m³",   oms: 10,  thresholds: [10, 25]    },
+  "cartozome:mod_aura_2024_o3_somo35":            { label: "O₃",             unit: "µg/m³·j", oms: null, thresholds: [10000, 17500] },
+  "cartozome:Ambroisie_2024_AURA":                { label: "Ambroisie",      unit: "gr/m³",   oms: null, thresholds: [3, 10]     },
+  "cartozome:sous_indice_multibruit_orhane_2023": { label: "Indice multi-bruit", unit: "dB(A)", oms: null, thresholds: [2, 4]   },
 };
 
 // Structure des catégories affichées dans le panel
 const RESULT_CATEGORIES = [
   {
-    label: "Air", icon: "🌫",
+    label: "Air", icon: '<img src="./img/air.png" style="width:16px;height:16px;object-fit:contain;vertical-align:middle">',
     layers: [
       "cartozome:mod_aura_2024_pm10_moyan",
       "cartozome:mod_aura_2024_pm25_moyan",
@@ -983,18 +979,12 @@ const RESULT_CATEGORIES = [
     ]
   },
   {
-    label: "Pollen", icon: "🌿",
+    label: "Pollen", icon: '<img src="./img/pollen.png" style="width:16px;height:16px;object-fit:contain;vertical-align:middle">',
     layers: ["cartozome:Ambroisie_2024_AURA"]
   },
   {
-    label: "Bruit", icon: "🔊",
-    layers: [
-      "cartozome:GL_Rte_Lden",
-      "cartozome:GL_Fer_Lden",
-      "cartozome:Indus_GL_E4_Lden",
-      "cartozome:GL_Rte_Ln",
-      "cartozome:GL_Fer_Ln",
-    ]
+    label: "Bruit", icon: '<img src="./img/bruit.png" style="width:16px;height:16px;object-fit:contain;vertical-align:middle">',
+    layers: ["cartozome:sous_indice_multibruit_orhane_2023"]
   },
 ];
 
@@ -1116,12 +1106,12 @@ function renderResultsPanel(address, layerValues, uvValue) {
     html += `</div></div>`;
   }
 
-  // Catégorie UV (données JSON Météo-France)
+  // Catégorie UV
   html += `<div class="cat-card">
-    <div class="cat-header">☀️ UV</div>
+    <div class="cat-header"><img src="./img/uv.png" style="width:16px;height:16px;object-fit:contain;vertical-align:middle"> UV</div>
     <div class="cat-body">
       <div class="res-row"><div class="res-top">
-        <span class="res-label">Indice UV max</span>`;
+        <span class="res-label">Indice UV</span>`;
 
   if (uvValue === null || uvValue === undefined) {
     html += `<span class="res-value no-data">Non disponible</span>`;
@@ -1132,12 +1122,7 @@ function renderResultsPanel(address, layerValues, uvValue) {
       <span class="res-badge ${badge.cls}">${badge.label}</span>
     </div>`;
   }
-
-  html += `</div>`;
-  if (uvValue !== null && uvValue !== undefined) {
-    html += buildLegendBar(uvValue, { min: 0, max: 11, oms: null, unit: "" });
-  }
-  html += `</div></div></div>`;
+  html += `</div></div></div></div>`;
 
   content.innerHTML = html;
 }
