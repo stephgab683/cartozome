@@ -1,15 +1,11 @@
-/* =============================================
-POLICES
-    Import de la police Jost depuis Google Fonts
-    Utilisée sur toute l'interface
-    ============================================= */
+/* ========================================================================================= */
+/* POLICES — Import de la police Jost depuis Google Fonts, utilisée sur toute l'interface   */
+/* ========================================================================================= */
 @import url('https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,100..900;1,100..900&display=swap');
 
-/* =============================================
-    BASE
-    Reset des marges/paddings, mise en page
-    colonne pour empiler le bandeau + la carte
-    ============================================= */
+/* ========================================================================================= */
+/* BASE — Reset marges/paddings + mise en page colonne pour empiler le bandeau et la carte  */
+/* ========================================================================================= */
 html, body {
     margin: 0;
     padding: 0;
@@ -19,21 +15,19 @@ html, body {
     flex-direction: column;
 }
 
-/* =============================================
-    UTILITAIRES
-    Classe générique .hidden utilisée par le JS
-    pour masquer/afficher les panels et couches
-    ============================================= */
+/* ========================================================================================= */
+/* UTILITAIRES — .hidden masque un élément ; utilisé par le JS pour afficher/cacher         */
+/* les panels de recherche, de résultats et les contenus de couches                         */
+/* ========================================================================================= */
 .hidden {
     display: none !important;
 }
 
-/* =============================================
-    POP-UP DE BIENVENUE
-    Overlay plein écran semi-transparent +
-    boîte blanche centrée. Affichée au
-    chargement, fermée via le bouton ✖
-    ============================================= */
+/* ========================================================================================= */
+/* POPUP DE BIENVENUE                                                                        */
+/* ========================================================================================= */
+
+/* Fond noir semi-transparent qui couvre toute la page et centre la boîte blanche           */
 #welcome-overlay {
     display: none;
     position: fixed;
@@ -47,6 +41,7 @@ html, body {
     align-items: center;
 }
 
+/* Boîte blanche centrée avec bordure bleue gauche, ombre portée et coins arrondis          */
 #welcome-popup {
     background: #fff;
     border-radius: 12px;
@@ -59,6 +54,7 @@ html, body {
     border-left: 4px solid #1A4E72;
 }
 
+/* Croix de fermeture positionnée en absolu en haut à droite de la boîte                   */
 #welcome-close {
     position: absolute;
     top: 12px;
@@ -70,9 +66,7 @@ html, body {
     color: #888;
 }
 
-#welcome-close:hover {
-    color: #1A4E72;
-}
+#welcome-close:hover { color: #1A4E72; }
 
 #welcome-popup h2 {
     margin: 0 0 15px 0;
@@ -86,12 +80,10 @@ html, body {
     color: #444;
 }
 
-/* =============================================
-    BANDEAU HAUT
-    Barre fixe en haut de page avec logo
-    Cartozome à gauche et logo Léon Bérard
-    à droite
-    ============================================= */
+/* ========================================================================================= */
+/* BANDEAU HAUT — Barre fixe en haut de page. Flex row pour aligner logo + titre à gauche  */
+/* et logo Léon Bérard à droite. Hauteur fixée à 55px (flex: 0 0 55px).                    */
+/* ========================================================================================= */
 #top-banner {
     display: flex;
     align-items: center;
@@ -108,9 +100,8 @@ html, body {
     gap: 10px;
 }
 
-#banner-logo {
-    height: 50px;
-}
+#banner-logo       { height: 50px; }
+#banner-logo-right { height: 50px; }
 
 #banner-left h1 {
     margin: 0;
@@ -119,26 +110,19 @@ html, body {
     text-transform: uppercase;
 }
 
-#banner-logo-right {
-    height: 50px;
-}
-
-/* =============================================
-    CONTENEUR PRINCIPAL
-    Prend tout l'espace restant sous le bandeau.
-    Position relative pour ancrer les éléments
-    flottants (carte, panels, boutons)
-    ============================================= */
+/* ========================================================================================= */
+/* CONTENEUR PRINCIPAL — Prend tout l'espace restant sous le bandeau (flex: 1).             */
+/* Position relative pour ancrer en absolu la carte, les panels et les boutons flottants.   */
+/* ========================================================================================= */
 #main-container {
     position: relative;
     flex: 1;
 }
 
-/* =============================================
-    CARTE LEAFLET
-    Occupe tout le conteneur principal.
-    z-index: 0 pour passer sous les panels
-    ============================================= */
+/* ========================================================================================= */
+/* CARTE LEAFLET — Occupe tout le conteneur en absolu (inset: 0).                           */
+/* z-index: 0 pour passer sous tous les panels et boutons flottants.                        */
+/* ========================================================================================= */
 #map {
     position: absolute;
     inset: 0;
@@ -147,11 +131,10 @@ html, body {
     z-index: 0;
 }
 
-/* =============================================
-    BOUTONS FLOTTANTS
-    Style de base partagé par le bouton couches
-    et les boutons Adresse/Itinéraire
-    ============================================= */
+/* ========================================================================================= */
+/* BOUTONS FLOTTANTS — Style de base partagé par le bouton couches et les boutons           */
+/* de mode de recherche (Où je suis / Comparer / Mon chemin). Taille 44×44px, arrondi.     */
+/* ========================================================================================= */
 .floating-btn {
     width: 44px;
     height: 44px;
@@ -164,16 +147,13 @@ html, body {
     margin-bottom: 10px;
 }
 
-.floating-btn:hover {
-    background: #f5f5f5;
-}
+.floating-btn:hover { background: #f5f5f5; }
 
-/* =============================================
-    RECHERCHE : ADRESSE / COMPARAISON / ITINÉRAIRE
-    Conteneur positionné en haut à gauche.
-    Contient les trois boutons toggle et le
-    panel de saisie qui s'affiche en dessous
-    ============================================= */
+/* ========================================================================================= */
+/* RECHERCHE                                                                                 */
+/* ========================================================================================= */
+
+/* Conteneur positionné en absolu en haut à gauche — contient les boutons toggle et le panel */
 #search-controls {
     position: absolute;
     top: 20px;
@@ -184,7 +164,7 @@ html, body {
     gap: 8px;
 }
 
-/* Boutons Où je suis / Comparer / Mon chemin : style pill */
+/* Boutons Où je suis / Comparer / Mon chemin — style pill avec coins très arrondis         */
 .search-btn {
     width: auto !important;
     height: 36px !important;
@@ -198,13 +178,13 @@ html, body {
     letter-spacing: 0.03em;
 }
 
-/* État actif du bouton sélectionné */
+/* Bouton actif : fond bleu foncé + texte blanc pour indiquer le mode sélectionné          */
 .search-btn.active {
     background-color: #1A4E72;
     color: #fff;
 }
 
-/* Boîte blanche qui contient les champs de saisie */
+/* Boîte blanche contenant les champs de saisie, positionnée sous les boutons toggle       */
 #search-panel {
     position: absolute;
     top: 46px;
@@ -216,7 +196,7 @@ html, body {
     box-shadow: 0 4px 20px rgba(0,0,0,0.15);
 }
 
-/* Champs de saisie d'adresse */
+/* Champs de saisie d'adresse — style pill, bordure fine qui passe en bleu au focus        */
 #search-panel input {
     width: 100%;
     padding: 10px 16px;
@@ -231,11 +211,10 @@ html, body {
     transition: border-color 0.2s;
 }
 
-#search-panel input:focus {
-    border-color: #1A4E72;
-}
+#search-panel input:focus { border-color: #1A4E72; }
 
-/* Bouton Valider */
+/* Bouton Valider — pleine largeur, fond bleu, majuscule. :not(.geolocate-btn) pour ne pas */
+/* affecter le bouton GPS qui est aussi dans #search-panel                                  */
 #search-panel button:not(.geolocate-btn) {
     width: 100%;
     padding: 10px;
@@ -253,17 +232,14 @@ html, body {
 }
 
 #search-panel button:not(.geolocate-btn):hover {
-    background-color: #1A4E72;
     box-shadow: inset 0 0 0 1000px rgba(255,255,255,0.1);
 }
 
-/* =============================================
-    BOUTON GÉOLOCALISATION
-    Petit bouton rond à droite du champ de
-    saisie. Remplit le champ avec l'adresse
-    correspondant à la position GPS de
-    l'utilisateur via l'API gouvernementale
-    ============================================= */
+/* ========================================================================================= */
+/* BOUTON GÉOLOCALISATION                                                                    */
+/* ========================================================================================= */
+
+/* Aligne le champ de saisie et le bouton GPS sur la même ligne                             */
 .search-row {
     display: flex;
     align-items: center;
@@ -271,11 +247,10 @@ html, body {
     margin-bottom: 8px;
 }
 
-.search-row input {
-    flex: 1;
-    margin-bottom: 0 !important;
-}
+/* Le champ prend tout l'espace disponible, le bouton GPS garde sa taille fixe              */
+.search-row input { flex: 1; margin-bottom: 0 !important; }
 
+/* Cercle blanc avec icône flèche, bordure fine qui passe en bleu au hover                  */
 .geolocate-btn {
     width: 36px !important;
     height: 36px !important;
@@ -298,13 +273,12 @@ html, body {
     background: #f0f5fa;
 }
 
-/* =============================================
-    AUTOCOMPLÉTION
-    Liste déroulante qui apparaît sous le champ
-    de saisie pendant la frappe. Les suggestions
-    viennent de l'API géocodage gouvernementale,
-    filtrées sur les bounds de la métropole de Lyon
-    ============================================= */
+/* ========================================================================================= */
+/* AUTOCOMPLÉTION — Liste déroulante absolue affichée sous le champ de saisie pendant la    */
+/* frappe. Suggestions filtrées sur les bounds de la métropole de Lyon côté JS.             */
+/* ========================================================================================= */
+
+/* Conteneur ancré sous le champ via position absolute + top: calc(100% + 4px)             */
 .autocomplete-list {
     position: absolute;
     top: calc(100% + 4px);
@@ -320,6 +294,7 @@ html, body {
     overflow: hidden;
 }
 
+/* Chaque suggestion — séparateur fin qui disparaît sur le dernier item                    */
 .autocomplete-list li {
     padding: 10px 16px;
     font-size: 0.84rem;
@@ -329,27 +304,23 @@ html, body {
     font-family: 'Jost', sans-serif;
 }
 
-.autocomplete-list li:last-child {
-    border-bottom: none;
-}
+.autocomplete-list li:last-child { border-bottom: none; }
 
 .autocomplete-list li:hover {
     background: #f0f5fa;
     color: #1A4E72;
 }
 
-/* =============================================
-    PANEL DE RÉSULTATS
-    S'affiche sous le panel de recherche après
-    validation. Même style que les popups
-    d'information (bordure bleue, ombre, arrondi).
-    Contenu injecté dynamiquement par main.js
-    selon le mode actif (point, comparaison,
-    itinéraire)
-    ============================================= */
+/* ========================================================================================= */
+/* PANEL DE RÉSULTATS — S'affiche sous le panel de recherche après validation.              */
+/* Le top est recalculé dynamiquement par main.js (getBoundingClientRect) pour s'adapter    */
+/* à la hauteur réelle du panel selon le mode actif (1 ou 2 champs de saisie).             */
+/* ========================================================================================= */
+
+/* Conteneur principal : colonne flex pour séparer le header fixe du contenu scrollable    */
 #results-panel {
     position: absolute;
-    top: 130px; /* sous les boutons + le search-panel — à ajuster selon le mode */
+    top: 130px;
     left: 20px;
     width: 350px;
     background: white;
@@ -363,50 +334,7 @@ html, body {
     animation: slideIn 0.2s ease;
 }
 
-#results-close {
-    background: none;
-    border: none;
-    font-size: 1.2rem;
-    cursor: pointer;
-    color: #888;
-    z-index: 1;
-    flex-shrink: 0;
-}
-
-#results-close:hover {
-    color: #1A4E72;
-}
-
-#results-content {
-    padding: 20px 14px 20px 20px;
-    margin-top: 0;
-    font-size: 0.85rem;
-    line-height: 1.8;
-    color: #444;
-    overflow-y: auto;
-    max-height: 60vh;
-    scrollbar-gutter: stable;
-}
-
-#results-content::-webkit-scrollbar {
-    width: 10px;
-}
-
-#results-content::-webkit-scrollbar-thumb {
-    background-color: #1A4E72;
-    border-radius: 10px;
-    border: 2px solid white;
-    background-clip: padding-box;
-}
-
-#results-content::-webkit-scrollbar-track {
-    background: transparent;
-    margin: 10px;
-}
-
-/* =============================================
-    PANEL DE RÉSULTATS — ADRESSE
-    ============================================= */
+/* Ligne titre adresse + bouton ✖, ne scroll pas avec le contenu                           */
 #results-header {
     display: flex;
     align-items: center;
@@ -416,7 +344,39 @@ html, body {
     flex-shrink: 0;
 }
 
-/* Titre de l'adresse en haut du panel */
+/* Croix de fermeture du panel de résultats                                                 */
+#results-close {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    color: #888;
+    flex-shrink: 0;
+}
+
+#results-close:hover { color: #1A4E72; }
+
+/* Zone scrollable qui reçoit le HTML injecté par renderResultsPanel()                     */
+#results-content {
+    padding: 20px 14px 20px 20px;
+    font-size: 0.85rem;
+    line-height: 1.8;
+    color: #444;
+    overflow-y: auto;
+    max-height: 60vh;
+    scrollbar-gutter: stable;
+}
+
+/* Scrollbar stylisée : fine, bleue, arrondie, avec espace blanc entre le pouce et le bord */
+#results-content::-webkit-scrollbar       { width: 10px; }
+#results-content::-webkit-scrollbar-thumb { background-color: #1A4E72; border-radius: 10px; border: 2px solid white; background-clip: padding-box; }
+#results-content::-webkit-scrollbar-track { background: transparent; margin: 10px; }
+
+/* ========================================================================================= */
+/* PANEL DE RÉSULTATS — CONTENU                                                             */
+/* ========================================================================================= */
+
+/* Titre gris majuscule affiché en haut du panel (adresse saisie ou "Point A / Point B")   */
 .panel-address-title {
     font-size: 0.75rem;
     font-weight: 700;
@@ -425,7 +385,7 @@ html, body {
     letter-spacing: 0.08em;
 }
 
-/* Carte par catégorie (Air, Pollen, Bruit, UV) */
+/* Carte par catégorie (Air, Pollen, Bruit, UV) avec bordure fine et coins arrondis         */
 .cat-card {
     border-radius: 10px;
     border: 1px solid #eee;
@@ -433,7 +393,7 @@ html, body {
     overflow: hidden;
 }
 
-/* En-tête de catégorie (fond bleu) */
+/* En-tête de catégorie : fond bleu foncé + icône + label blanc en majuscule               */
 .cat-header {
     display: flex;
     align-items: center;
@@ -449,7 +409,7 @@ html, body {
 
 .cat-body { padding: 4px 0; }
 
-/* Bloc d'une sous-catégorie (PM10, NO₂, etc.) */
+/* Bloc d'une sous-catégorie (PM10, NO₂, etc.) séparé du suivant par un trait fin          */
 .res-row {
     padding: 8px 12px 10px 12px;
     border-bottom: 1px solid #f5f5f5;
@@ -457,7 +417,7 @@ html, body {
 
 .res-row:last-child { border-bottom: none; }
 
-/* Ligne nom + valeur + badge */
+/* Ligne flex : nom du polluant à gauche, valeur + badge à droite                          */
 .res-top {
     display: flex;
     align-items: center;
@@ -467,47 +427,38 @@ html, body {
 
 .res-label { color: #555; font-size: 0.82rem; }
 
+/* Conteneur valeur + badge alignés côte à côte                                            */
 .res-right {
     display: flex;
     align-items: center;
     gap: 6px;
 }
 
-/* Valeur numérique */
-.res-value {
-    font-weight: 700;
-    color: #1A4E72;
-    font-size: 0.82rem;
-}
+/* Valeur numérique en gras bleu                                                            */
+.res-value { font-weight: 700; color: #1A4E72; font-size: 0.82rem; }
 
-/* Valeur absente */
-.res-value.no-data {
-    font-weight: 400;
-    color: #bbb;
-    font-style: italic;
-    font-size: 0.78rem;
-}
+/* Valeur absente : gris italique                                                           */
+.res-value.no-data { font-weight: 400; color: #bbb; font-style: italic; font-size: 0.78rem; }
 
-/* Badge de niveau : Bon / Modéré / Élevé */
-.res-badge {
-    font-size: 0.68rem;
-    font-weight: 700;
-    padding: 2px 7px;
-    border-radius: 20px;
-}
+/* Pilule colorée indiquant le niveau : Bon / Modéré / Élevé selon les seuils de LAYER_META */
+.res-badge { font-size: 0.68rem; font-weight: 700; padding: 2px 7px; border-radius: 20px; }
 
 .badge-low  { background: #e8f8ee; color: #27ae60; }
 .badge-mid  { background: #fff8e1; color: #f39c12; }
 .badge-high { background: #fdecea; color: #e74c3c; }
 
-/* Conteneur de la barre de légende */
+/* ========================================================================================= */
+/* BARRE DE LÉGENDE — Affichée sous chaque sous-catégorie quand une valeur est disponible  */
+/* ========================================================================================= */
+
+/* Conteneur relatif qui sert de référence de positionnement pour tous les éléments enfants */
 .legend-bar-wrap {
     position: relative;
     height: 28px;
     margin-top: 2px;
 }
 
-/* Barre dégradé vert → orange → rouge */
+/* Dégradé vert → orange → rouge sur toute la largeur                                      */
 .legend-bar {
     position: absolute;
     top: 6px;
@@ -518,7 +469,7 @@ html, body {
     background: linear-gradient(to right, #27ae60, #f39c12, #e74c3c);
 }
 
-/* Trait blanc vertical : seuil OMS */
+/* Trait blanc vertical positionné en % selon le seuil OMS (style="left: XX%")             */
 .marker-oms {
     position: absolute;
     top: 3px;
@@ -529,7 +480,7 @@ html, body {
     transform: translateX(-50%);
 }
 
-/* Point bleu : valeur à l'adresse */
+/* Point bleu circulaire positionné en % selon la valeur à l'adresse (style="left: XX%")   */
 .marker-val {
     position: absolute;
     top: 2px;
@@ -542,7 +493,7 @@ html, body {
     box-shadow: 0 1px 4px rgba(0,0,0,0.3);
 }
 
-/* Labels min et max sous la barre */
+/* Labels min et max sous la barre, collés aux extrémités gauche et droite                 */
 .legend-labels {
     position: absolute;
     top: 18px;
@@ -554,7 +505,7 @@ html, body {
     color: #aaa;
 }
 
-/* Label OMS positionné sous le trait blanc */
+/* Label "OMS xx" centré sous le trait blanc via translateX(-50%)                          */
 .label-oms {
     position: absolute;
     top: 18px;
@@ -565,11 +516,11 @@ html, body {
     white-space: nowrap;
 }
 
-/* =============================================
-    SÉLECTEUR DE COUCHES
-    Bouton flottant en haut à droite qui ouvre
-    le panneau de sélection des couches
-    ============================================= */
+/* ========================================================================================= */
+/* SÉLECTEUR DE COUCHES                                                                     */
+/* ========================================================================================= */
+
+/* Ancré en haut à droite en position fixed pour rester visible quand la carte est scrollée */
 #layers-control {
     position: fixed;
     top: 95px;
@@ -577,6 +528,7 @@ html, body {
     z-index: 1000;
 }
 
+/* Panneau des couches : boîte arrondie qui s'ouvre vers le bas à droite du bouton          */
 #layers-panel {
     position: absolute;
     top: 50px;
@@ -590,13 +542,11 @@ html, body {
     overflow-y: auto;
 }
 
-/* =============================================
-    GROUPES DE COUCHES
-    Chaque groupe est un accordéon : un header
-    cliquable (bleu foncé) qui affiche/masque
-    la liste des couches. Un seul groupe peut
-    être ouvert à la fois (géré dans main.js)
-    ============================================= */
+/* ========================================================================================= */
+/* GROUPES DE COUCHES — Accordéon, un seul groupe ouvert à la fois (géré dans main.js)     */
+/* ========================================================================================= */
+
+/* Conteneur d'un groupe avec bordure fine et coins arrondis                                */
 .layer-group {
     margin-bottom: 6px;
     border-radius: 8px;
@@ -604,12 +554,14 @@ html, body {
     border: 1px solid #dde4ea;
 }
 
+/* Ligne d'en-tête du groupe : fond bleu, aligne le bouton toggle et le bouton ℹ           */
 .layer-group-header {
     display: flex;
     align-items: stretch;
     background-color: #1A4E72;
 }
 
+/* Bouton toggle pleine largeur avec chevron + icône + label, cliquable pour ouvrir/fermer  */
 .layer-group-toggle {
     flex: 1;
     display: flex;
@@ -629,26 +581,20 @@ html, body {
     transition: background 0.15s;
 }
 
-.layer-group-toggle:hover {
-    background-color: rgba(255,255,255,0.1);
-}
+.layer-group-toggle:hover { background-color: rgba(255,255,255,0.1); }
 
-.layer-group-toggle .cat-icon {
-    width: 20px;
-    height: 20px;
-    object-fit: contain;
-}
+.layer-group-toggle .cat-icon { width: 20px; height: 20px; object-fit: contain; }
 
+/* Chevron animé : pointe vers le bas (ouvert) ou vers la droite (-90°, fermé)             */
 .layer-group-toggle .chevron {
     margin-right: 8px;
     font-size: 0.85rem;
     transition: transform 0.2s;
 }
 
-.layer-group-toggle.closed .chevron {
-    transform: rotate(-90deg);
-}
+.layer-group-toggle.closed .chevron { transform: rotate(-90deg); }
 
+/* Bouton ℹ séparé du toggle par une bordure gauche, ouvre la popup d'information          */
 .info-btn {
     background: none;
     border: none;
@@ -661,22 +607,17 @@ html, body {
     flex-shrink: 0;
 }
 
-.info-btn:hover {
-    background-color: rgba(255,255,255,0.15);
-}
+.info-btn:hover { background-color: rgba(255,255,255,0.15); }
 
-.layer-group-content {
-    background: #fff;
-    padding: 4px 0;
-}
+/* Zone de contenu masquée par défaut, révélée au clic sur le toggle                       */
+.layer-group-content { background: #fff; padding: 4px 0; }
+.layer-group-content.hidden { display: none; }
 
-.layer-group-content.hidden {
-    display: none;
-}
+/* ========================================================================================= */
+/* ITEMS DE COUCHE                                                                          */
+/* ========================================================================================= */
 
-/* =============================================
-    ITEMS DE COUCHE
-    ============================================= */
+/* Chaque couche est un label flex avec un toggle switch à gauche et un nom à droite       */
 .layer-group-content label {
     display: flex;
     align-items: center;
@@ -689,25 +630,14 @@ html, body {
     border-bottom: 1px solid #f0f0f0;
 }
 
-.layer-group-content label:last-of-type {
-    border-bottom: none;
-}
+.layer-group-content label:last-of-type { border-bottom: none; }
+.layer-group-content label:hover { color: #1A4E72; }
 
-.layer-group-content label:hover {
-    color: #1A4E72;
-}
+/* Couche non encore disponible : opacité réduite et curseur interdit                      */
+.layer-disabled { opacity: 0.4; cursor: not-allowed !important; }
+.layer-disabled input { cursor: not-allowed !important; }
 
-/* Couches non encore disponibles */
-.layer-disabled {
-    opacity: 0.4;
-    cursor: not-allowed !important;
-}
-
-.layer-disabled input {
-    cursor: not-allowed !important;
-}
-
-/* Toggle switch (checkbox stylisée) */
+/* Toggle switch : checkbox masquée et remplacée par un pill gris avec rond blanc           */
 .layer-group-content input[type="checkbox"] {
     appearance: none;
     -webkit-appearance: none;
@@ -721,6 +651,7 @@ html, body {
     flex-shrink: 0;
 }
 
+/* Rond blanc qui glisse de gauche à droite quand la checkbox est cochée                   */
 .layer-group-content input[type="checkbox"]::before {
     content: "";
     position: absolute;
@@ -734,17 +665,13 @@ html, body {
     box-shadow: 0 1px 3px rgba(0,0,0,0.3);
 }
 
-.layer-group-content input[type="checkbox"]:checked {
-    background-color: #1A4E72;
-}
+/* Fond bleu quand cochée                                                                   */
+.layer-group-content input[type="checkbox"]:checked { background-color: #1A4E72; }
 
-.layer-group-content input[type="checkbox"]:checked::before {
-    transform: translateX(18px);
-}
+/* Déplace le rond vers la droite quand cochée                                              */
+.layer-group-content input[type="checkbox"]:checked::before { transform: translateX(18px); }
 
-/* =============================================
-    SOUS-LABELS JOURNÉE / NUIT
-    ============================================= */
+/* Bandeaux bleu clair séparateurs Journée / Nuit dans la catégorie Bruit                  */
 .sublabel {
     margin: 4px 0 0 0;
     padding: 4px 12px;
@@ -754,14 +681,16 @@ html, body {
     background-color: #5dade2;
 }
 
-/* =============================================
-    POPUP D'INFORMATION
-    ============================================= */
+/* ========================================================================================= */
+/* POPUP D'INFORMATION — Même structure que la popup de bienvenue. Créée dynamiquement par  */
+/* popups.js. Rendue visible via la classe .visible. Contenu injecté depuis #info-contents. */
+/* ========================================================================================= */
+
+/* Fond semi-transparent, masqué par défaut, affiché via .visible                          */
 #info-popup {
     display: none;
     position: fixed;
-    top: 0;
-    left: 0;
+    top: 0; left: 0;
     width: 100%;
     height: 100%;
     background: rgba(0,0,0,0.5);
@@ -770,10 +699,9 @@ html, body {
     align-items: center;
 }
 
-#info-popup.visible {
-    display: flex;
-}
+#info-popup.visible { display: flex; }
 
+/* Boîte blanche avec bordure bleue gauche et animation d'apparition                       */
 #popup-inner {
     background: #fff;
     border-radius: 12px;
@@ -786,6 +714,7 @@ html, body {
     animation: slideIn 0.2s ease;
 }
 
+/* Zone scrollable du contenu avec scrollbar fine bleue                                    */
 #popup-content {
     max-height: 60vh;
     overflow-y: auto;
@@ -793,20 +722,16 @@ html, body {
     margin-top: 10px;
 }
 
-#popup-content::-webkit-scrollbar {
-    width: 6px;
-}
+#popup-content::-webkit-scrollbar       { width: 6px; }
+#popup-content::-webkit-scrollbar-thumb { background-color: #1A4E72; border-radius: 3px; }
 
-#popup-content::-webkit-scrollbar-thumb {
-    background-color: #1A4E72;
-    border-radius: 3px;
-}
-
+/* Animation d'apparition partagée par toutes les popups et le panel de résultats          */
 @keyframes slideIn {
     from { opacity: 0; transform: translateY(-10px); }
-    to { opacity: 1; transform: translateY(0); }
+    to   { opacity: 1; transform: translateY(0); }
 }
 
+/* Croix de fermeture positionnée en absolu en haut à droite                               */
 #popup-close {
     position: absolute;
     top: 12px;
@@ -818,9 +743,7 @@ html, body {
     color: #888;
 }
 
-#popup-close:hover {
-    color: #1A4E72;
-}
+#popup-close:hover { color: #1A4E72; }
 
 #popup-content h3 {
     display: flex;
@@ -832,23 +755,17 @@ html, body {
     font-weight: 700;
 }
 
-#popup-content h3 img {
-    width: 20px;
-    height: 20px;
-    object-fit: contain;
-}
+#popup-content h3 img { width: 20px; height: 20px; object-fit: contain; }
 
 #popup-content p,
 #popup-content ul,
-#popup-content li {
-    font-size: 0.85rem;
-    line-height: 1.8;
-    color: #444;
-}
+#popup-content li { font-size: 0.85rem; line-height: 1.8; color: #444; }
 
-/* =============================================
-    CONTRÔLES LEAFLET — STYLES GLOBAUX
-    ============================================= */
+/* ========================================================================================= */
+/* CONTRÔLES LEAFLET — Surcharge des styles natifs pour harmoniser typographie et couleur  */
+/* ========================================================================================= */
+
+/* Surcharge globale : police Jost et couleur bleue sur tous les contrôles Leaflet         */
 .leaflet-control {
     font-family: 'Jost', sans-serif !important;
     font-weight: 500 !important;
@@ -856,15 +773,15 @@ html, body {
     color: #1A4E72 !important;
 }
 
+/* Supprime les bordures et ombres par défaut de Leaflet                                    */
 .leaflet-control-zoom,
-.leaflet-control {
-    border: none !important;
-    box-shadow: none !important;
-}
+.leaflet-control { border: none !important; box-shadow: none !important; }
 
-/* =============================================
-    BOUTONS ZOOM
-    ============================================= */
+/* ========================================================================================= */
+/* BOUTONS ZOOM                                                                             */
+/* ========================================================================================= */
+
+/* Déplace le groupe +/- du coin supérieur gauche (défaut Leaflet) vers le bas à droite    */
 .leaflet-top.leaflet-left .leaflet-control-zoom {
     position: fixed !important;
     bottom: 40px !important;
@@ -874,6 +791,7 @@ html, body {
     z-index: 1000;
 }
 
+/* Boutons + et - individuels : carrés 32px arrondis, fond blanc, icône bleue              */
 .leaflet-control-zoom a {
     width: 32px !important;
     height: 32px !important;
@@ -890,17 +808,14 @@ html, body {
     transition: all 0.2s ease;
 }
 
-.leaflet-control-zoom a:hover {
-    background: #f5f5f5 !important;
-}
+.leaflet-control-zoom a:hover { background: #f5f5f5 !important; }
 
-.leaflet-control-zoom-in {
-    border-bottom: none !important;
-}
+/* Supprime la bordure entre les boutons + et - héritée de Leaflet                         */
+.leaflet-control-zoom-in { border-bottom: none !important; }
 
-/* =============================================
-    ÉCHELLE
-    ============================================= */
+/* ========================================================================================= */
+/* ÉCHELLE — Barre d'échelle en bas à gauche, même style card arrondi que les boutons zoom */
+/* ========================================================================================= */
 .leaflet-control-scale {
     background: rgba(255,255,255,0.9) !important;
     padding: 4px 8px !important;
@@ -912,6 +827,7 @@ html, body {
     color: #1A4E72 !important;
 }
 
+/* Ligne de l'échelle : supprime le fond blanc natif Leaflet                               */
 .leaflet-control-scale-line {
     background: none !important;
     color: #1A4E72 !important;
@@ -919,9 +835,9 @@ html, body {
     font-weight: 500 !important;
 }
 
-/* =============================================
-    CRÉDITS OPENSTREETMAP
-    ============================================= */
+/* ========================================================================================= */
+/* CRÉDITS OPENSTREETMAP — Bandeau attribution en bas à droite, même style card arrondi    */
+/* ========================================================================================= */
 .leaflet-control-attribution {
     background: rgba(255,255,255,0.9) !important;
     padding: 6px 10px !important;
@@ -939,11 +855,7 @@ html, body {
     font-weight: 600 !important;
 }
 
-.leaflet-bottom.leaflet-right {
-    bottom: 5px !important;
-    right: 5px !important;
-}
+/* Repositionne le bandeau pour coller aux bords inférieurs droit de la carte              */
+.leaflet-bottom.leaflet-right { bottom: 5px !important; right: 5px !important; }
 
-.leaflet-control-attribution a:hover {
-    text-decoration: underline !important;
-}
+.leaflet-control-attribution a:hover { text-decoration: underline !important; }

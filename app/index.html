@@ -3,24 +3,22 @@
   <head>
     <meta charset="UTF-8" />
     <title>Cartozome</title>
-
-    <!-- Favicon : logo Cartozome -->
     <link rel="icon" type="image/png" href="./img/logo.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <!-- Feuille de styles principale -->
     <link rel="stylesheet" href="./style.css" />
   </head>
 
-  <!-- ============================================= -->
-  <!-- TEMPLATES DES ICÔNES DE MARQUEURS            -->
-  <!-- Point unique : pin bleu + rond blanc         -->
-  <!-- Comparaison point A : pin vert + lettre A    -->
-  <!-- Comparaison point B : pin rouge + lettre B   -->
-  <!-- Itinéraire départ : pin vert + lettre D      -->
-  <!-- Itinéraire arrivée : pin rouge + lettre A    -->
-  <!-- ============================================= -->
+  <!-- ========================================================================================= -->
+  <!-- TEMPLATES DES ICÔNES DE MARQUEURS                                                         -->
+  <!-- Définis ici comme <template> pour être clonés dans main.js via markerIcon(templateId).    -->
+  <!-- Chaque template contient un SVG : rectangle arrondi + pointe basse + lettre ou point.     -->
+  <!-- tpl-marker-point    : pin bleu foncé (#1A4E72) + rond blanc — mode point unique           -->
+  <!-- tpl-marker-compare-a: pin vert (#27ae60) + lettre A — mode comparaison, point A           -->
+  <!-- tpl-marker-compare-b: pin rouge (#e74c3c) + lettre B — mode comparaison, point B          -->
+  <!-- tpl-marker-depart   : pin vert (#27ae60) + lettre D — mode itinéraire, point de départ    -->
+  <!-- tpl-marker-arrivee  : pin rouge (#e74c3c) + lettre A — mode itinéraire, point d'arrivée   -->
+  <!-- ========================================================================================= -->
 
-  <!-- Marker Point -->
   <template id="tpl-marker-point">
     <svg width="32" height="40" viewBox="0 0 32 40" fill="none" xmlns="http://www.w3.org/2000/svg">
       <defs>
@@ -34,7 +32,6 @@
     </svg>
   </template>
 
-  <!-- Marker Compare A -->
   <template id="tpl-marker-compare-a">
     <svg width="32" height="40" viewBox="0 0 32 40" fill="none" xmlns="http://www.w3.org/2000/svg">
       <defs>
@@ -48,7 +45,6 @@
     </svg>
   </template>
 
-  <!-- Marker Compare B -->
   <template id="tpl-marker-compare-b">
     <svg width="32" height="40" viewBox="0 0 32 40" fill="none" xmlns="http://www.w3.org/2000/svg">
       <defs>
@@ -62,7 +58,6 @@
     </svg>
   </template>
 
-  <!-- Marker Départ A -->
   <template id="tpl-marker-depart">
     <svg width="32" height="40" viewBox="0 0 32 40" fill="none" xmlns="http://www.w3.org/2000/svg">
       <defs>
@@ -76,7 +71,6 @@
     </svg>
   </template>
 
-  <!-- Marker Arrivée A -->
   <template id="tpl-marker-arrivee">
     <svg width="32" height="40" viewBox="0 0 32 40" fill="none" xmlns="http://www.w3.org/2000/svg">
       <defs>
@@ -92,11 +86,10 @@
 
   <body>
 
-    <!-- ================================ -->
-    <!-- BANDEAU HAUT                     -->
-    <!-- Logo Cartozome (gauche) +        -->
-    <!-- Logo Léon Bérard (droite)        -->
-    <!-- ================================ -->
+    <!-- ========================================================================================= -->
+    <!-- BANDEAU HAUT — Barre fixe en haut de page. Logo Cartozome + titre à gauche,               -->
+    <!-- logo Centre Léon Bérard à droite. Hauteur fixée à 55px via flex: 0 0 55px dans le CSS.    -->
+    <!-- ========================================================================================= -->
     <header id="top-banner">
       <div id="banner-left">
         <img src="./img/logo.png" alt="Logo Cartozome" id="banner-logo">
@@ -105,45 +98,42 @@
       <img src="./img/leonberard.png" alt="Logo Centre Léon Bérard" id="banner-logo-right">
     </header>
 
+    <!-- Conteneur principal : prend tout l'espace sous le bandeau. Position relative pour ancrer -->
+    <!-- les éléments flottants (carte, panels de recherche, résultats, sélecteur de couches).   -->
     <div id="main-container">
 
-      <!-- ================================ -->
-      <!-- RECHERCHE : ADRESSE / COMPARAISON / ITINÉRAIRE -->
-      <!--                                                -->
-      <!-- Trois boutons toggles (Où je suis /            -->
-      <!-- Comparer / Mon chemin) affichent le panel      -->
-      <!-- correspondant. La logique d'affichage est      -->
-      <!-- gérée dans main.js (setAddressMode /           -->
-      <!-- setCompareMode / setRouteMode).                -->
-      <!-- ================================ -->
+      <!-- ========================================================================================= -->
+      <!-- RECHERCHE : ADRESSE / COMPARAISON / ITINÉRAIRE                                            -->
+      <!-- Trois boutons toggle (Où je suis / Comparer / Mon chemin) affichent le panel de saisie    -->
+      <!-- correspondant. La logique d'affichage est gérée dans main.js via setAddressMode(),        -->
+      <!-- setCompareMode() et setRouteMode(). Chaque panel inclut un ou deux champs texte avec      -->
+      <!-- autocomplétion (API geopf.fr, filtrée sur les bounds de la métropole de Lyon) et un       -->
+      <!-- bouton de géolocalisation GPS qui remplit le champ via reverse géocodage.                 -->
+      <!-- ========================================================================================= -->
       <div id="search-controls">
 
-        <!-- Boutons de sélection du mode -->
         <button class="floating-btn search-btn" id="btn-address">Où je suis</button>
         <button class="floating-btn search-btn" id="btn-compare">Comparer</button>
         <button class="floating-btn search-btn" id="btn-route">Mon chemin</button>
 
-        <!-- Panel de recherche (caché par défaut) -->
         <div id="search-panel" class="hidden">
 
-          <!-- Panel MODE POINT UNIQUE -->
-          <!-- Affiché quand l'utilisateur clique sur "Adresse" -->
+          <!-- Panel MODE POINT UNIQUE — affiché au clic sur "Où je suis" -->
+          <!-- Géocode l'adresse saisie et place un marqueur bleu sur la carte -->
           <div id="panel-address" class="hidden">
             <div class="search-row">
               <input type="text" id="point-start" placeholder="Entrer une adresse">
-              <!-- Bouton géolocalisation : remplit le champ avec la position actuelle -->
               <button class="geolocate-btn" id="geolocate-point" title="Utiliser ma position">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M2 12L21 3L12 22L10 14L2 12Z"/>
                 </svg>
               </button>
             </div>
-            <!-- Déclenche le géocodage et place un marqueur sur la carte -->
             <button id="calc-point-btn">Valider</button>
           </div>
 
-          <!-- Panel MODE COMPARAISON -->
-          <!-- Affiché quand l'utilisateur clique sur "Comparer" -->
+          <!-- Panel MODE COMPARAISON — affiché au clic sur "Comparer" -->
+          <!-- Géocode deux adresses et place un marqueur vert (A) et rouge (B) sur la carte -->
           <div id="panel-compare" class="hidden">
             <div class="search-row">
               <input type="text" id="compare-a" placeholder="Point A">
@@ -164,12 +154,12 @@
             <button id="calc-compare-btn">Valider</button>
           </div>
 
-          <!-- Panel MODE ITINÉRAIRE -->
-          <!-- Affiché quand l'utilisateur clique sur "Itinéraire" -->
+          <!-- Panel MODE ITINÉRAIRE — affiché au clic sur "Mon chemin" -->
+          <!-- Géocode départ et arrivée, trace la route piétonne via bdtopo-osrm (geopf.fr) -->
+          <!-- et échantillonne des points le long du trajet pour interroger les couches actives -->
           <div id="panel-route" class="hidden">
             <div class="search-row">
               <input type="text" id="route-start" placeholder="Départ">
-              <!-- Bouton géolocalisation pour le point de départ -->
               <button class="geolocate-btn" id="geolocate-start" title="Utiliser ma position">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M2 12L21 3L12 22L10 14L2 12Z"/>
@@ -178,26 +168,27 @@
             </div>
             <div class="search-row">
               <input type="text" id="route-end" placeholder="Arrivée">
-              <!-- Bouton géolocalisation pour le point d'arrivée -->
               <button class="geolocate-btn" id="geolocate-end" title="Utiliser ma position">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M2 12L21 3L12 22L10 14L2 12Z"/>
                 </svg>
               </button>
             </div>
-            <!-- Déclenche le géocodage départ/arrivée et trace l'itinéraire sur la carte -->
             <button id="calc-route-btn">Valider</button>
           </div>
+
         </div>
       </div>
 
-      <!-- ================================ -->
-      <!-- PANEL DE RÉSULTATS               -->
-      <!-- S'affiche sous le panel de       -->
-      <!-- recherche après validation.      -->
-      <!-- Contenu injecté par main.js      -->
-      <!-- selon le mode actif.             -->
-      <!-- ================================ -->
+      <!-- ========================================================================================= -->
+      <!-- PANEL DE RÉSULTATS — S'affiche sous le panel de recherche après validation.               -->
+      <!-- Positionné dynamiquement par main.js via getBoundingClientRect() pour s'adapter à la      -->
+      <!-- hauteur réelle du panel selon le mode actif (1 ou 2 champs de saisie).                    -->
+      <!-- En mode point : affiche les valeurs d'exposition pour toutes les catégories               -->
+      <!-- (Air, Pollen, Bruit, UV) avec barre de légende, seuil OMS et badge de niveau.             -->
+      <!-- En mode comparaison et itinéraire : contenu à définir (TODO).                             -->
+      <!-- Fermé au clic sur la croix ou au changement de mode de recherche.                         -->
+      <!-- ========================================================================================= -->
       <div id="results-panel" class="hidden">
         <div id="results-header">
           <div class="panel-address-title" id="results-address"></div>
@@ -206,22 +197,16 @@
         <div id="results-content"></div>
       </div>
 
-      
-      <!-- ================================ -->
-      <!-- SÉLECTEUR DE COUCHES             -->
-      <!--                                  -->
-      <!-- Panneau flottant (droite) avec   -->
-      <!-- 4 catégories : Air, Pollen,      -->
-      <!-- Bruit, UV. Chaque catégorie est  -->
-      <!-- un accordéon. Une seule couche   -->
-      <!-- peut être active à la fois.      -->
-      <!-- Les couches sont servies par     -->
-      <!-- GeoServer en WMS (ou WFS pour    -->
-      <!-- le bruit aérien).                -->
-      <!-- ================================ -->
+      <!-- ========================================================================================= -->
+      <!-- SÉLECTEUR DE COUCHES — Panneau flottant ancré en haut à droite.                           -->
+      <!-- Le bouton SVG (icône de couches) ouvre/ferme le panneau via un toggle de classe.          -->
+      <!-- 4 catégories en accordéon (un seul groupe ouvert à la fois, géré dans main.js) :          -->
+      <!-- Air (WMS), Pollen (WMS + couches désactivées à venir), Bruit (WMS), UV (GeoJSON local)    -->
+      <!-- Chaque catégorie possède un bouton ℹ qui ouvre la popup d'information correspondante.     -->
+      <!-- Une seule couche peut être active à la fois — les autres sont décochées automatiquement.  -->
+      <!-- ========================================================================================= -->
       <div id="layers-control">
 
-        <!-- Bouton pour ouvrir/fermer le panneau des couches -->
         <button class="floating-btn" id="layers-toggle" title="Couches">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#1A4E72" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <polygon points="12 2 2 7 12 12 22 7 12 2"/>
@@ -230,12 +215,10 @@
           </svg>
         </button>
   
-        <!-- Panneau des couches (caché par défaut) -->
         <div id="layers-panel" class="hidden">
 
-          <!-- ---- CATÉGORIE : Qualité de l'air ---- -->
-          <!-- Couches WMS : PM10, PM2.5, NO₂, O₃     -->
-          <!-- Source : modélisation AURA 2024         -->
+          <!-- Catégorie AIR — couches WMS modélisation AURA 2024 servies par GeoServer local -->
+          <!-- PM10, PM2.5 : particules fines | NO₂ : dioxyde d'azote | O₃ : ozone troposphérique -->
           <div class="layer-group">
             <div class="layer-group-header">
               <button class="layer-group-toggle closed">
@@ -243,7 +226,6 @@
                 <img src="./img/air.png" alt="Air" class="cat-icon">
                 <span>Air</span>
               </button>
-              <!-- Bouton ℹ : ouvre la popup d'information sur la catégorie -->
               <button class="info-btn" data-cat="cat-air" title="En savoir plus">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round">
                   <circle cx="12" cy="12" r="10"/>
@@ -252,7 +234,6 @@
                 </svg>
               </button>
             </div>
-            <!-- data-layer : nom de la couche GeoServer -->
             <div class="layer-group-content hidden">
               <label><input type="checkbox" class="layer-checkbox" data-layer="cartozome:mod_aura_2024_pm10_moyan"> PM10</label>
               <label><input type="checkbox" class="layer-checkbox" data-layer="cartozome:mod_aura_2024_pm25_moyan"> PM2.5</label>
@@ -261,12 +242,9 @@
             </div>
           </div>
       
-          <!-- ---- CATÉGORIE : Pollen ---- -->
-          <!-- Couche WMS disponible : Ambroisie 2024   -->
-          <!-- Couches à venir (flux WMS non disponible -->
-          <!-- pour l'instant) : Multi-taxons,          -->
-          <!-- Graminées, Olivier, Bouleau, Aulne,      -->
-          <!-- Armoise                                  -->
+          <!-- Catégorie POLLEN — couche WMS Ambroisie 2024 disponible. Les autres taxons      -->
+          <!-- (Multi-taxons, Graminées, Olivier, Bouleau, Aulne, Armoise) sont désactivés     -->
+          <!-- (disabled + .layer-disabled) en attendant que les flux WMS soient disponibles.  -->
           <div class="layer-group">
             <div class="layer-group-header">
               <button class="layer-group-toggle closed">
@@ -283,9 +261,7 @@
               </button>
             </div>
             <div class="layer-group-content hidden">
-              <!-- Couche disponible -->
               <label><input type="checkbox" class="layer-checkbox" data-layer="cartozome:Ambroisie_2024_AURA"> Ambroisie</label>
-              <!-- Couches à venir — data-layer à renseigner quand le flux sera disponible -->
               <label class="layer-disabled"><input type="checkbox" class="layer-checkbox" data-layer="" disabled> Multi-taxons</label>
               <label class="layer-disabled"><input type="checkbox" class="layer-checkbox" data-layer="" disabled> Graminées</label>
               <label class="layer-disabled"><input type="checkbox" class="layer-checkbox" data-layer="" disabled> Olivier</label>
@@ -295,9 +271,7 @@
             </div>
           </div>
       
-          <!-- ---- CATÉGORIE : Bruit ---- -->
-          <!-- Couches WMS : routier, ferroviaire, industriel (Lden/Ln) -->
-          <!-- Couches WFS : aérien (Lden/Ln) — data-type="wfs"         -->
+          <!-- Catégorie BRUIT — couche WMS sous-indice multi-bruit ORHANE 2023 -->
           <div class="layer-group">
             <div class="layer-group-header">
               <button class="layer-group-toggle closed">
@@ -314,15 +288,13 @@
               </button>
             </div>
             <div class="layer-group-content hidden">
-              <label><input type="checkbox" class="layer-checkbox" data-layer="cartozome:sous_indice_multibruit_orhane_2023">Bruit</label>
+              <label><input type="checkbox" class="layer-checkbox" data-layer="cartozome:sous_indice_multibruit_orhane_2023"> Bruit</label>
             </div>
           </div>
       
-          <!-- ---- CATÉGORIE : UV ---- -->
-          <!-- Couche WMS : index UV                                 -->
-          <!-- Valeur dynamique récupérée depuis un JSON             -->
-          <!-- servi par Caddy : /data/openmeteo_uv_meteofrance.json -->
-          <!-- Mise à jour quotidienne par Météo-France              -->
+          <!-- Catégorie UV — couche GeoJSON chargée depuis l'endpoint Python /uvCommunes.      -->
+          <!-- Les communes sont colorées selon l'indice UV du jour (Météo-France via FastAPI). -->
+          <!-- data-layer="uvLayer" est un identifiant interne géré dans main.js (pas GeoServer).-->
           <div class="layer-group">
             <div class="layer-group-header">
               <button class="layer-group-toggle closed">
@@ -339,29 +311,23 @@
               </button>
             </div>
             <div class="layer-group-content hidden">
-              <label><input type="checkbox" class="layer-checkbox" data-layer="uvLayer">Index UV</label>
+              <label><input type="checkbox" class="layer-checkbox" data-layer="uvLayer"> Index UV</label>
             </div>
           </div>
 
         </div>
       </div>
 
-      <!-- ================================ -->
-      <!-- CARTE LEAFLET                    -->
-      <!-- Initialisée dans main.js         -->
-      <!-- Centrée sur Lyon (45.76, 4.83)   -->
-      <!-- Limitée aux bounds de la         -->
-      <!-- métropole de Lyon                -->
-      <!-- ================================ -->
+      <!-- Carte Leaflet — initialisée dans main.js, centrée sur Lyon, limitée aux bounds de la métropole -->
       <div id="map"></div>
 
     </div>
 
-    <!-- ================================ -->
-    <!-- POP-UP DE BIENVENUE              -->
-    <!-- Affichée au chargement de la     -->
-    <!-- page, gérée dans popups.js       -->
-    <!-- ================================ -->
+    <!-- ========================================================================================= -->
+    <!-- POPUP DE BIENVENUE — Overlay plein écran affiché au chargement de la page.                -->
+    <!-- display:none par défaut dans le HTML, rendu visible par popups.js (overlay.style.display  -->
+    <!-- = 'flex'). Fermée au clic sur le bouton ✖ (#welcome-close).                              -->
+    <!-- ========================================================================================= -->
     <div id="welcome-overlay" style="display:none">
       <div id="welcome-popup">
         <button id="welcome-close">✖</button>
@@ -374,16 +340,14 @@
       </div>
     </div>
   
-    <!-- ============================================= -->
-    <!-- CONTENUS DES POPUPS D'INFORMATION             -->
-    <!-- Ces divs sont cachées (display:none) et       -->
-    <!-- leur contenu est injecté dynamiquement dans   -->
-    <!-- #popup-content par popups.js lors du clic     -->
-    <!-- sur un bouton ℹ                               -->
-    <!-- ============================================= -->
+    <!-- ========================================================================================= -->
+    <!-- CONTENUS DES POPUPS D'INFORMATION — Divs cachées (display:none sur le conteneur parent)   -->
+    <!-- dont le innerHTML est injecté dans #popup-content par popups.js au clic sur un bouton ℹ.   -->
+    <!-- Chaque div correspond à une catégorie : info-cat-air, info-cat-pollen,                    -->
+    <!-- info-cat-bruit, info-cat-uv. Le data-cat du bouton ℹ sert de clé de correspondance.       -->
+    <!-- ========================================================================================= -->
     <div id="info-contents" style="display: none;">
 
-      <!-- Contenu popup : Qualité de l'air -->
       <div id="info-cat-air">
         <h3 class="popup-title">
           <img src="./img/air.png" alt="Logo Air">
@@ -406,7 +370,6 @@
         <p>Les valeurs sont comparées aux recommandations de l'OMS (2021).</p>
       </div>
 
-      <!-- Contenu popup : Pollen -->
       <div id="info-cat-pollen">
         <h3 class="popup-title">
           <img src="./img/pollen.png" alt="Logo Pollen">
@@ -426,12 +389,9 @@
           <li><strong>Modéré</strong> — Une quantité importante est nécessaire pour affecter un faible nombre de personnes sensibles.</li>
           <li><strong>Fort</strong> — Quelques grains suffisent à déclencher une réaction chez la majorité des personnes allergiques.</li>
         </ul>
-        <p>
-          Les données représentent les concentrations moyennes de pollen d'ambroisie sur l'année 2024.
-        </p>
+        <p>Les données représentent les concentrations moyennes de pollen d'ambroisie sur l'année 2024.</p>
       </div>
 
-      <!-- Contenu popup : Bruit -->
       <div id="info-cat-bruit">
         <h3 class="popup-title">
           <img src="./img/bruit.png" alt="Logo Bruit">
@@ -446,12 +406,9 @@
         <p><strong>Comment mesure-t-on le bruit ?</strong><br>
           Le bruit s'exprime en décibels (dB). Sur cette carte, deux indicateurs sont utilisés : l'exposition en journée et l'exposition la nuit.
         </p>
-        <p>
-          Les données représentent les niveaux de bruit moyens sur l'année 2022, issus de quatre sources : l'activité industrielle, le trafic routier, le trafic ferroviaire et le trafic aérien.
-        </p>
+        <p>Les données représentent les niveaux de bruit moyens sur l'année 2022, issus de quatre sources : l'activité industrielle, le trafic routier, le trafic ferroviaire et le trafic aérien.</p>
       </div>
 
-      <!-- Contenu popup : UV -->
       <div id="info-cat-uv">
         <h3 class="popup-title">
           <img src="./img/uv.png" alt="Logo UV">
@@ -461,20 +418,15 @@
         <p><strong>Comment mesure-t-on le risque UV ?</strong></p>
         <p>Les scientifiques utilisent l'Indice UV Global, une échelle internationale recommandée par l'OMS et l'OMM. Il va de 1 (risque faible) à 11 et au-delà (risque extrême).</p>
         <p><strong>Niveaux de risque :</strong></p>
-        <p>1-2 : Faible<br>
-        3-5 : Modéré<br>
-        6-7 : Fort<br>
-        8-10 : Très fort<br>
-        11+ : Extrême</p>
+        <p>1-2 : Faible<br>3-5 : Modéré<br>6-7 : Fort<br>8-10 : Très fort<br>11+ : Extrême</p>
         <p>Source : <a href="http://www.meteo.fr/temps/domtom/La_Reunion/meteoreunion2/UV/legendeUV.html" target="_blank">Météo-France</a></p>
         <p>Sur cette carte, l'indice affiché est celui produit par Météo-France, mis à jour chaque jour.</p>
       </div>
 
     </div>
 
-    <!-- Scripts chargés en modules ES6 -->
-    <!-- main.js   : carte, couches, recherche, géocodage, routing -->
-    <!-- popups.js : popup bienvenue + popups d'information        -->
+    <!-- main.js   : carte Leaflet, couches WMS/WFS/GeoJSON, recherche, géocodage, routing, panel de résultats -->
+    <!-- popups.js : popup de bienvenue + popups d'information (boutons ℹ) -->
     <script type="module" src="./main.js"></script>
     <script type="module" src="./popups.js"></script>
   </body>
