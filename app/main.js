@@ -677,6 +677,7 @@ document.getElementById("calc-point-btn").addEventListener("click", async () => 
 
   console.log("[POINT] Coordonnées :", { lat: coords[1], lon: coords[0] });
   openResultsPanel();
+  updateResultsForPoint(coords[1], coords[0], pointInput);
 });
 
 // Validation comparaison : géocode les deux points et place deux marqueurs.
@@ -709,6 +710,7 @@ document.getElementById("calc-compare-btn").addEventListener("click", async () =
   console.log("[COMPARAISON] Point A :", { lat: coordsA[1], lon: coordsA[0] });
   console.log("[COMPARAISON] Point B :", { lat: coordsB[1], lon: coordsB[0] });
   openResultsPanel();
+  updateResultsForPoint(coordsA[1], coordsA[0], inputA);
 });
 
 // Validation itinéraire : géocode départ et arrivée, trace la route piétonne.
@@ -742,6 +744,7 @@ document.getElementById("calc-compare-btn").addEventListener("click", async () =
 
 //   console.log("[ITINÉRAIRE] Coordonnées :", routeCoords);
 //   openResultsPanel();
+//   updateResultsForPoint(startCoords[1], startCoords[0], routeStart);
 // });
 
 
@@ -881,6 +884,219 @@ attachAutocomplete('route-end');
 btnAddress.addEventListener("click", setAddressMode);
 btnCompare.addEventListener("click", setCompareMode);
 btnRoute.addEventListener("click", setRouteMode);
+
+
+// =============================================
+// MÉTADONNÉES POUR LE PANEL DE RÉSULTATS
+// min/max : valeurs approx. sur la métropole
+// oms     : seuil OMS (null si inexistant)
+// thresholds : [seuil_bon, seuil_modéré]
+// =============================================
+const LAYER_META = {
+  "cartozome:mod_aura_2024_pm10_moyan":  { label: "PM10",              unit: "µg/m³",   min: 5,  max: 50,    oms: 15,   thresholds: [15, 30]    },
+  "cartozome:mod_aura_2024_pm25_moyan":  { label: "PM2.5",             unit: "µg/m³",   min: 2,  max: 30,    oms: 5,    thresholds: [5, 15]     },
+  "cartozome:mod_aura_2024_no2_moyan":   { label: "NO₂",               unit: "µg/m³",   min: 5,  max: 80,    oms: 10,   thresholds: [10, 25]    },
+  "cartozome:mod_aura_2024_o3_somo35":   { label: "O₃",                unit: "µg/m³·j", min: 0,  max: 25000, oms: null, thresholds: [10000, 17500] },
+  "cartozome:Ambroisie_2024_AURA":       { label: "Ambroisie",         unit: "gr/m³",   min: 0,  max: 20,    oms: null, thresholds: [3, 10]     },
+  "cartozome:GL_Rte_Lden":               { label: "Routier (jour)",     unit: "dB",      min: 40, max: 80,    oms: 53,   thresholds: [53, 65]    },
+  "cartozome:GL_Fer_Lden":               { label: "Ferroviaire (jour)", unit: "dB",      min: 40, max: 80,    oms: 54,   thresholds: [54, 65]    },
+  "cartozome:Indus_GL_E4_Lden":          { label: "Industriel (jour)",  unit: "dB",      min: 40, max: 80,    oms: 70,   thresholds: [70, 75]    },
+  "cartozome:GL_Rte_Ln":                 { label: "Routier (nuit)",     unit: "dB",      min: 30, max: 70,    oms: 45,   thresholds: [45, 55]    },
+  "cartozome:GL_Fer_Ln":                 { label: "Ferroviaire (nuit)", unit: "dB",      min: 30, max: 70,    oms: 44,   thresholds: [44, 55]    },
+};
+
+// Structure des catégories affichées dans le panel
+const RESULT_CATEGORIES = [
+  {
+    label: "Air", icon: "🌫",
+    layers: [
+      "cartozome:mod_aura_2024_pm10_moyan",
+      "cartozome:mod_aura_2024_pm25_moyan",
+      "cartozome:mod_aura_2024_no2_moyan",
+      "cartozome:mod_aura_2024_o3_somo35",
+    ]
+  },
+  {
+    label: "Pollen", icon: "🌿",
+    layers: ["cartozome:Ambroisie_2024_AURA"]
+  },
+  {
+    label: "Bruit", icon: "🔊",
+    layers: [
+      "cartozome:GL_Rte_Lden",
+      "cartozome:GL_Fer_Lden",
+      "cartozome:Indus_GL_E4_Lden",
+      "cartozome:GL_Rte_Ln",
+      "cartozome:GL_Fer_Ln",
+    ]
+  },
+];
+
+// Retourne le badge correspondant à la valeur
+function getBadge(val, thresholds) {
+  if (val <= thresholds[0]) return { label: "Bon",     cls: "badge-low"  };
+  if (val <= thresholds[1]) return { label: "Modéré",  cls: "badge-mid"  };
+  return                           { label: "Élevé",   cls: "badge-high" };
+}
+
+// Construit la barre de légende avec marqueur OMS et marqueur valeur
+function buildLegendBar(val, meta) {
+  const { min, max, oms, unit } = meta;
+  const pct    = v  => Math.min(100, Math.max(0, ((v - min) / (max - min)) * 100));
+  const valPct = pct(val);
+  const omsPct = oms !== null ? pct(oms) : null;
+
+  return `
+    <div class="legend-bar-wrap">
+      <div class="legend-bar"></div>
+      ${omsPct !== null ? `
+        <div class="marker-oms" style="left:${omsPct}%"></div>
+        <span class="label-oms" style="left:${omsPct}%">OMS ${oms}</span>
+      ` : ''}
+      <div class="marker-val" style="left:${valPct}%"></div>
+      <div class="legend-labels">
+        <span>${min}</span>
+        <span>${max} ${unit}</span>
+      </div>
+    </div>`;
+}
+
+// Interroge GeoServer en GetFeatureInfo pour un point donné
+// Retourne la valeur numérique de la couche, ou null si absent
+async function queryLayerAtPoint(layerName, lat, lon) {
+  const delta = 0.001; // Petite bbox autour du point
+  const bbox  = `${lon - delta},${lat - delta},${lon + delta},${lat + delta}`;
+
+  const params = new URLSearchParams({
+    service:       "WMS",
+    version:       "1.1.1",
+    request:       "GetFeatureInfo",
+    layers:        layerName,
+    query_layers:  layerName,
+    styles:        "",
+    bbox:          bbox,
+    width:         101,
+    height:        101,
+    srs:           "EPSG:4326",
+    format:        "image/png",
+    transparent:   true,
+    info_format:   "application/json",
+    x:             50,
+    y:             50,
+    feature_count: 1,
+  });
+
+  try {
+    const res  = await fetch(`${GEOSERVER_URL}?${params}`);
+    if (!res.ok) return null;
+    const data = await res.json();
+    const features = data?.features;
+    if (!features || features.length === 0) return null;
+    const entry = Object.entries(features[0].properties).find(([, v]) => typeof v === "number");
+    return entry ? entry[1] : null;
+  } catch {
+    return null;
+  }
+}
+
+// Construit et injecte le HTML du panel de résultats
+// address    : adresse lisible affichée en titre
+// layerValues : { layerName: valeur | null }
+// uvValue    : indice UV (number | null)
+function renderResultsPanel(address, layerValues, uvValue) {
+  const content = document.getElementById("results-content");
+  const header  = document.getElementById("results-header");
+
+  document.getElementById("results-address").textContent = address;
+  document.getElementById("results-close").addEventListener("click", () => {
+      resultsPanel.classList.add("hidden");
+  });
+
+  document.getElementById("results-close").addEventListener("click", () => {
+    resultsPanel.classList.add("hidden");
+  });
+
+  let html = ``;
+
+  // Catégories Air, Pollen, Bruit
+  for (const cat of RESULT_CATEGORIES) {
+    html += `<div class="cat-card">
+      <div class="cat-header">${cat.icon} ${cat.label}</div>
+      <div class="cat-body">`;
+
+    for (const layerName of cat.layers) {
+      const meta = LAYER_META[layerName];
+      if (!meta) continue;
+      const val = layerValues[layerName];
+
+      html += `<div class="res-row"><div class="res-top">
+        <span class="res-label">${meta.label}</span>`;
+
+      if (val === null || val === undefined) {
+        html += `<span class="res-value no-data">Non disponible</span>`;
+      } else {
+        const badge = getBadge(val, meta.thresholds);
+        html += `<div class="res-right">
+          <span class="res-value">${val.toFixed(1)} ${meta.unit}</span>
+          <span class="res-badge ${badge.cls}">${badge.label}</span>
+        </div>`;
+      }
+
+      html += `</div>`;
+      if (val !== null && val !== undefined) html += buildLegendBar(val, meta);
+      html += `</div>`;
+    }
+
+    html += `</div></div>`;
+  }
+
+  // Catégorie UV (données JSON Météo-France)
+  html += `<div class="cat-card">
+    <div class="cat-header">☀️ UV</div>
+    <div class="cat-body">
+      <div class="res-row"><div class="res-top">
+        <span class="res-label">Indice UV max</span>`;
+
+  if (uvValue === null || uvValue === undefined) {
+    html += `<span class="res-value no-data">Non disponible</span>`;
+  } else {
+    const badge = getBadge(uvValue, [2, 5]);
+    html += `<div class="res-right">
+      <span class="res-value">${uvValue}</span>
+      <span class="res-badge ${badge.cls}">${badge.label}</span>
+    </div>`;
+  }
+
+  html += `</div>`;
+  if (uvValue !== null && uvValue !== undefined) {
+    html += buildLegendBar(uvValue, { min: 0, max: 11, oms: null, unit: "" });
+  }
+  html += `</div></div></div>`;
+
+  content.innerHTML = html;
+}
+
+// Interroge toutes les couches pour un point et met à jour le panel
+async function updateResultsForPoint(lat, lon, address) {
+  // Lance toutes les requêtes en parallèle
+  const entries = await Promise.all(
+    Object.keys(LAYER_META).map(async layerName => {
+      const val = await queryLayerAtPoint(layerName, lat, lon);
+      return [layerName, val];
+    })
+  );
+  const layerValues = Object.fromEntries(entries);
+
+  // Récupère la valeur UV depuis le JSON déjà chargé
+  let uvValue = null;
+  try {
+    const points = await fetchUvJson();
+    const p      = closestUvPoint(points, lat, lon);
+    if (p) uvValue = extractUvMax(p).uv;
+  } catch { /* silencieux */ }
+
+  renderResultsPanel(address, layerValues, uvValue);
+}
 
 // =============================================
 // CLIC SUR LA CARTE -> POPUP INDICATEURS
