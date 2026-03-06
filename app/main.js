@@ -487,7 +487,7 @@ document.getElementById("calc-point-btn").addEventListener("click", async () => 
   if (!coords) { alert("Adresse introuvable"); return; }
 
   const latLng = L.latLng(coords[1], coords[0]);
-  L.marker(latLng, { icon: iconPoint }).addTo(routingLayer).bindPopup("Point sélectionné").openPopup();
+  L.marker(latLng, { icon: iconPoint }).addTo(routingLayer);
   map.setView(latLng, 16);
 
   console.log("[POINT] Coordonnées :", { lat: coords[1], lon: coords[0] });
@@ -514,7 +514,7 @@ document.getElementById("calc-compare-btn").addEventListener("click", async () =
   const latLngA = L.latLng(coordsA[1], coordsA[0]);
   const latLngB = L.latLng(coordsB[1], coordsB[0]);
 
-  L.marker(latLngA, { icon: iconCompareA }).addTo(routingLayer).bindPopup("Point A").openPopup();
+  L.marker(latLngA, { icon: iconCompareA }).addTo(routingLayer).bindPopup("Point A");
   L.marker(latLngB, { icon: iconCompareB }).addTo(routingLayer).bindPopup("Point B");
 
   // Centre la vue pour afficher les deux points
@@ -539,7 +539,7 @@ document.getElementById("calc-compare-btn").addEventListener("click", async () =
 //   const startCoords = await geocodeAddress(routeStart);
 //   if (!startCoords) { alert("Adresse de départ introuvable"); return; }
 //   const startLatLng = L.latLng(startCoords[1], startCoords[0]);
-//   L.marker(startLatLng, { icon: iconDepart }).addTo(routingLayer).bindPopup("Départ").openPopup();
+//   L.marker(startLatLng, { icon: iconDepart }).addTo(routingLayer).bindPopup("Départ");
 
 //   if (!routeEnd) { map.setView(startLatLng, 16); return; }
 
@@ -570,7 +570,7 @@ document.getElementById("calc-route-btn").addEventListener("click", async () => 
   const startCoords = await geocodeAddress(routeStart);
   if (!startCoords) { alert("Adresse de départ introuvable"); return; }
   const startLatLng = L.latLng(startCoords[1], startCoords[0]);
-  L.marker(startLatLng, { icon: iconDepart }).addTo(routingLayer).bindPopup("Départ").openPopup();
+  L.marker(startLatLng, { icon: iconDepart }).addTo(routingLayer).bindPopup("Départ");
 
   if (!routeEnd) { map.setView(startLatLng, 16); return; }
 
