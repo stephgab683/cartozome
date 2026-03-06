@@ -66,6 +66,9 @@ async function loadUvLayer() {
 // Charger la couche au démarrage
 loadUvLayer();
 
+// Échelle
+L.control.scale({ position: 'bottomleft', imperial: false }).addTo(map);
+
 // =============================================
 // ICÔNES MARQUEURS PERSONNALISÉES
 // Les SVG sont définis dans des <template> dans
