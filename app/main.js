@@ -184,7 +184,7 @@ const LAYER_LABELS = {
   // Bouleau
   // Aulne
   // Armoise
-  "cartozome:sous_indice_multibruit_orhane_2023":"Bruit",
+  "cartozome:sous_indice_multibruit_orhane_2023":"Indice multi-bruit",
 };
 
 // Unités affichées dans la popup de clic
