@@ -1,3 +1,16 @@
+// PILL DE PRESENTATION
+
+// Clic sur le titre Cartozome — réouvre la popup de bienvenue
+document.getElementById('pill-title').addEventListener('click', () => {
+  document.getElementById('welcome-overlay').style.display = 'flex';
+});
+
+// Clic sur le logo CLB — ouvre le site de prévention dans un nouvel onglet
+document.getElementById('pill-clb').addEventListener('click', () => {
+  window.open('https://prevention.centreleonberard.fr/', '_blank');
+});
+
+
 // =============================================
 // POP-UP DE BIENVENUE
 // Affichée automatiquement au chargement de
@@ -15,6 +28,8 @@ window.addEventListener('load', () => {
     overlay.style.display = 'none';
   });
 });
+
+
 
 // =============================================
 // POPUPS D'INFORMATION

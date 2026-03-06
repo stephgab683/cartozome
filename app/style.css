@@ -51,7 +51,7 @@ html, body {
     text-align: center;
     position: relative;
     box-shadow: 0 6px 30px rgba(0,0,0,0.25);
-    border-left: 4px solid #1A4E72;
+    border-left: 4px solid #2c426c;
 }
 
 /* Croix de fermeture positionnée en absolu en haut à droite de la boîte                   */
@@ -66,12 +66,12 @@ html, body {
     color: #888;
 }
 
-#welcome-close:hover { color: #1A4E72; }
+#welcome-close:hover { color: #e71d73; }
 
 #welcome-popup h2 {
     margin: 0 0 15px 0;
     font-size: 1.5rem;
-    color: #1A4E72;
+    color: #2c426c;
 }
 
 #welcome-popup p {
@@ -81,42 +81,93 @@ html, body {
 }
 
 /* ========================================================================================= */
-/* BANDEAU HAUT — Barre fixe en haut de page. Flex row pour aligner logo + titre à gauche  */
-/* et logo Léon Bérard à droite. Hauteur fixée à 55px (flex: 0 0 55px).                    */
+/* BANDEAU HAUT — Pill centrée flottante sur la carte, sans fond pleine largeur             */
 /* ========================================================================================= */
 #top-banner {
+    position: absolute;
+    top: 14px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    pointer-events: none;
+}
+
+/* Pill blanche centrée : logo + titre + séparateur + description + CLB                     */
+#center-pill {
+    background: rgba(255,255,255,0.97);
+    border-radius: 40px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.14);
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    padding: 15px 20px;
-    background-color: #FFFFFF;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    flex: 0 0 55px;
+    height: 52px;
+    overflow: hidden;
+    pointer-events: all;
+    white-space: nowrap;
 }
 
-#banner-left {
+/* Logo Cartozome sans fond, à sa taille naturelle                                          */
+#pill-logo {
+    width: auto;
+    height: auto;
+    border-radius: 0;
+    background: none;
+    margin-left: 12px;
+    flex-shrink: 0;
+}
+
+#pill-logo img { width: 36px; height: 36px; object-fit: contain; }
+
+/* Titre CARTOZOME en gras bleu, cliquable pour réouvrir la popup de bienvenue             */
+#pill-title {
+    font-size: 1rem;
+    font-weight: 900;
+    color: #2c426c;
+    letter-spacing: 0.08em;
+    padding: 0 16px 0 10px;
+    cursor: pointer;
+}
+
+#pill-title:hover { color: #e71d73; }
+
+/* Séparateurs fins entre les sections                                                       */
+.pill-sep {
+    width: 1px;
+    height: 24px;
+    background: #eee;
+    flex-shrink: 0;
+}
+
+/* Description courte en gris                                                                */
+#pill-desc {
+    font-size: 0.78rem;
+    color: #999;
+    padding: 0 16px;
+}
+
+/* Logo CLB cliquable — ouvre le site de prévention au clic                                 */
+#pill-clb {
+    height: 100%;
+    background: white;
     display: flex;
     align-items: center;
-    gap: 10px;
+    padding: 0 12px;
+    margin-right: 10px;
+    cursor: pointer;
+    transition: background 0.15s;
 }
 
-#banner-logo       { height: 50px; }
-#banner-logo-right { height: 50px; }
+#pill-clb:hover { background: #fff0f6; }
 
-#banner-left h1 {
-    margin: 0;
-    font-size: 1.8rem;
-    color: #1A4E72;
-    text-transform: uppercase;
-}
+#pill-clb img { height: 34px; object-fit: contain; }
 
 /* ========================================================================================= */
-/* CONTENEUR PRINCIPAL — Prend tout l'espace restant sous le bandeau (flex: 1).             */
+/* CONTENEUR PRINCIPAL — Prend tout l'espace restant, hauteur 100vh.                        */
 /* Position relative pour ancrer en absolu la carte, les panels et les boutons flottants.   */
 /* ========================================================================================= */
 #main-container {
     position: relative;
     flex: 1;
+    height: 100vh;
 }
 
 /* ========================================================================================= */
@@ -149,14 +200,22 @@ html, body {
 
 .floating-btn:hover { background: #f5f5f5; }
 
+#layers-toggle:hover {
+    background: #fff0f6 !important;
+}
+
+#layers-toggle:hover svg {
+    stroke: #e71d73 !important;
+}
+
 /* ========================================================================================= */
 /* RECHERCHE                                                                                 */
 /* ========================================================================================= */
 
-/* Conteneur positionné en absolu en haut à gauche — contient les boutons toggle et le panel */
+/* Conteneur positionné en absolu en haut à gauche — abaissé à 95px pour passer sous la pill */
 #search-controls {
     position: absolute;
-    top: 20px;
+    top: 95px;
     left: 20px;
     z-index: 1000;
     display: flex;
@@ -173,16 +232,17 @@ html, body {
     font-size: 0.82rem !important;
     font-weight: 600;
     font-family: 'Jost', sans-serif;
-    color: #1A4E72;
+    color: #2c426c;
     margin-bottom: 0 !important;
     letter-spacing: 0.03em;
+    transition: background 0.15s, color 0.15s;
 }
 
-/* Bouton actif : fond bleu foncé + texte blanc pour indiquer le mode sélectionné          */
-.search-btn.active {
-    background-color: #1A4E72;
-    color: #fff;
-}
+/* Bouton actif : fond bleu + texte blanc                                                   */
+.search-btn.active { background-color: #2c426c; color: #fff; }
+
+/* Hover sur bouton inactif                                                 */
+.search-btn:hover:not(.active) { background-color: #e71d73; color: #fff; }
 
 /* Boîte blanche contenant les champs de saisie, positionnée sous les boutons toggle       */
 #search-panel {
@@ -211,14 +271,14 @@ html, body {
     transition: border-color 0.2s;
 }
 
-#search-panel input:focus { border-color: #1A4E72; }
+#search-panel input:focus { border-color: #2c426c; }
 
 /* Bouton Valider — pleine largeur, fond bleu, majuscule. :not(.geolocate-btn) pour ne pas */
 /* affecter le bouton GPS qui est aussi dans #search-panel                                  */
 #search-panel button:not(.geolocate-btn) {
     width: 100%;
     padding: 10px;
-    background-color: #1A4E72;
+    background-color: #2c426c;
     color: #fff;
     border: none;
     border-radius: 24px;
@@ -231,9 +291,8 @@ html, body {
     transition: background 0.15s;
 }
 
-#search-panel button:not(.geolocate-btn):hover {
-    box-shadow: inset 0 0 0 1000px rgba(255,255,255,0.1);
-}
+/* Hover rose CLB sur le bouton Valider                                                     */
+#search-panel button:not(.geolocate-btn):hover { background-color: #e71d73; }
 
 /* ========================================================================================= */
 /* BOUTON GÉOLOCALISATION                                                                    */
@@ -250,14 +309,14 @@ html, body {
 /* Le champ prend tout l'espace disponible, le bouton GPS garde sa taille fixe              */
 .search-row input { flex: 1; margin-bottom: 0 !important; }
 
-/* Cercle blanc avec icône flèche, bordure fine qui passe en bleu au hover                  */
+/* Cercle blanc avec icône flèche, bordure fine qui passe en rose au hover                  */
 .geolocate-btn {
     width: 36px !important;
     height: 36px !important;
     border-radius: 50% !important;
     border: 1.5px solid #e0e0e0;
     background: white;
-    color: #1A4E72;
+    color: #2c426c;
     cursor: pointer;
     font-size: 14px;
     flex-shrink: 0;
@@ -268,10 +327,7 @@ html, body {
     transition: border-color 0.2s, color 0.2s, background 0.2s;
 }
 
-.geolocate-btn:hover {
-    border-color: #1A4E72;
-    background: #f0f5fa;
-}
+.geolocate-btn:hover { border-color: #e71d73; color: #e71d73; background: #fff0f6; }
 
 /* ========================================================================================= */
 /* AUTOCOMPLÉTION — Liste déroulante absolue affichée sous le champ de saisie pendant la    */
@@ -306,221 +362,14 @@ html, body {
 
 .autocomplete-list li:last-child { border-bottom: none; }
 
-.autocomplete-list li:hover {
-    background: #f0f5fa;
-    color: #1A4E72;
-}
-
-/* ========================================================================================= */
-/* PANEL DE RÉSULTATS — S'affiche sous le panel de recherche après validation.              */
-/* Le top est recalculé dynamiquement par main.js (getBoundingClientRect) pour s'adapter    */
-/* à la hauteur réelle du panel selon le mode actif (1 ou 2 champs de saisie).             */
-/* ========================================================================================= */
-
-/* Conteneur principal : colonne flex pour séparer le header fixe du contenu scrollable    */
-#results-panel {
-    position: absolute;
-    top: 130px;
-    left: 20px;
-    width: 350px;
-    background: white;
-    border-radius: 16px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-    z-index: 1000;
-    max-height: 60vh;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    animation: slideIn 0.2s ease;
-}
-
-/* Ligne titre adresse + bouton ✖, ne scroll pas avec le contenu                           */
-#results-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 14px 14px 10px 20px;
-    border-bottom: 1px solid #f0f0f0;
-    flex-shrink: 0;
-}
-
-/* Croix de fermeture du panel de résultats                                                 */
-#results-close {
-    background: none;
-    border: none;
-    font-size: 1.2rem;
-    cursor: pointer;
-    color: #888;
-    flex-shrink: 0;
-}
-
-#results-close:hover { color: #1A4E72; }
-
-/* Zone scrollable qui reçoit le HTML injecté par renderResultsPanel()                     */
-#results-content {
-    padding: 20px 14px 20px 20px;
-    font-size: 0.85rem;
-    line-height: 1.8;
-    color: #444;
-    overflow-y: auto;
-    max-height: 60vh;
-    scrollbar-gutter: stable;
-}
-
-/* Scrollbar stylisée : fine, bleue, arrondie, avec espace blanc entre le pouce et le bord */
-#results-content::-webkit-scrollbar       { width: 10px; }
-#results-content::-webkit-scrollbar-thumb { background-color: #1A4E72; border-radius: 10px; border: 2px solid white; background-clip: padding-box; }
-#results-content::-webkit-scrollbar-track { background: transparent; margin: 10px; }
-
-/* ========================================================================================= */
-/* PANEL DE RÉSULTATS — CONTENU                                                             */
-/* ========================================================================================= */
-
-/* Titre gris majuscule affiché en haut du panel (adresse saisie ou "Point A / Point B")   */
-.panel-address-title {
-    font-size: 0.75rem;
-    font-weight: 700;
-    color: #888;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-}
-
-/* Carte par catégorie (Air, Pollen, Bruit, UV) avec bordure fine et coins arrondis         */
-.cat-card {
-    border-radius: 10px;
-    border: 1px solid #eee;
-    margin-bottom: 10px;
-    overflow: hidden;
-}
-
-/* En-tête de catégorie : fond bleu foncé + icône + label blanc en majuscule               */
-.cat-header {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 12px;
-    background: #1A4E72;
-    color: white;
-    font-size: 0.8rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-}
-
-.cat-body { padding: 4px 0; }
-
-/* Bloc d'une sous-catégorie (PM10, NO₂, etc.) séparé du suivant par un trait fin          */
-.res-row {
-    padding: 8px 12px 10px 12px;
-    border-bottom: 1px solid #f5f5f5;
-}
-
-.res-row:last-child { border-bottom: none; }
-
-/* Ligne flex : nom du polluant à gauche, valeur + badge à droite                          */
-.res-top {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 6px;
-}
-
-.res-label { color: #555; font-size: 0.82rem; }
-
-/* Conteneur valeur + badge alignés côte à côte                                            */
-.res-right {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-}
-
-/* Valeur numérique en gras bleu                                                            */
-.res-value { font-weight: 700; color: #1A4E72; font-size: 0.82rem; }
-
-/* Valeur absente : gris italique                                                           */
-.res-value.no-data { font-weight: 400; color: #bbb; font-style: italic; font-size: 0.78rem; }
-
-/* Pilule colorée indiquant le niveau : Bon / Modéré / Élevé selon les seuils de LAYER_META */
-.res-badge { font-size: 0.68rem; font-weight: 700; padding: 2px 7px; border-radius: 20px; }
-
-.badge-low  { background: #e8f8ee; color: #27ae60; }
-.badge-mid  { background: #fff8e1; color: #f39c12; }
-.badge-high { background: #fdecea; color: #e74c3c; }
-
-/* ========================================================================================= */
-/* BARRE DE LÉGENDE — Affichée sous chaque sous-catégorie quand une valeur est disponible  */
-/* ========================================================================================= */
-
-/* Conteneur relatif qui sert de référence de positionnement pour tous les éléments enfants */
-.legend-bar-wrap {
-    position: relative;
-    height: 28px;
-    margin-top: 2px;
-}
-
-/* Dégradé vert → orange → rouge sur toute la largeur                                      */
-.legend-bar {
-    position: absolute;
-    top: 6px;
-    left: 0;
-    right: 0;
-    height: 8px;
-    border-radius: 6px;
-    background: linear-gradient(to right, #27ae60, #f39c12, #e74c3c);
-}
-
-/* Trait blanc vertical positionné en % selon le seuil OMS (style="left: XX%")             */
-.marker-oms {
-    position: absolute;
-    top: 3px;
-    width: 2px;
-    height: 14px;
-    background: white;
-    border-radius: 2px;
-    transform: translateX(-50%);
-}
-
-/* Point bleu circulaire positionné en % selon la valeur à l'adresse (style="left: XX%")   */
-.marker-val {
-    position: absolute;
-    top: 2px;
-    width: 12px;
-    height: 12px;
-    background: #1A4E72;
-    border: 2px solid white;
-    border-radius: 50%;
-    transform: translateX(-50%);
-    box-shadow: 0 1px 4px rgba(0,0,0,0.3);
-}
-
-/* Labels min et max sous la barre, collés aux extrémités gauche et droite                 */
-.legend-labels {
-    position: absolute;
-    top: 18px;
-    left: 0;
-    right: 0;
-    display: flex;
-    justify-content: space-between;
-    font-size: 0.62rem;
-    color: #aaa;
-}
-
-/* Label "OMS xx" centré sous le trait blanc via translateX(-50%)                          */
-.label-oms {
-    position: absolute;
-    top: 18px;
-    font-size: 0.62rem;
-    color: #888;
-    font-weight: 600;
-    transform: translateX(-50%);
-    white-space: nowrap;
-}
+/* Hover rose CLB sur les suggestions                                                       */
+.autocomplete-list li:hover { background: #fff0f6; color: #e71d73; }
 
 /* ========================================================================================= */
 /* SÉLECTEUR DE COUCHES                                                                     */
 /* ========================================================================================= */
 
-/* Ancré en haut à droite en position fixed pour rester visible quand la carte est scrollée */
+/* Ancré en haut à droite au même niveau que les boutons de recherche (top: 95px)          */
 #layers-control {
     position: fixed;
     top: 95px;
@@ -558,7 +407,7 @@ html, body {
 .layer-group-header {
     display: flex;
     align-items: stretch;
-    background-color: #1A4E72;
+    background-color: #2c426c;
 }
 
 /* Bouton toggle pleine largeur avec chevron + icône + label, cliquable pour ouvrir/fermer  */
@@ -581,7 +430,8 @@ html, body {
     transition: background 0.15s;
 }
 
-.layer-group-toggle:hover { background-color: rgba(255,255,255,0.1); }
+/* Hover rose CLB sur le toggle                                                             */
+.layer-group-toggle:hover { background-color: #e71d73; }
 
 .layer-group-toggle .cat-icon { width: 20px; height: 20px; object-fit: contain; }
 
@@ -607,7 +457,8 @@ html, body {
     flex-shrink: 0;
 }
 
-.info-btn:hover { background-color: rgba(255,255,255,0.15); }
+/* Hover rose CLB sur le bouton ℹ                                                          */
+.info-btn:hover { background-color: #e71d73; }
 
 /* Zone de contenu masquée par défaut, révélée au clic sur le toggle                       */
 .layer-group-content { background: #fff; padding: 4px 0; }
@@ -628,10 +479,13 @@ html, body {
     color: #333;
     user-select: none;
     border-bottom: 1px solid #f0f0f0;
+    transition: color 0.15s;
 }
 
 .layer-group-content label:last-of-type { border-bottom: none; }
-.layer-group-content label:hover { color: #1A4E72; }
+
+/* Hover rose CLB sur les labels de couche                                                  */
+.layer-group-content label:hover { color: #e71d73; }
 
 /* Couche non encore disponible : opacité réduite et curseur interdit                      */
 .layer-disabled { opacity: 0.4; cursor: not-allowed !important; }
@@ -666,7 +520,7 @@ html, body {
 }
 
 /* Fond bleu quand cochée                                                                   */
-.layer-group-content input[type="checkbox"]:checked { background-color: #1A4E72; }
+.layer-group-content input[type="checkbox"]:checked { background-color: #2c426c; }
 
 /* Déplace le rond vers la droite quand cochée                                              */
 .layer-group-content input[type="checkbox"]:checked::before { transform: translateX(18px); }
@@ -710,7 +564,7 @@ html, body {
     width: 90%;
     position: relative;
     box-shadow: 0 6px 30px rgba(0,0,0,0.25);
-    border-left: 4px solid #1A4E72;
+    border-left: 4px solid #2c426c;
     animation: slideIn 0.2s ease;
 }
 
@@ -723,7 +577,7 @@ html, body {
 }
 
 #popup-content::-webkit-scrollbar       { width: 6px; }
-#popup-content::-webkit-scrollbar-thumb { background-color: #1A4E72; border-radius: 3px; }
+#popup-content::-webkit-scrollbar-thumb { background-color: #2c426c; border-radius: 3px; }
 
 /* Animation d'apparition partagée par toutes les popups et le panel de résultats          */
 @keyframes slideIn {
@@ -743,7 +597,7 @@ html, body {
     color: #888;
 }
 
-#popup-close:hover { color: #1A4E72; }
+#popup-close:hover { color: #e71d73; }
 
 #popup-content h3 {
     display: flex;
@@ -751,7 +605,7 @@ html, body {
     gap: 8px;
     margin: 0 0 12px 0;
     font-size: 1rem;
-    color: #1A4E72;
+    color: #2c426c;
     font-weight: 700;
 }
 
@@ -762,6 +616,41 @@ html, body {
 #popup-content li { font-size: 0.85rem; line-height: 1.8; color: #444; }
 
 /* ========================================================================================= */
+/* POPUP DE CLIC COUCHE — Popup Leaflet affichée au clic sur une couche WMS active          */
+/* ========================================================================================= */
+
+/* Supprime le padding natif Leaflet autour du contenu                                      */
+.leaflet-popup-content { margin: 0 !important; }
+
+/* Boîte blanche arrondie, ombre légère                                                     */
+.leaflet-popup-content-wrapper {
+    border-radius: 12px !important;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15) !important;
+    padding: 0 !important;
+}
+
+.leaflet-popup-tip-container { margin-top: -1px; }
+
+/* Conteneur interne avec padding généreux                                                  */
+.layer-popup { padding: 14px 18px; min-width: 180px; }
+
+/* Ligne flex : label à gauche, valeur à droite                                             */
+.layer-popup-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.layer-popup-label { font-size: 0.82rem; color: #555; line-height: 1.8; }
+
+/* Valeur numérique en gras bleu                                                            */
+.layer-popup-value { font-weight: 700; color: #2c426c; font-size: 0.82rem; white-space: nowrap; line-height: 1.8; }
+
+/* Ligne de coordonnées GPS en haut de la popup                                            */
+.layer-popup-coords { font-size: 0.75rem; color: #aaa; margin-bottom: 8px; }
+
+/* ========================================================================================= */
 /* CONTRÔLES LEAFLET — Surcharge des styles natifs pour harmoniser typographie et couleur  */
 /* ========================================================================================= */
 
@@ -770,7 +659,7 @@ html, body {
     font-family: 'Jost', sans-serif !important;
     font-weight: 500 !important;
     font-size: 0.75rem !important;
-    color: #1A4E72 !important;
+    color: #2c426c !important;
 }
 
 /* Supprime les bordures et ombres par défaut de Leaflet                                    */
@@ -796,7 +685,7 @@ html, body {
     width: 32px !important;
     height: 32px !important;
     background: white !important;
-    color: #1A4E72 !important;
+    color: #2c426c !important;
     border: none !important;
     line-height: 36px;
     font-size: 18px;
@@ -808,7 +697,7 @@ html, body {
     transition: all 0.2s ease;
 }
 
-.leaflet-control-zoom a:hover { background: #f5f5f5 !important; }
+.leaflet-control-zoom a:hover { background: #fff0f6 !important; color: #e71d73 !important; }
 
 /* Supprime la bordure entre les boutons + et - héritée de Leaflet                         */
 .leaflet-control-zoom-in { border-bottom: none !important; }
@@ -824,13 +713,13 @@ html, body {
     font-family: 'Jost', sans-serif !important;
     font-size: 0.75rem !important;
     font-weight: 500 !important;
-    color: #1A4E72 !important;
+    color: #2c426c !important;
 }
 
 /* Ligne de l'échelle : supprime le fond blanc natif Leaflet                               */
 .leaflet-control-scale-line {
     background: none !important;
-    color: #1A4E72 !important;
+    color: #2c426c !important;
     font-family: 'Jost', sans-serif !important;
     font-weight: 500 !important;
 }
@@ -846,11 +735,11 @@ html, body {
     font-family: 'Jost', sans-serif !important;
     font-size: 0.75rem !important;
     font-weight: 500 !important;
-    color: #1A4E72 !important;
+    color: #2c426c !important;
 }
 
 .leaflet-control-attribution a {
-    color: #1A4E72 !important;
+    color: #2c426c !important;
     text-decoration: none !important;
     font-weight: 600 !important;
 }
@@ -1010,4 +899,214 @@ html, body {
     text-align: center;
     padding: 4px 0;
     font-family: 'Jost', sans-serif;
+}
+/* Hover rose CLB sur les liens d'attribution                                               */
+.leaflet-control-attribution a:hover { color: #e71d73 !important; text-decoration: underline !important; }
+
+/* ========================================================================================= */
+/* ============================== PANEL RESULTATS ========================================== */
+/* ========================================================================================= */
+
+/* ========================================================================================= */
+/* PANEL DE RÉSULTATS — S'affiche sous le panel de recherche après validation.              */
+/* Le top est recalculé dynamiquement par main.js (getBoundingClientRect).                  */
+/* ========================================================================================= */
+
+/* Conteneur principal : colonne flex pour séparer le header fixe du contenu scrollable    */
+#results-panel {
+    position: absolute;
+    top: 210px;
+    left: 20px;
+    width: 350px;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    z-index: 1000;
+    max-height: 60vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    animation: slideIn 0.2s ease;
+}
+
+/* Ligne titre adresse + bouton ✖, ne scroll pas avec le contenu                           */
+#results-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 14px 10px 20px;
+    border-bottom: 1px solid #f0f0f0;
+    flex-shrink: 0;
+}
+
+/* Croix de fermeture du panel de résultats                                                 */
+#results-close {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    color: #888;
+    flex-shrink: 0;
+}
+
+#results-close:hover { color: #e71d73; }
+
+/* Zone scrollable qui reçoit le HTML injecté par renderResultsPanel()                     */
+#results-content {
+    padding: 20px 14px 20px 20px;
+    font-size: 0.85rem;
+    line-height: 1.8;
+    color: #444;
+    overflow-y: auto;
+    max-height: 60vh;
+    scrollbar-gutter: stable;
+}
+
+/* Scrollbar stylisée : fine, bleue, arrondie, avec espace blanc entre le pouce et le bord */
+#results-content::-webkit-scrollbar       { width: 10px; }
+#results-content::-webkit-scrollbar-thumb { background-color: #2c426c; border-radius: 10px; border: 2px solid white; background-clip: padding-box; }
+#results-content::-webkit-scrollbar-track { background: transparent; margin: 10px; }
+
+/* ========================================================================================= */
+/* PANEL DE RÉSULTATS — CONTENU                                                             */
+/* ========================================================================================= */
+
+/* Titre gris majuscule affiché en haut du panel (adresse saisie ou "Point A / Point B")   */
+.panel-address-title {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+/* Carte par catégorie (Air, Pollen, Bruit, UV) avec bordure fine et coins arrondis         */
+.cat-card {
+    border-radius: 10px;
+    border: 1px solid #eee;
+    margin-bottom: 10px;
+    overflow: hidden;
+}
+
+/* En-tête de catégorie : fond bleu foncé + icône + label blanc en majuscule               */
+.cat-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: #2c426c;
+    color: white;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.cat-body { padding: 4px 0; }
+
+/* Bloc d'une sous-catégorie (PM10, NO₂, etc.) séparé du suivant par un trait fin          */
+.res-row {
+    padding: 8px 12px 10px 12px;
+    border-bottom: 1px solid #f5f5f5;
+}
+
+.res-row:last-child { border-bottom: none; }
+
+/* Ligne flex : nom du polluant à gauche, valeur + badge à droite                          */
+.res-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 6px;
+}
+
+.res-label { color: #555; font-size: 0.82rem; }
+
+/* Conteneur valeur + badge alignés côte à côte                                            */
+.res-right {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* Valeur numérique en gras bleu                                                            */
+.res-value { font-weight: 700; color: #2c426c; font-size: 0.82rem; }
+
+/* Valeur absente : gris italique                                                           */
+.res-value.no-data { font-weight: 400; color: #bbb; font-style: italic; font-size: 0.78rem; }
+
+/* Pilule colorée indiquant le niveau : Bon / Modéré / Élevé selon les seuils de LAYER_META */
+.res-badge { font-size: 0.68rem; font-weight: 700; padding: 2px 7px; border-radius: 20px; }
+
+.badge-low  { background: #e8f8ee; color: #27ae60; }
+.badge-mid  { background: #fff8e1; color: #f39c12; }
+.badge-high { background: #fdecea; color: #e74c3c; }
+
+/* ========================================================================================= */
+/* BARRE DE LÉGENDE — Affichée sous chaque sous-catégorie quand une valeur est disponible  */
+/* ========================================================================================= */
+
+/* Conteneur relatif qui sert de référence de positionnement pour tous les éléments enfants */
+.legend-bar-wrap {
+    position: relative;
+    height: 28px;
+    margin-top: 2px;
+}
+
+/* Dégradé vert → orange → rouge sur toute la largeur                                      */
+.legend-bar {
+    position: absolute;
+    top: 6px;
+    left: 0;
+    right: 0;
+    height: 8px;
+    border-radius: 6px;
+    background: linear-gradient(to right, #27ae60, #f39c12, #e74c3c);
+}
+
+/* Trait blanc vertical positionné en % selon le seuil OMS (style="left: XX%")             */
+.marker-oms {
+    position: absolute;
+    top: 3px;
+    width: 2px;
+    height: 14px;
+    background: white;
+    border-radius: 2px;
+    transform: translateX(-50%);
+}
+
+/* Point bleu circulaire positionné en % selon la valeur à l'adresse (style="left: XX%")   */
+.marker-val {
+    position: absolute;
+    top: 2px;
+    width: 12px;
+    height: 12px;
+    background: #2c426c;
+    border: 2px solid white;
+    border-radius: 50%;
+    transform: translateX(-50%);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+}
+
+/* Labels min et max sous la barre, collés aux extrémités gauche et droite                 */
+.legend-labels {
+    position: absolute;
+    top: 18px;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.62rem;
+    color: #aaa;
+}
+
+/* Label "OMS xx" centré sous le trait blanc via translateX(-50%)                          */
+.label-oms {
+    position: absolute;
+    top: 18px;
+    font-size: 0.62rem;
+    color: #888;
+    font-weight: 600;
+    transform: translateX(-50%);
+    white-space: nowrap;
 }
