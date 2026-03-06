@@ -90,13 +90,20 @@
     <!-- BANDEAU HAUT — Barre fixe en haut de page. Logo Cartozome + titre à gauche,               -->
     <!-- logo Centre Léon Bérard à droite. Hauteur fixée à 55px via flex: 0 0 55px dans le CSS.    -->
     <!-- ========================================================================================= -->
-    <header id="top-banner">
-      <div id="banner-left">
-        <img src="./img/logo.png" alt="Logo Cartozome" id="banner-logo">
-        <h1>CARTOZOME</h1>
+    <div id="top-banner">
+      <div id="center-pill">
+        <div id="pill-logo">
+          <img src="./img/logo.png" alt="Logo Cartozome">
+        </div>
+        <span id="pill-title">CARTOZOME</span>
+        <div class="pill-sep"></div>
+        <span id="pill-desc">Exposition environnementale sur la Métropole de Lyon</span>
+        <div class="pill-sep"></div>
+        <div id="pill-clb">
+          <img src="./img/leonberard.png" alt="Centre Léon Bérard">
+        </div>
       </div>
-      <img src="./img/leonberard.png" alt="Logo Centre Léon Bérard" id="banner-logo-right">
-    </header>
+    </div>
 
     <!-- Conteneur principal : prend tout l'espace sous le bandeau. Position relative pour ancrer -->
     <!-- les éléments flottants (carte, panels de recherche, résultats, sélecteur de couches).   -->

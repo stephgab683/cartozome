@@ -51,7 +51,7 @@ html, body {
     text-align: center;
     position: relative;
     box-shadow: 0 6px 30px rgba(0,0,0,0.25);
-    border-left: 4px solid #1A4E72;
+    border-left: 4px solid #2c426c;
 }
 
 /* Croix de fermeture positionnée en absolu en haut à droite de la boîte                   */
@@ -66,12 +66,12 @@ html, body {
     color: #888;
 }
 
-#welcome-close:hover { color: #1A4E72; }
+#welcome-close:hover { color: #e71d73; }
 
 #welcome-popup h2 {
     margin: 0 0 15px 0;
     font-size: 1.5rem;
-    color: #1A4E72;
+    color: #2c426c;
 }
 
 #welcome-popup p {
@@ -81,42 +81,93 @@ html, body {
 }
 
 /* ========================================================================================= */
-/* BANDEAU HAUT — Barre fixe en haut de page. Flex row pour aligner logo + titre à gauche  */
-/* et logo Léon Bérard à droite. Hauteur fixée à 55px (flex: 0 0 55px).                    */
+/* BANDEAU HAUT — Pill centrée flottante sur la carte, sans fond pleine largeur             */
 /* ========================================================================================= */
 #top-banner {
+    position: absolute;
+    top: 14px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    pointer-events: none;
+}
+
+/* Pill blanche centrée : logo + titre + séparateur + description + CLB                     */
+#center-pill {
+    background: rgba(255,255,255,0.97);
+    border-radius: 40px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.14);
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    padding: 15px 20px;
-    background-color: #FFFFFF;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    flex: 0 0 55px;
+    height: 52px;
+    overflow: hidden;
+    pointer-events: all;
+    white-space: nowrap;
 }
 
-#banner-left {
+/* Logo Cartozome sans fond, à sa taille naturelle                                          */
+#pill-logo {
+    width: auto;
+    height: auto;
+    border-radius: 0;
+    background: none;
+    margin-left: 12px;
+    flex-shrink: 0;
+}
+
+#pill-logo img { width: 36px; height: 36px; object-fit: contain; }
+
+/* Titre CARTOZOME en gras bleu, cliquable pour réouvrir la popup de bienvenue             */
+#pill-title {
+    font-size: 1rem;
+    font-weight: 900;
+    color: #2c426c;
+    letter-spacing: 0.08em;
+    padding: 0 16px 0 10px;
+    cursor: pointer;
+}
+
+#pill-title:hover { color: #e71d73; }
+
+/* Séparateurs fins entre les sections                                                       */
+.pill-sep {
+    width: 1px;
+    height: 24px;
+    background: #eee;
+    flex-shrink: 0;
+}
+
+/* Description courte en gris                                                                */
+#pill-desc {
+    font-size: 0.78rem;
+    color: #999;
+    padding: 0 16px;
+}
+
+/* Logo CLB cliquable — ouvre le site de prévention au clic                                 */
+#pill-clb {
+    height: 100%;
+    background: white;
     display: flex;
     align-items: center;
-    gap: 10px;
+    padding: 0 12px;
+    margin-right: 10px;
+    cursor: pointer;
+    transition: background 0.15s;
 }
 
-#banner-logo       { height: 50px; }
-#banner-logo-right { height: 50px; }
+#pill-clb:hover { background: #fff0f6; }
 
-#banner-left h1 {
-    margin: 0;
-    font-size: 1.8rem;
-    color: #1A4E72;
-    text-transform: uppercase;
-}
+#pill-clb img { height: 34px; object-fit: contain; }
 
 /* ========================================================================================= */
-/* CONTENEUR PRINCIPAL — Prend tout l'espace restant sous le bandeau (flex: 1).             */
+/* CONTENEUR PRINCIPAL — Prend tout l'espace restant, hauteur 100vh.                        */
 /* Position relative pour ancrer en absolu la carte, les panels et les boutons flottants.   */
 /* ========================================================================================= */
 #main-container {
     position: relative;
     flex: 1;
+    height: 100vh;
 }
 
 /* ========================================================================================= */
@@ -149,14 +200,22 @@ html, body {
 
 .floating-btn:hover { background: #f5f5f5; }
 
+#layers-toggle:hover {
+    background: #fff0f6 !important;
+}
+
+#layers-toggle:hover svg {
+    stroke: #e71d73 !important;
+}
+
 /* ========================================================================================= */
 /* RECHERCHE                                                                                 */
 /* ========================================================================================= */
 
-/* Conteneur positionné en absolu en haut à gauche — contient les boutons toggle et le panel */
+/* Conteneur positionné en absolu en haut à gauche — abaissé à 95px pour passer sous la pill */
 #search-controls {
     position: absolute;
-    top: 20px;
+    top: 95px;
     left: 20px;
     z-index: 1000;
     display: flex;
@@ -173,16 +232,17 @@ html, body {
     font-size: 0.82rem !important;
     font-weight: 600;
     font-family: 'Jost', sans-serif;
-    color: #1A4E72;
+    color: #2c426c;
     margin-bottom: 0 !important;
     letter-spacing: 0.03em;
+    transition: background 0.15s, color 0.15s;
 }
 
-/* Bouton actif : fond bleu foncé + texte blanc pour indiquer le mode sélectionné          */
-.search-btn.active {
-    background-color: #1A4E72;
-    color: #fff;
-}
+/* Bouton actif : fond bleu + texte blanc                                                   */
+.search-btn.active { background-color: #2c426c; color: #fff; }
+
+/* Hover sur bouton inactif                                                 */
+.search-btn:hover:not(.active) { background-color: #e71d73; color: #fff; }
 
 /* Boîte blanche contenant les champs de saisie, positionnée sous les boutons toggle       */
 #search-panel {
@@ -211,14 +271,14 @@ html, body {
     transition: border-color 0.2s;
 }
 
-#search-panel input:focus { border-color: #1A4E72; }
+#search-panel input:focus { border-color: #2c426c; }
 
 /* Bouton Valider — pleine largeur, fond bleu, majuscule. :not(.geolocate-btn) pour ne pas */
 /* affecter le bouton GPS qui est aussi dans #search-panel                                  */
 #search-panel button:not(.geolocate-btn) {
     width: 100%;
     padding: 10px;
-    background-color: #1A4E72;
+    background-color: #2c426c;
     color: #fff;
     border: none;
     border-radius: 24px;
@@ -231,9 +291,8 @@ html, body {
     transition: background 0.15s;
 }
 
-#search-panel button:not(.geolocate-btn):hover {
-    box-shadow: inset 0 0 0 1000px rgba(255,255,255,0.1);
-}
+/* Hover rose CLB sur le bouton Valider                                                     */
+#search-panel button:not(.geolocate-btn):hover { background-color: #e71d73; }
 
 /* ========================================================================================= */
 /* BOUTON GÉOLOCALISATION                                                                    */
@@ -250,14 +309,14 @@ html, body {
 /* Le champ prend tout l'espace disponible, le bouton GPS garde sa taille fixe              */
 .search-row input { flex: 1; margin-bottom: 0 !important; }
 
-/* Cercle blanc avec icône flèche, bordure fine qui passe en bleu au hover                  */
+/* Cercle blanc avec icône flèche, bordure fine qui passe en rose au hover                  */
 .geolocate-btn {
     width: 36px !important;
     height: 36px !important;
     border-radius: 50% !important;
     border: 1.5px solid #e0e0e0;
     background: white;
-    color: #1A4E72;
+    color: #2c426c;
     cursor: pointer;
     font-size: 14px;
     flex-shrink: 0;
@@ -268,10 +327,7 @@ html, body {
     transition: border-color 0.2s, color 0.2s, background 0.2s;
 }
 
-.geolocate-btn:hover {
-    border-color: #1A4E72;
-    background: #f0f5fa;
-}
+.geolocate-btn:hover { border-color: #e71d73; color: #e71d73; background: #fff0f6; }
 
 /* ========================================================================================= */
 /* AUTOCOMPLÉTION — Liste déroulante absolue affichée sous le champ de saisie pendant la    */
@@ -306,21 +362,407 @@ html, body {
 
 .autocomplete-list li:last-child { border-bottom: none; }
 
-.autocomplete-list li:hover {
-    background: #f0f5fa;
-    color: #1A4E72;
+/* Hover rose CLB sur les suggestions                                                       */
+.autocomplete-list li:hover { background: #fff0f6; color: #e71d73; }
+
+/* ========================================================================================= */
+/* SÉLECTEUR DE COUCHES                                                                     */
+/* ========================================================================================= */
+
+/* Ancré en haut à droite au même niveau que les boutons de recherche (top: 95px)          */
+#layers-control {
+    position: fixed;
+    top: 95px;
+    right: 10px;
+    z-index: 1000;
+}
+
+/* Panneau des couches : boîte arrondie qui s'ouvre vers le bas à droite du bouton          */
+#layers-panel {
+    position: absolute;
+    top: 50px;
+    right: 0;
+    width: 210px;
+    background: #f5f7f9;
+    border-radius: 12px;
+    padding: 10px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    max-height: 70vh;
+    overflow-y: auto;
 }
 
 /* ========================================================================================= */
+/* GROUPES DE COUCHES — Accordéon, un seul groupe ouvert à la fois (géré dans main.js)     */
+/* ========================================================================================= */
+
+/* Conteneur d'un groupe avec bordure fine et coins arrondis                                */
+.layer-group {
+    margin-bottom: 6px;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #dde4ea;
+}
+
+/* Ligne d'en-tête du groupe : fond bleu, aligne le bouton toggle et le bouton ℹ           */
+.layer-group-header {
+    display: flex;
+    align-items: stretch;
+    background-color: #2c426c;
+}
+
+/* Bouton toggle pleine largeur avec chevron + icône + label, cliquable pour ouvrir/fermer  */
+.layer-group-toggle {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 12px;
+    background: none;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    font-family: 'Jost', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    text-align: left;
+    transition: background 0.15s;
+}
+
+/* Hover rose CLB sur le toggle                                                             */
+.layer-group-toggle:hover { background-color: #e71d73; }
+
+.layer-group-toggle .cat-icon { width: 20px; height: 20px; object-fit: contain; }
+
+/* Chevron animé : pointe vers le bas (ouvert) ou vers la droite (-90°, fermé)             */
+.layer-group-toggle .chevron {
+    margin-right: 8px;
+    font-size: 0.85rem;
+    transition: transform 0.2s;
+}
+
+.layer-group-toggle.closed .chevron { transform: rotate(-90deg); }
+
+/* Bouton ℹ séparé du toggle par une bordure gauche, ouvre la popup d'information          */
+.info-btn {
+    background: none;
+    border: none;
+    border-left: 1px solid rgba(255,255,255,0.2);
+    color: #fff;
+    cursor: pointer;
+    padding: 0 12px;
+    font-size: 1rem;
+    transition: background 0.15s;
+    flex-shrink: 0;
+}
+
+/* Hover rose CLB sur le bouton ℹ                                                          */
+.info-btn:hover { background-color: #e71d73; }
+
+/* Zone de contenu masquée par défaut, révélée au clic sur le toggle                       */
+.layer-group-content { background: #fff; padding: 4px 0; }
+.layer-group-content.hidden { display: none; }
+
+/* ========================================================================================= */
+/* ITEMS DE COUCHE                                                                          */
+/* ========================================================================================= */
+
+/* Chaque couche est un label flex avec un toggle switch à gauche et un nom à droite       */
+.layer-group-content label {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 0.84rem;
+    color: #333;
+    user-select: none;
+    border-bottom: 1px solid #f0f0f0;
+    transition: color 0.15s;
+}
+
+.layer-group-content label:last-of-type { border-bottom: none; }
+
+/* Hover rose CLB sur les labels de couche                                                  */
+.layer-group-content label:hover { color: #e71d73; }
+
+/* Couche non encore disponible : opacité réduite et curseur interdit                      */
+.layer-disabled { opacity: 0.4; cursor: not-allowed !important; }
+.layer-disabled input { cursor: not-allowed !important; }
+
+/* Toggle switch : checkbox masquée et remplacée par un pill gris avec rond blanc           */
+.layer-group-content input[type="checkbox"] {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 38px;
+    height: 20px;
+    background-color: #ddd;
+    border-radius: 20px;
+    position: relative;
+    cursor: pointer;
+    transition: background-color 0.25s ease;
+    flex-shrink: 0;
+}
+
+/* Rond blanc qui glisse de gauche à droite quand la checkbox est cochée                   */
+.layer-group-content input[type="checkbox"]::before {
+    content: "";
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    top: 2px;
+    left: 2px;
+    background-color: white;
+    border-radius: 50%;
+    transition: transform 0.25s ease;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+}
+
+/* Fond bleu quand cochée                                                                   */
+.layer-group-content input[type="checkbox"]:checked { background-color: #2c426c; }
+
+/* Déplace le rond vers la droite quand cochée                                              */
+.layer-group-content input[type="checkbox"]:checked::before { transform: translateX(18px); }
+
+/* Bandeaux bleu clair séparateurs Journée / Nuit dans la catégorie Bruit                  */
+.sublabel {
+    margin: 4px 0 0 0;
+    padding: 4px 12px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #fff;
+    background-color: #5dade2;
+}
+
+/* ========================================================================================= */
+/* POPUP D'INFORMATION — Même structure que la popup de bienvenue. Créée dynamiquement par  */
+/* popups.js. Rendue visible via la classe .visible. Contenu injecté depuis #info-contents. */
+/* ========================================================================================= */
+
+/* Fond semi-transparent, masqué par défaut, affiché via .visible                          */
+#info-popup {
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    z-index: 2000;
+    justify-content: center;
+    align-items: center;
+}
+
+#info-popup.visible { display: flex; }
+
+/* Boîte blanche avec bordure bleue gauche et animation d'apparition                       */
+#popup-inner {
+    background: #fff;
+    border-radius: 12px;
+    padding: 30px 40px;
+    max-width: 500px;
+    width: 90%;
+    position: relative;
+    box-shadow: 0 6px 30px rgba(0,0,0,0.25);
+    border-left: 4px solid #2c426c;
+    animation: slideIn 0.2s ease;
+}
+
+/* Zone scrollable du contenu avec scrollbar fine bleue                                    */
+#popup-content {
+    max-height: 60vh;
+    overflow-y: auto;
+    padding-right: 6px;
+    margin-top: 10px;
+}
+
+#popup-content::-webkit-scrollbar       { width: 6px; }
+#popup-content::-webkit-scrollbar-thumb { background-color: #2c426c; border-radius: 3px; }
+
+/* Animation d'apparition partagée par toutes les popups et le panel de résultats          */
+@keyframes slideIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Croix de fermeture positionnée en absolu en haut à droite                               */
+#popup-close {
+    position: absolute;
+    top: 12px;
+    right: 14px;
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    color: #888;
+}
+
+#popup-close:hover { color: #e71d73; }
+
+#popup-content h3 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 12px 0;
+    font-size: 1rem;
+    color: #2c426c;
+    font-weight: 700;
+}
+
+#popup-content h3 img { width: 20px; height: 20px; object-fit: contain; }
+
+#popup-content p,
+#popup-content ul,
+#popup-content li { font-size: 0.85rem; line-height: 1.8; color: #444; }
+
+/* ========================================================================================= */
+/* POPUP DE CLIC COUCHE — Popup Leaflet affichée au clic sur une couche WMS active          */
+/* ========================================================================================= */
+
+/* Supprime le padding natif Leaflet autour du contenu                                      */
+.leaflet-popup-content { margin: 0 !important; }
+
+/* Boîte blanche arrondie, ombre légère                                                     */
+.leaflet-popup-content-wrapper {
+    border-radius: 12px !important;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15) !important;
+    padding: 0 !important;
+}
+
+.leaflet-popup-tip-container { margin-top: -1px; }
+
+/* Conteneur interne avec padding généreux                                                  */
+.layer-popup { padding: 14px 18px; min-width: 180px; }
+
+/* Ligne flex : label à gauche, valeur à droite                                             */
+.layer-popup-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.layer-popup-label { font-size: 0.82rem; color: #555; line-height: 1.8; }
+
+/* Valeur numérique en gras bleu                                                            */
+.layer-popup-value { font-weight: 700; color: #2c426c; font-size: 0.82rem; white-space: nowrap; line-height: 1.8; }
+
+/* Ligne de coordonnées GPS en haut de la popup                                            */
+.layer-popup-coords { font-size: 0.75rem; color: #aaa; margin-bottom: 8px; }
+
+/* ========================================================================================= */
+/* CONTRÔLES LEAFLET — Surcharge des styles natifs pour harmoniser typographie et couleur  */
+/* ========================================================================================= */
+
+/* Surcharge globale : police Jost et couleur bleue sur tous les contrôles Leaflet         */
+.leaflet-control {
+    font-family: 'Jost', sans-serif !important;
+    font-weight: 500 !important;
+    font-size: 0.75rem !important;
+    color: #2c426c !important;
+}
+
+/* Supprime les bordures et ombres par défaut de Leaflet                                    */
+.leaflet-control-zoom,
+.leaflet-control { border: none !important; box-shadow: none !important; }
+
+/* ========================================================================================= */
+/* BOUTONS ZOOM                                                                             */
+/* ========================================================================================= */
+
+/* Déplace le groupe +/- du coin supérieur gauche (défaut Leaflet) vers le bas à droite    */
+.leaflet-top.leaflet-left .leaflet-control-zoom {
+    position: fixed !important;
+    bottom: 40px !important;
+    right: 5px !important;
+    top: auto !important;
+    left: auto !important;
+    z-index: 1000;
+}
+
+/* Boutons + et - individuels : carrés 32px arrondis, fond blanc, icône bleue              */
+.leaflet-control-zoom a {
+    width: 32px !important;
+    height: 32px !important;
+    background: white !important;
+    color: #2c426c !important;
+    border: none !important;
+    line-height: 36px;
+    font-size: 18px;
+    font-weight: 500;
+    border-radius: 12px !important;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2) !important;
+    display: block;
+    margin-bottom: 6px;
+    transition: all 0.2s ease;
+}
+
+.leaflet-control-zoom a:hover { background: #fff0f6 !important; color: #e71d73 !important; }
+
+/* Supprime la bordure entre les boutons + et - héritée de Leaflet                         */
+.leaflet-control-zoom-in { border-bottom: none !important; }
+
+/* ========================================================================================= */
+/* ÉCHELLE — Barre d'échelle en bas à gauche, même style card arrondi que les boutons zoom */
+/* ========================================================================================= */
+.leaflet-control-scale {
+    background: rgba(255,255,255,0.9) !important;
+    padding: 4px 8px !important;
+    border-radius: 10px !important;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15) !important;
+    font-family: 'Jost', sans-serif !important;
+    font-size: 0.75rem !important;
+    font-weight: 500 !important;
+    color: #2c426c !important;
+}
+
+/* Ligne de l'échelle : supprime le fond blanc natif Leaflet                               */
+.leaflet-control-scale-line {
+    background: none !important;
+    color: #2c426c !important;
+    font-family: 'Jost', sans-serif !important;
+    font-weight: 500 !important;
+}
+
+/* ========================================================================================= */
+/* CRÉDITS OPENSTREETMAP — Bandeau attribution en bas à droite, même style card arrondi    */
+/* ========================================================================================= */
+.leaflet-control-attribution {
+    background: rgba(255,255,255,0.9) !important;
+    padding: 6px 10px !important;
+    border-radius: 10px !important;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15) !important;
+    font-family: 'Jost', sans-serif !important;
+    font-size: 0.75rem !important;
+    font-weight: 500 !important;
+    color: #2c426c !important;
+}
+
+.leaflet-control-attribution a {
+    color: #2c426c !important;
+    text-decoration: none !important;
+    font-weight: 600 !important;
+}
+
+/* Repositionne le bandeau pour coller aux bords inférieurs droit de la carte              */
+.leaflet-bottom.leaflet-right { bottom: 5px !important; right: 5px !important; }
+
+/* Hover rose CLB sur les liens d'attribution                                               */
+.leaflet-control-attribution a:hover { color: #e71d73 !important; text-decoration: underline !important; }
+
+/* ========================================================================================= */
+/* ============================== PANEL RESULTATS ========================================== */
+/* ========================================================================================= */
+
+/* ========================================================================================= */
 /* PANEL DE RÉSULTATS — S'affiche sous le panel de recherche après validation.              */
-/* Le top est recalculé dynamiquement par main.js (getBoundingClientRect) pour s'adapter    */
-/* à la hauteur réelle du panel selon le mode actif (1 ou 2 champs de saisie).             */
+/* Le top est recalculé dynamiquement par main.js (getBoundingClientRect).                  */
 /* ========================================================================================= */
 
 /* Conteneur principal : colonne flex pour séparer le header fixe du contenu scrollable    */
 #results-panel {
     position: absolute;
-    top: 130px;
+    top: 210px;
     left: 20px;
     width: 350px;
     background: white;
@@ -354,7 +796,7 @@ html, body {
     flex-shrink: 0;
 }
 
-#results-close:hover { color: #1A4E72; }
+#results-close:hover { color: #e71d73; }
 
 /* Zone scrollable qui reçoit le HTML injecté par renderResultsPanel()                     */
 #results-content {
@@ -369,7 +811,7 @@ html, body {
 
 /* Scrollbar stylisée : fine, bleue, arrondie, avec espace blanc entre le pouce et le bord */
 #results-content::-webkit-scrollbar       { width: 10px; }
-#results-content::-webkit-scrollbar-thumb { background-color: #1A4E72; border-radius: 10px; border: 2px solid white; background-clip: padding-box; }
+#results-content::-webkit-scrollbar-thumb { background-color: #2c426c; border-radius: 10px; border: 2px solid white; background-clip: padding-box; }
 #results-content::-webkit-scrollbar-track { background: transparent; margin: 10px; }
 
 /* ========================================================================================= */
@@ -399,7 +841,7 @@ html, body {
     align-items: center;
     gap: 8px;
     padding: 8px 12px;
-    background: #1A4E72;
+    background: #2c426c;
     color: white;
     font-size: 0.8rem;
     font-weight: 700;
@@ -435,7 +877,7 @@ html, body {
 }
 
 /* Valeur numérique en gras bleu                                                            */
-.res-value { font-weight: 700; color: #1A4E72; font-size: 0.82rem; }
+.res-value { font-weight: 700; color: #2c426c; font-size: 0.82rem; }
 
 /* Valeur absente : gris italique                                                           */
 .res-value.no-data { font-weight: 400; color: #bbb; font-style: italic; font-size: 0.78rem; }
@@ -486,7 +928,7 @@ html, body {
     top: 2px;
     width: 12px;
     height: 12px;
-    background: #1A4E72;
+    background: #2c426c;
     border: 2px solid white;
     border-radius: 50%;
     transform: translateX(-50%);
@@ -515,347 +957,3 @@ html, body {
     transform: translateX(-50%);
     white-space: nowrap;
 }
-
-/* ========================================================================================= */
-/* SÉLECTEUR DE COUCHES                                                                     */
-/* ========================================================================================= */
-
-/* Ancré en haut à droite en position fixed pour rester visible quand la carte est scrollée */
-#layers-control {
-    position: fixed;
-    top: 95px;
-    right: 10px;
-    z-index: 1000;
-}
-
-/* Panneau des couches : boîte arrondie qui s'ouvre vers le bas à droite du bouton          */
-#layers-panel {
-    position: absolute;
-    top: 50px;
-    right: 0;
-    width: 210px;
-    background: #f5f7f9;
-    border-radius: 12px;
-    padding: 10px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-    max-height: 70vh;
-    overflow-y: auto;
-}
-
-/* ========================================================================================= */
-/* GROUPES DE COUCHES — Accordéon, un seul groupe ouvert à la fois (géré dans main.js)     */
-/* ========================================================================================= */
-
-/* Conteneur d'un groupe avec bordure fine et coins arrondis                                */
-.layer-group {
-    margin-bottom: 6px;
-    border-radius: 8px;
-    overflow: hidden;
-    border: 1px solid #dde4ea;
-}
-
-/* Ligne d'en-tête du groupe : fond bleu, aligne le bouton toggle et le bouton ℹ           */
-.layer-group-header {
-    display: flex;
-    align-items: stretch;
-    background-color: #1A4E72;
-}
-
-/* Bouton toggle pleine largeur avec chevron + icône + label, cliquable pour ouvrir/fermer  */
-.layer-group-toggle {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 12px;
-    background: none;
-    color: #fff;
-    border: none;
-    cursor: pointer;
-    font-family: 'Jost', sans-serif;
-    font-size: 0.82rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    text-align: left;
-    transition: background 0.15s;
-}
-
-.layer-group-toggle:hover { background-color: rgba(255,255,255,0.1); }
-
-.layer-group-toggle .cat-icon { width: 20px; height: 20px; object-fit: contain; }
-
-/* Chevron animé : pointe vers le bas (ouvert) ou vers la droite (-90°, fermé)             */
-.layer-group-toggle .chevron {
-    margin-right: 8px;
-    font-size: 0.85rem;
-    transition: transform 0.2s;
-}
-
-.layer-group-toggle.closed .chevron { transform: rotate(-90deg); }
-
-/* Bouton ℹ séparé du toggle par une bordure gauche, ouvre la popup d'information          */
-.info-btn {
-    background: none;
-    border: none;
-    border-left: 1px solid rgba(255,255,255,0.2);
-    color: #fff;
-    cursor: pointer;
-    padding: 0 12px;
-    font-size: 1rem;
-    transition: background 0.15s;
-    flex-shrink: 0;
-}
-
-.info-btn:hover { background-color: rgba(255,255,255,0.15); }
-
-/* Zone de contenu masquée par défaut, révélée au clic sur le toggle                       */
-.layer-group-content { background: #fff; padding: 4px 0; }
-.layer-group-content.hidden { display: none; }
-
-/* ========================================================================================= */
-/* ITEMS DE COUCHE                                                                          */
-/* ========================================================================================= */
-
-/* Chaque couche est un label flex avec un toggle switch à gauche et un nom à droite       */
-.layer-group-content label {
-    display: flex;
-    align-items: center;
-    gap: 9px;
-    padding: 8px 12px;
-    cursor: pointer;
-    font-size: 0.84rem;
-    color: #333;
-    user-select: none;
-    border-bottom: 1px solid #f0f0f0;
-}
-
-.layer-group-content label:last-of-type { border-bottom: none; }
-.layer-group-content label:hover { color: #1A4E72; }
-
-/* Couche non encore disponible : opacité réduite et curseur interdit                      */
-.layer-disabled { opacity: 0.4; cursor: not-allowed !important; }
-.layer-disabled input { cursor: not-allowed !important; }
-
-/* Toggle switch : checkbox masquée et remplacée par un pill gris avec rond blanc           */
-.layer-group-content input[type="checkbox"] {
-    appearance: none;
-    -webkit-appearance: none;
-    width: 38px;
-    height: 20px;
-    background-color: #ddd;
-    border-radius: 20px;
-    position: relative;
-    cursor: pointer;
-    transition: background-color 0.25s ease;
-    flex-shrink: 0;
-}
-
-/* Rond blanc qui glisse de gauche à droite quand la checkbox est cochée                   */
-.layer-group-content input[type="checkbox"]::before {
-    content: "";
-    position: absolute;
-    width: 16px;
-    height: 16px;
-    top: 2px;
-    left: 2px;
-    background-color: white;
-    border-radius: 50%;
-    transition: transform 0.25s ease;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.3);
-}
-
-/* Fond bleu quand cochée                                                                   */
-.layer-group-content input[type="checkbox"]:checked { background-color: #1A4E72; }
-
-/* Déplace le rond vers la droite quand cochée                                              */
-.layer-group-content input[type="checkbox"]:checked::before { transform: translateX(18px); }
-
-/* Bandeaux bleu clair séparateurs Journée / Nuit dans la catégorie Bruit                  */
-.sublabel {
-    margin: 4px 0 0 0;
-    padding: 4px 12px;
-    font-size: 0.78rem;
-    font-weight: 600;
-    color: #fff;
-    background-color: #5dade2;
-}
-
-/* ========================================================================================= */
-/* POPUP D'INFORMATION — Même structure que la popup de bienvenue. Créée dynamiquement par  */
-/* popups.js. Rendue visible via la classe .visible. Contenu injecté depuis #info-contents. */
-/* ========================================================================================= */
-
-/* Fond semi-transparent, masqué par défaut, affiché via .visible                          */
-#info-popup {
-    display: none;
-    position: fixed;
-    top: 0; left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.5);
-    z-index: 2000;
-    justify-content: center;
-    align-items: center;
-}
-
-#info-popup.visible { display: flex; }
-
-/* Boîte blanche avec bordure bleue gauche et animation d'apparition                       */
-#popup-inner {
-    background: #fff;
-    border-radius: 12px;
-    padding: 30px 40px;
-    max-width: 500px;
-    width: 90%;
-    position: relative;
-    box-shadow: 0 6px 30px rgba(0,0,0,0.25);
-    border-left: 4px solid #1A4E72;
-    animation: slideIn 0.2s ease;
-}
-
-/* Zone scrollable du contenu avec scrollbar fine bleue                                    */
-#popup-content {
-    max-height: 60vh;
-    overflow-y: auto;
-    padding-right: 6px;
-    margin-top: 10px;
-}
-
-#popup-content::-webkit-scrollbar       { width: 6px; }
-#popup-content::-webkit-scrollbar-thumb { background-color: #1A4E72; border-radius: 3px; }
-
-/* Animation d'apparition partagée par toutes les popups et le panel de résultats          */
-@keyframes slideIn {
-    from { opacity: 0; transform: translateY(-10px); }
-    to   { opacity: 1; transform: translateY(0); }
-}
-
-/* Croix de fermeture positionnée en absolu en haut à droite                               */
-#popup-close {
-    position: absolute;
-    top: 12px;
-    right: 14px;
-    background: none;
-    border: none;
-    font-size: 1.2rem;
-    cursor: pointer;
-    color: #888;
-}
-
-#popup-close:hover { color: #1A4E72; }
-
-#popup-content h3 {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin: 0 0 12px 0;
-    font-size: 1rem;
-    color: #1A4E72;
-    font-weight: 700;
-}
-
-#popup-content h3 img { width: 20px; height: 20px; object-fit: contain; }
-
-#popup-content p,
-#popup-content ul,
-#popup-content li { font-size: 0.85rem; line-height: 1.8; color: #444; }
-
-/* ========================================================================================= */
-/* CONTRÔLES LEAFLET — Surcharge des styles natifs pour harmoniser typographie et couleur  */
-/* ========================================================================================= */
-
-/* Surcharge globale : police Jost et couleur bleue sur tous les contrôles Leaflet         */
-.leaflet-control {
-    font-family: 'Jost', sans-serif !important;
-    font-weight: 500 !important;
-    font-size: 0.75rem !important;
-    color: #1A4E72 !important;
-}
-
-/* Supprime les bordures et ombres par défaut de Leaflet                                    */
-.leaflet-control-zoom,
-.leaflet-control { border: none !important; box-shadow: none !important; }
-
-/* ========================================================================================= */
-/* BOUTONS ZOOM                                                                             */
-/* ========================================================================================= */
-
-/* Déplace le groupe +/- du coin supérieur gauche (défaut Leaflet) vers le bas à droite    */
-.leaflet-top.leaflet-left .leaflet-control-zoom {
-    position: fixed !important;
-    bottom: 40px !important;
-    right: 5px !important;
-    top: auto !important;
-    left: auto !important;
-    z-index: 1000;
-}
-
-/* Boutons + et - individuels : carrés 32px arrondis, fond blanc, icône bleue              */
-.leaflet-control-zoom a {
-    width: 32px !important;
-    height: 32px !important;
-    background: white !important;
-    color: #1A4E72 !important;
-    border: none !important;
-    line-height: 36px;
-    font-size: 18px;
-    font-weight: 500;
-    border-radius: 12px !important;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.2) !important;
-    display: block;
-    margin-bottom: 6px;
-    transition: all 0.2s ease;
-}
-
-.leaflet-control-zoom a:hover { background: #f5f5f5 !important; }
-
-/* Supprime la bordure entre les boutons + et - héritée de Leaflet                         */
-.leaflet-control-zoom-in { border-bottom: none !important; }
-
-/* ========================================================================================= */
-/* ÉCHELLE — Barre d'échelle en bas à gauche, même style card arrondi que les boutons zoom */
-/* ========================================================================================= */
-.leaflet-control-scale {
-    background: rgba(255,255,255,0.9) !important;
-    padding: 4px 8px !important;
-    border-radius: 10px !important;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.15) !important;
-    font-family: 'Jost', sans-serif !important;
-    font-size: 0.75rem !important;
-    font-weight: 500 !important;
-    color: #1A4E72 !important;
-}
-
-/* Ligne de l'échelle : supprime le fond blanc natif Leaflet                               */
-.leaflet-control-scale-line {
-    background: none !important;
-    color: #1A4E72 !important;
-    font-family: 'Jost', sans-serif !important;
-    font-weight: 500 !important;
-}
-
-/* ========================================================================================= */
-/* CRÉDITS OPENSTREETMAP — Bandeau attribution en bas à droite, même style card arrondi    */
-/* ========================================================================================= */
-.leaflet-control-attribution {
-    background: rgba(255,255,255,0.9) !important;
-    padding: 6px 10px !important;
-    border-radius: 10px !important;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.15) !important;
-    font-family: 'Jost', sans-serif !important;
-    font-size: 0.75rem !important;
-    font-weight: 500 !important;
-    color: #1A4E72 !important;
-}
-
-.leaflet-control-attribution a {
-    color: #1A4E72 !important;
-    text-decoration: none !important;
-    font-weight: 600 !important;
-}
-
-/* Repositionne le bandeau pour coller aux bords inférieurs droit de la carte              */
-.leaflet-bottom.leaflet-right { bottom: 5px !important; right: 5px !important; }
-
-.leaflet-control-attribution a:hover { text-decoration: underline !important; }
