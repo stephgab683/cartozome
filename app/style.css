@@ -382,13 +382,30 @@ html, body {
     position: absolute;
     top: 50px;
     right: 0;
-    width: 210px;
+    width: 240px;
     background: #f5f7f9;
     border-radius: 12px;
-    padding: 10px;
+    padding: 12px;
     box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-    max-height: 70vh;
+    max-height: 65vh;
     overflow-y: auto;
+    scrollbar-gutter: stable;
+}
+
+#layers-panel::-webkit-scrollbar {
+    width: 10px;
+}
+
+#layers-panel::-webkit-scrollbar-thumb {
+    background-color: #1A4E72;
+    border-radius: 10px;
+    border: 2px solid white;
+    background-clip: padding-box;
+}
+
+#layers-panel::-webkit-scrollbar-track {
+    background: transparent;
+    margin: 10px;
 }
 
 /* ========================================================================================= */
