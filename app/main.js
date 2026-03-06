@@ -16,8 +16,6 @@ const METROPOLE_BOUNDS = L.latLngBounds(
 );
 
 const map = L.map('map', {
-  maxBounds:          METROPOLE_BOUNDS,
-  maxBoundsViscosity: 1.0,                                                   // Empêche de sortir des bounds
   minZoom:            10,
   maxZoom:            18,
 }).fitBounds(METROPOLE_BOUNDS);                                      // Vue initiale centrée sur Lyon

@@ -103,6 +103,10 @@ async def get_point_data(coord: Coord):
         data = await fetch_point_data(client, coord.latitude, coord.longitude)
     return data
 
+
+
+
+
 # ======== fonction pour afficher les données des UV ========
 
 # -------- récupération des communes --------
