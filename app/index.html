@@ -90,13 +90,20 @@
     <!-- BANDEAU HAUT — Barre fixe en haut de page. Logo Cartozome + titre à gauche,               -->
     <!-- logo Centre Léon Bérard à droite. Hauteur fixée à 55px via flex: 0 0 55px dans le CSS.    -->
     <!-- ========================================================================================= -->
-    <header id="top-banner">
-      <div id="banner-left">
-        <img src="./img/logo.png" alt="Logo Cartozome" id="banner-logo">
-        <h1>CARTOZOME</h1>
+    <div id="top-banner">
+      <div id="center-pill">
+        <div id="pill-logo">
+          <img src="./img/logo.png" alt="Logo Cartozome">
+        </div>
+        <span id="pill-title">CARTOZOME</span>
+        <div class="pill-sep"></div>
+        <span id="pill-desc">Exposition environnementale sur la Métropole de Lyon</span>
+        <div class="pill-sep"></div>
+        <div id="pill-clb">
+          <img src="./img/leonberard.png" alt="Centre Léon Bérard">
+        </div>
       </div>
-      <img src="./img/leonberard.png" alt="Logo Centre Léon Bérard" id="banner-logo-right">
-    </header>
+    </div>
 
     <!-- Conteneur principal : prend tout l'espace sous le bandeau. Position relative pour ancrer -->
     <!-- les éléments flottants (carte, panels de recherche, résultats, sélecteur de couches).   -->
@@ -235,10 +242,10 @@
               </button>
             </div>
             <div class="layer-group-content hidden">
-              <label><input type="checkbox" class="layer-checkbox" data-layer="cartozome:mod_aura_2024_pm10_moyan"> PM10</label>
-              <label><input type="checkbox" class="layer-checkbox" data-layer="cartozome:mod_aura_2024_pm25_moyan"> PM2.5</label>
-              <label><input type="checkbox" class="layer-checkbox" data-layer="cartozome:mod_aura_2024_no2_moyan"> NO₂</label>
-              <label><input type="checkbox" class="layer-checkbox" data-layer="cartozome:mod_aura_2024_o3_somo35"> O₃</label>
+              <label><input type="checkbox" class="layer-checkbox" data-layer="cartozome:mod_aura_2024_pm10_moyan">PM10</label>
+              <label><input type="checkbox" class="layer-checkbox" data-layer="cartozome:mod_aura_2024_pm25_moyan">PM2.5</label>
+              <label><input type="checkbox" class="layer-checkbox" data-layer="cartozome:mod_aura_2024_no2_moyan">NO₂</label>
+              <label><input type="checkbox" class="layer-checkbox" data-layer="cartozome:mod_aura_2024_o3_somo35">O₃</label>
             </div>
           </div>
       
@@ -261,13 +268,13 @@
               </button>
             </div>
             <div class="layer-group-content hidden">
-              <label><input type="checkbox" class="layer-checkbox" data-layer="cartozome:Ambroisie_2024_AURA"> Ambroisie</label>
-              <label class="layer-disabled"><input type="checkbox" class="layer-checkbox" data-layer="" disabled> Multi-taxons</label>
-              <label class="layer-disabled"><input type="checkbox" class="layer-checkbox" data-layer="" disabled> Graminées</label>
-              <label class="layer-disabled"><input type="checkbox" class="layer-checkbox" data-layer="" disabled> Olivier</label>
-              <label class="layer-disabled"><input type="checkbox" class="layer-checkbox" data-layer="" disabled> Bouleau</label>
-              <label class="layer-disabled"><input type="checkbox" class="layer-checkbox" data-layer="" disabled> Aulne</label>
-              <label class="layer-disabled"><input type="checkbox" class="layer-checkbox" data-layer="" disabled> Armoise</label>
+              <label><input type="checkbox" class="layer-checkbox" data-layer="cartozome:Ambroisie_2024_AURA">Ambroisie</label>
+              <label class="layer-disabled"><input type="checkbox" class="layer-checkbox" data-layer="" disabled>Multi-taxons</label>
+              <label class="layer-disabled"><input type="checkbox" class="layer-checkbox" data-layer="" disabled>Graminées</label>
+              <label class="layer-disabled"><input type="checkbox" class="layer-checkbox" data-layer="" disabled>Olivier</label>
+              <label class="layer-disabled"><input type="checkbox" class="layer-checkbox" data-layer="" disabled>Bouleau</label>
+              <label class="layer-disabled"><input type="checkbox" class="layer-checkbox" data-layer="" disabled>Aulne</label>
+              <label class="layer-disabled"><input type="checkbox" class="layer-checkbox" data-layer="" disabled>Armoise</label>
             </div>
           </div>
       
@@ -288,7 +295,7 @@
               </button>
             </div>
             <div class="layer-group-content hidden">
-              <label><input type="checkbox" class="layer-checkbox" data-layer="cartozome:sous_indice_multibruit_orhane_2023"> Bruit</label>
+              <label><input type="checkbox" class="layer-checkbox" data-layer="cartozome:sous_indice_multibruit_orhane_2023">Indice multi-bruit</label>
             </div>
           </div>
       
@@ -311,7 +318,7 @@
               </button>
             </div>
             <div class="layer-group-content hidden">
-              <label><input type="checkbox" class="layer-checkbox" data-layer="uvLayer"> Index UV</label>
+              <label><input type="checkbox" class="layer-checkbox" data-layer="uvLayer">Index UV</label>
             </div>
           </div>
 
