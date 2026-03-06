@@ -209,7 +209,7 @@ const LAYER_UNITS = {
 // Swatches hardcodées pour toutes les couches
 // (couleurs extraites des SLD).
 // UV : placeholder (palette à définir).
-// Bruit : GetLegendGraphic (style GeoServer).
+// Légende bruit : barre segmentée hardcodée.
 // =============================================
 
 // Définition des légendes en barres dégradées pour les couches Air et Ambroisie.
@@ -266,45 +266,111 @@ const LAYER_LEGENDS = {
   },
 
   "cartozome:Ambroisie_2024_AURA": {
-    unit: "grains/m³", oms: null,
+    unit: "grains/m³", oms: null, centerLabels: true,
     entries: [
-      { color: '#ffffcc', label: '0'    },
-      { color: '#a1dab4', label: '5'    },
-      { color: '#41b6c4', label: '10'   },
-      { color: '#2c7fb8', label: '20'   },
-      { color: '#253494', label: '>50'  },
+      { color: '#b2e0e8', label: 'Très faible (0 – 3)'    },
+      { color: '#7ecdc2', label: 'Faible (3 – 30)'         },
+      { color: '#f5e96a', label: 'Modéré (30 – 50)'        },
+      { color: '#f4846a', label: 'Élevé (50 – 250)'        },
+      { color: '#c0392b', label: 'Très élevé (250 – 500)'  },
+      { color: '#8e44ad', label: 'Extrêmement élevé (>500)'},
     ]
   },
 
-  "uvLayer": null, // palette à définir — placeholder affiché
+  "cartozome:sous_indice_multibruit_orhane_2023": {
+    unit: "dB(A)", oms: null, centerLabels: true,
+    entries: [
+      { color: '#78c679', label: 'Zone préservée ou Absence de données' },
+      { color: '#addd8e', label: 'Zone peu altérée'                     },
+      { color: '#fed976', label: 'Zone moyennement altérée'             },
+      { color: '#fd8d3c', label: 'Zone altérée'                         },
+      { color: '#e31a1c', label: 'Zone dégradée'                        },
+      { color: '#800026', label: 'Zone très dégradée'                   },
+      { color: '#54278f', label: 'Zone hautement dégradée'              },
+    ]
+  },
+
+  // ── Autres taxons pollen (à décommenter quand les couches seront actives) ──
+  // Seuils communs Aulne / Bouleau : 0-10 / 10-60 / 60-100 / 100-500 / 500-1000 / >1000
+  // "cartozome:Aulne_2024_AURA": {
+  //   unit: "grains/m³", oms: null, centerLabels: true,
+  //   entries: [
+  //     { color: '#b2e0e8', label: 'Très faible (0 – 10)'      },
+  //     { color: '#7ecdc2', label: 'Faible (10 – 60)'           },
+  //     { color: '#f5e96a', label: 'Modéré (60 – 100)'          },
+  //     { color: '#f4846a', label: 'Élevé (100 – 500)'          },
+  //     { color: '#c0392b', label: 'Très élevé (500 – 1000)'    },
+  //     { color: '#8e44ad', label: 'Extrêmement élevé (> 1000)' },
+  //   ]
+  // },
+  // Seuils Armoise / Graminées / Ambroisie : 0-3 / 3-30 / 30-50 / 50-250 / 250-500 / >500
+  // "cartozome:Armoise_2024_AURA": {
+  //   unit: "grains/m³", oms: null, centerLabels: true,
+  //   entries: [
+  //     { color: '#b2e0e8', label: 'Très faible (0 – 3)'       },
+  //     { color: '#7ecdc2', label: 'Faible (3 – 30)'            },
+  //     { color: '#f5e96a', label: 'Modéré (30 – 50)'           },
+  //     { color: '#f4846a', label: 'Élevé (50 – 250)'           },
+  //     { color: '#c0392b', label: 'Très élevé (250 – 500)'     },
+  //     { color: '#8e44ad', label: 'Extrêmement élevé (> 500)'  },
+  //   ]
+  // },
+  // "cartozome:Graminees_2024_AURA": {
+  //   unit: "grains/m³", oms: null, centerLabels: true,
+  //   entries: [
+  //     { color: '#b2e0e8', label: 'Très faible (0 – 3)'       },
+  //     { color: '#7ecdc2', label: 'Faible (3 – 30)'            },
+  //     { color: '#f5e96a', label: 'Modéré (30 – 50)'           },
+  //     { color: '#f4846a', label: 'Élevé (50 – 250)'           },
+  //     { color: '#c0392b', label: 'Très élevé (250 – 500)'     },
+  //     { color: '#8e44ad', label: 'Extrêmement élevé (> 500)'  },
+  //   ]
+  // },
+  // Seuils Bouleau : 0-10 / 10-60 / 60-100 / 100-500 / 500-1000 / >1000
+  // "cartozome:Bouleau_2024_AURA": {
+  //   unit: "grains/m³", oms: null, centerLabels: true,
+  //   entries: [
+  //     { color: '#b2e0e8', label: 'Très faible (0 – 10)'      },
+  //     { color: '#7ecdc2', label: 'Faible (10 – 60)'           },
+  //     { color: '#f5e96a', label: 'Modéré (60 – 100)'          },
+  //     { color: '#f4846a', label: 'Élevé (100 – 500)'          },
+  //     { color: '#c0392b', label: 'Très élevé (500 – 1000)'    },
+  //     { color: '#8e44ad', label: 'Extrêmement élevé (> 1000)' },
+  //   ]
+  // },
+  // Seuils Olivier : 0-20 / 20-100 / 100-200 / 200-500 / 500-1000 / >1000
+  // "cartozome:Olivier_2024_AURA": {
+  //   unit: "grains/m³", oms: null, centerLabels: true,
+  //   entries: [
+  //     { color: '#b2e0e8', label: 'Très faible (0 – 20)'      },
+  //     { color: '#7ecdc2', label: 'Faible (20 – 100)'          },
+  //     { color: '#f5e96a', label: 'Modéré (100 – 200)'         },
+  //     { color: '#f4846a', label: 'Élevé (200 – 500)'          },
+  //     { color: '#c0392b', label: 'Très élevé (500 – 1000)'    },
+  //     { color: '#8e44ad', label: 'Extrêmement élevé (> 1000)' },
+  //   ]
+  // },
+
+  "uvLayer": {
+    unit: null, oms: null, centerLabels: true,
+    entries: [
+      { color: '#8bc34a', label: 'Faible (0 – 2)'    },
+      { color: '#ffeb3b', label: 'Modéré (3 – 5)'    },
+      { color: '#ff9800', label: 'Fort (6 – 7)'      },
+      { color: '#f44336', label: 'Très fort (8 – 10)'},
+      { color: '#9c27b0', label: 'Extrême (≥ 11)'    },
+    ]
+  },
 
 };
 
-// Couche bruit : GetLegendGraphic (style GeoServer)
-const BRUIT_LAYER = "cartozome:sous_indice_multibruit_orhane_2023";
 
 /**
  * Construit le HTML de la légende pour un data-layer donné.
  */
 function buildLegendHTML(layerName) {
 
-  // Bruit → GetLegendGraphic
-  if (layerName === BRUIT_LAYER) {
-    const params = new URLSearchParams({
-      SERVICE: 'WMS', VERSION: '1.1.1', REQUEST: 'GetLegendGraphic',
-      FORMAT: 'image/png', LAYER: layerName,
-      LEGEND_OPTIONS: 'fontName:Jost;fontSize:11;fontColor:0x444444;bgColor:0xFFFFFF;labelMargin:4',
-    });
-    return `<div class="legend-wms">
-      <img src="${GEOSERVER_URL}?${params}" alt="Légende" style="opacity:${LAYER_OPACITY}"
-           onerror="this.parentElement.innerHTML='<span class=legend-unavail>Légende non disponible</span>'">
-    </div>`;
-  }
-
-  // UV → placeholder
-  if (layerName === 'uvLayer') {
-    return `<div class="legend-placeholder">Palette UV à venir</div>`;
-  }
+  // UV → même logique que les autres couches
 
   // Autres couches → barre dégradée
   const def = LAYER_LEGENDS[layerName];
@@ -320,27 +386,29 @@ function buildLegendHTML(layerName) {
 function buildSegmentedBar(def) {
   const n = def.entries.length;
 
-  // Les labels sont les valeurs de seuil de chaque case = bordures gauches
-  // + le dernier label est la bordure droite de la dernière case
-  // On a n cases → n+1 bordures, mais on n'affiche que les n labels (début de chaque case)
-  // positionnés en absolu à i/n * 100%
-
   const segments = def.entries.map((e, i) => {
     const radius = i === 0 ? '4px 0 0 4px' : i === n - 1 ? '0 4px 4px 0' : '0';
     return `<div class="lgd-seg" style="background:${e.color};opacity:${LAYER_OPACITY};border-radius:${radius};flex:1"></div>`;
   }).join('');
 
-  // Labels en absolu aux bordures gauches de chaque case + bordure droite finale
+  // Mode columnLabels : liste verticale case + label (bruit)
+  if (def.centerLabels) {
+    const unitLabel = def.unit ? `<div class="lgd-col-unit">${def.unit}</div>` : '';
+    const rows = def.entries.map((e, i) => {
+      return `<div class="lgd-col-row">
+        <span class="lgd-col-swatch" style="background:${e.color};opacity:${LAYER_OPACITY}"></span>
+        <span class="lgd-col-label">${e.label}</span>
+      </div>`;
+    }).join('');
+    return `<div class="lgd-col-list">${unitLabel}${rows}</div>`;
+  }
+
+  // Mode défaut : labels aux bordures gauches + seuil OMS au-dessus
   const borderLabels = def.entries.map((e, i) => {
     const pct = (i / n) * 100;
-    const align = i === 0 ? 'left' : i === n - 1 ? 'right' : 'center'; // dernier label ancré à droite avec une case de plus
     return `<span class="lgd-border-label" style="left:${pct}%">${e.label}</span>`;
   }).join('');
-  // Dernier label = fin de la dernière case, ancré à 100%
-  const lastEntry = def.entries[n - 1];
-  const endLabel = `<span class="lgd-border-label lgd-border-label-end" style="left:100%">${lastEntry.label.startsWith('>') ? lastEntry.label : ''}</span>`;
 
-  // Seuil OMS : affiché au-dessus, positionné à la bordure gauche de sa case
   const omsIdx = def.oms != null
     ? def.entries.findIndex(e => e.label === String(def.oms))
     : -1;
