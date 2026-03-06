@@ -769,14 +769,14 @@ html, body {
 #popup-content ul,
 #popup-content li { font-size: 0.85rem; line-height: 1.8; color: #444; }
 
-/* ========================================================================================= */
-/* POPUP DE CLIC COUCHE — Popup Leaflet affichée au clic sur une couche WMS active          */
-/* ========================================================================================= */
+/* =========================================================================================
+/* POPUP DE CLIC COUCHE — Popup Leaflet affichée au clic sur une couche WMS active          
+/* =========================================================================================
 
-/* Supprime le padding natif Leaflet autour du contenu                                      */
+/* Supprime le padding natif Leaflet autour du contenu                                      
 .leaflet-popup-content { margin: 0 !important; }
 
-/* Boîte blanche arrondie, ombre légère                                                     */
+/* Boîte blanche arrondie, ombre légère                                                     
 .leaflet-popup-content-wrapper {
     border-radius: 12px !important;
     box-shadow: 0 4px 20px rgba(0,0,0,0.15) !important;
@@ -785,10 +785,10 @@ html, body {
 
 .leaflet-popup-tip-container { margin-top: -1px; }
 
-/* Conteneur interne avec padding généreux                                                  */
+/* Conteneur interne avec padding généreux                                                  
 .layer-popup { padding: 14px 18px; min-width: 180px; }
 
-/* Ligne flex : label à gauche, valeur à droite                                             */
+/* Ligne flex : label à gauche, valeur à droite                                             
 .layer-popup-row {
     display: flex;
     align-items: center;
@@ -798,10 +798,10 @@ html, body {
 
 .layer-popup-label { font-size: 0.82rem; color: #555; line-height: 1.8; }
 
-/* Valeur numérique en gras bleu                                                            */
+/* Valeur numérique en gras bleu                                                            
 .layer-popup-value { font-weight: 700; color: #2c426c; font-size: 0.82rem; white-space: nowrap; line-height: 1.8; }
 
-/* Ligne de coordonnées GPS en haut de la popup                                            */
+/* Ligne de coordonnées GPS en haut de la popup                                            
 .layer-popup-coords { font-size: 0.75rem; color: #aaa; margin-bottom: 8px; }
 
 /* ========================================================================================= */
