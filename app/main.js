@@ -204,6 +204,184 @@ const LAYER_UNITS = {
 
 };
 
+// =============================================
+// LÉGENDE
+// Swatches hardcodées pour toutes les couches
+// (couleurs extraites des SLD).
+// UV : placeholder (palette à définir).
+// Bruit : GetLegendGraphic (style GeoServer).
+// =============================================
+
+// Définition des légendes en barres dégradées pour les couches Air et Ambroisie.
+// stops   : points de couleur du dégradé CSS (position en % + couleur hex)
+// min/max : valeurs affichées aux extrémités de la barre
+// oms     : valeur du seuil OMS (null si absent) — marqueur vertical + label
+// unit    : unité affichée à droite de la valeur max
+const LAYER_LEGENDS = {
+
+  "cartozome:mod_aura_2024_pm25_moyan": {
+    unit: "µg/m³", oms: 5,
+    entries: [
+      { color: '#5C85A1', label: '0'   },
+      { color: '#5FB0A9', label: '3'   },
+      { color: '#DEDB6D', label: '4'   },
+      { color: '#D47979', label: '5'   },
+      { color: '#A83939', label: '6'   },
+      { color: '#BD37AC', label: '>25' },
+    ]
+  },
+
+  "cartozome:mod_aura_2024_pm10_moyan": {
+    unit: "µg/m³", oms: 15,
+    entries: [
+      { color: '#5C85A1', label: '0'    },
+      { color: '#5FB0A9', label: '8'    },
+      { color: '#DEDB6D', label: '11'   },
+      { color: '#D47979', label: '15'   },
+      { color: '#A83939', label: '16'   },
+      { color: '#BD37AC', label: '>35'  },
+    ]
+  },
+
+  "cartozome:mod_aura_2024_no2_moyan": {
+    unit: "µg/m³", oms: 10,
+    entries: [
+      { color: '#5C85A1', label: '0'    },
+      { color: '#5FB0A9', label: '5'    },
+      { color: '#DEDB6D', label: '7'    },
+      { color: '#D47979', label: '10'   },
+      { color: '#A83939', label: '11'   },
+      { color: '#BD37AC', label: '>40'  },
+    ]
+  },
+
+  "cartozome:mod_aura_2024_o3_somo35": {
+    unit: "µg/m³·j", oms: null,
+    entries: [
+      { color: '#5FB0A9', label: '0'    },
+      { color: '#DEDB6D', label: '4k'   },
+      { color: '#D47979', label: '6k'   },
+      { color: '#A83939', label: '7k'   },
+    ]
+  },
+
+  "cartozome:Ambroisie_2024_AURA": {
+    unit: "grains/m³", oms: null,
+    entries: [
+      { color: '#ffffcc', label: '0'    },
+      { color: '#a1dab4', label: '5'    },
+      { color: '#41b6c4', label: '10'   },
+      { color: '#2c7fb8', label: '20'   },
+      { color: '#253494', label: '>50'  },
+    ]
+  },
+
+  "uvLayer": null, // palette à définir — placeholder affiché
+
+};
+
+// Couche bruit : GetLegendGraphic (style GeoServer)
+const BRUIT_LAYER = "cartozome:sous_indice_multibruit_orhane_2023";
+
+/**
+ * Construit le HTML de la légende pour un data-layer donné.
+ */
+function buildLegendHTML(layerName) {
+
+  // Bruit → GetLegendGraphic
+  if (layerName === BRUIT_LAYER) {
+    const params = new URLSearchParams({
+      SERVICE: 'WMS', VERSION: '1.1.1', REQUEST: 'GetLegendGraphic',
+      FORMAT: 'image/png', LAYER: layerName,
+      LEGEND_OPTIONS: 'fontName:Jost;fontSize:11;fontColor:0x444444;bgColor:0xFFFFFF;labelMargin:4',
+    });
+    return `<div class="legend-wms">
+      <img src="${GEOSERVER_URL}?${params}" alt="Légende" style="opacity:${LAYER_OPACITY}"
+           onerror="this.parentElement.innerHTML='<span class=legend-unavail>Légende non disponible</span>'">
+    </div>`;
+  }
+
+  // UV → placeholder
+  if (layerName === 'uvLayer') {
+    return `<div class="legend-placeholder">Palette UV à venir</div>`;
+  }
+
+  // Autres couches → barre dégradée
+  const def = LAYER_LEGENDS[layerName];
+  if (!def) return '';
+  return buildSegmentedBar(def);
+}
+
+/**
+ * Barre segmentée couleurs pleines.
+ * Les labels sont placés aux bordures entre cases (left: 0%, 1/n*100%, 2/n*100%…).
+ * Seuil OMS affiché au-dessus de la barre avec flèche, aligné sur la bordure OMS.
+ */
+function buildSegmentedBar(def) {
+  const n = def.entries.length;
+
+  // Les labels sont les valeurs de seuil de chaque case = bordures gauches
+  // + le dernier label est la bordure droite de la dernière case
+  // On a n cases → n+1 bordures, mais on n'affiche que les n labels (début de chaque case)
+  // positionnés en absolu à i/n * 100%
+
+  const segments = def.entries.map((e, i) => {
+    const radius = i === 0 ? '4px 0 0 4px' : i === n - 1 ? '0 4px 4px 0' : '0';
+    return `<div class="lgd-seg" style="background:${e.color};opacity:${LAYER_OPACITY};border-radius:${radius};flex:1"></div>`;
+  }).join('');
+
+  // Labels en absolu aux bordures gauches de chaque case + bordure droite finale
+  const borderLabels = def.entries.map((e, i) => {
+    const pct = (i / n) * 100;
+    const align = i === 0 ? 'left' : i === n - 1 ? 'right' : 'center'; // dernier label ancré à droite avec une case de plus
+    return `<span class="lgd-border-label" style="left:${pct}%">${e.label}</span>`;
+  }).join('');
+  // Dernier label = fin de la dernière case, ancré à 100%
+  const lastEntry = def.entries[n - 1];
+  const endLabel = `<span class="lgd-border-label lgd-border-label-end" style="left:100%">${lastEntry.label.startsWith('>') ? lastEntry.label : ''}</span>`;
+
+  // Seuil OMS : affiché au-dessus, positionné à la bordure gauche de sa case
+  const omsIdx = def.oms != null
+    ? def.entries.findIndex(e => e.label === String(def.oms))
+    : -1;
+  const omsAbove = omsIdx >= 0 ? (() => {
+    const pct = (omsIdx / n) * 100;
+    return `<div class="lgd-oms-above" style="left:${pct}%">
+      <span class="lgd-seg-oms">Seuil OMS : ${def.oms} ${def.unit}</span>
+    </div>
+    <div class="lgd-oms-line" style="left:${pct}%"></div>`;
+  })() : '';
+
+  return `
+    <div class="lgd-bar-outer">
+      ${omsAbove}
+      <div class="lgd-seg-bar">${segments}</div>
+      <div class="lgd-border-labels">${borderLabels}</div>
+    </div>`;
+}
+
+/**
+ * Affiche la légende dans le layer-group-content de la couche active.
+ * Passe null pour tout effacer.
+ */
+function updateLegend(layerName) {
+  document.querySelectorAll('.layer-legend').forEach(el => el.remove());
+  if (!layerName) return;
+
+  const checkbox = document.querySelector(`.layer-checkbox[data-layer="${layerName}"]`);
+  if (!checkbox) return;
+  const content = checkbox.closest('.layer-group-content');
+  if (!content) return;
+
+  const html = buildLegendHTML(layerName);
+  if (!html) return;
+
+  const wrapper = document.createElement('div');
+  wrapper.className = 'layer-legend';
+  wrapper.innerHTML = html;
+  content.appendChild(wrapper);
+}
+
 // URLs GeoServer local (WMS pour les rasters, WFS pour le bruit aérien)
 const GEOSERVER_URL = "http://localhost:8081/geoserver/wms";
 const GEOSERVER_WFS = "http://localhost:8081/geoserver/wfs";
@@ -214,6 +392,9 @@ const GEOSERVER_WFS = "http://localhost:8081/geoserver/wfs";
 // =============================================
 
 const layerInstances = {}; // Cache des instances déjà initialisées
+// Opacité commune couches + légende
+const LAYER_OPACITY = 0.7;
+
 
 // Raccourci pour créer une couche WMS avec BetterWMS
 function createWMSLayer(layerName) {
@@ -221,7 +402,7 @@ function createWMSLayer(layerName) {
     layers: layerName,
     transparent: true,
     format: "image/png",
-    opacity: 0.7,
+    opacity: LAYER_OPACITY,
     version: "1.1.1",
   });
 }
@@ -270,8 +451,12 @@ document.querySelectorAll('.layer-checkbox').forEach(checkbox => {
       // Initialise la couche si pas encore en cache
       if (!layerInstances[layerName]) layerInstances[layerName] = await initLayer(layerName, isWFS);
       map.addLayer(layerInstances[layerName]);
+
+      // Affiche la légende
+      updateLegend(layerName);
     } else {
       if (layerInstances[layerName]) map.removeLayer(layerInstances[layerName]);
+      updateLegend(null);
     }
   });
 });
