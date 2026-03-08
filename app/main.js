@@ -181,7 +181,7 @@ const LAYER_LABELS = {
   "cartozome:mod_aura_2024_pm10_moyan":  "PM10",
   "cartozome:mod_aura_2024_pm25_moyan":  "PM2,5",
   "cartozome:mod_aura_2024_no2_moyan":   "NO2",
-  "cartozome:mod_aura_2024_o3_somo35":   "O3 SOMO35",
+  "cartozome:mod_aura_2024_o3_nbjdep120":  "O3 SOMO35",
   "cartozome:Ambroisie_2024_AURA":       "Ambroisie",
   // Multi-taxons
   // Graminées
@@ -197,7 +197,7 @@ const LAYER_UNITS = {
   "cartozome:mod_aura_2024_pm10_moyan":  "µg/m³",
   "cartozome:mod_aura_2024_pm25_moyan":  "µg/m³",
   "cartozome:mod_aura_2024_no2_moyan":   "µg/m³",
-  "cartozome:mod_aura_2024_o3_somo35":   "µg/m³·j",
+  "cartozome:mod_aura_2024_o3_nbjdep120":   "µg/m³·j",
   "cartozome:Ambroisie_2024_AURA":       "grains/m³",
   // Multi-taxons
   // Graminées
@@ -260,7 +260,7 @@ const LAYER_LEGENDS = {
     ]
   },
 
-  "cartozome:mod_aura_2024_o3_somo35": {
+  "cartozome:mod_aura_2024_o3_nbjdep120": {
     unit: "µg/m³·j", oms: null,
     entries: [
       { color: '#5FB0A9', label: '0'    },
@@ -568,6 +568,7 @@ document.getElementById("layers-toggle").addEventListener("click", () => {
 
 
 
+
 // =============================================
 // APIs GOUVERNEMENTALES
 // Géocodage, reverse géocodage et calcul
@@ -786,39 +787,6 @@ document.getElementById("calc-compare-btn").addEventListener("click", async () =
   updateResultsForPoint(coordsA[1], coordsA[0], inputA);
 });
 
-// Validation itinéraire : géocode départ et arrivée, trace la route piétonne.
-// TODO : échantillonner des points le long de la polyligne et interroger les
-// couches actives pour calculer l'exposition moyenne sur le trajet
-// document.getElementById("calc-route-btn").addEventListener("click", async () => {
-//   routingLayer.clearLayers();
-
-//   const routeStart = document.getElementById("route-start").value.trim();
-//   const routeEnd   = document.getElementById("route-end").value.trim();
-//   if (!routeStart) { alert("Veuillez saisir une adresse de départ"); return; }
-
-//   const startCoords = await geocodeAddress(routeStart);
-//   if (!startCoords) { alert("Adresse de départ introuvable"); return; }
-//   const startLatLng = L.latLng(startCoords[1], startCoords[0]);
-//   L.marker(startLatLng, { icon: iconDepart }).addTo(routingLayer).bindPopup("Départ");
-
-//   if (!routeEnd) { map.setView(startLatLng, 16); return; }
-
-//   const endCoords = await geocodeAddress(routeEnd);
-//   if (!endCoords) { alert("Adresse d'arrivée introuvable"); return; }
-//   const endLatLng = L.latLng(endCoords[1], endCoords[0]);
-//   L.marker(endLatLng, { icon: iconArrivee }).addTo(routingLayer).bindPopup("Arrivée");
-
-//   const routeCoords = await getRoute(startCoords, endCoords);
-//   if (!routeCoords) { alert("Impossible de calculer l'itinéraire"); return; }
-
-//   const latLngs   = routeCoords.map(c => [c[1], c[0]]);
-//   const routeLine = L.polyline(latLngs, { color: "#1A4E72", weight: 4, opacity: 1 }).addTo(routingLayer);
-//   map.fitBounds(routeLine.getBounds(), { padding: [50, 50] });
-
-//   console.log("[ITINÉRAIRE] Coordonnées :", routeCoords);
-//   openResultsPanel();
-//   updateResultsForPoint(startCoords[1], startCoords[0], routeStart);
-// });
 
 
 document.getElementById("calc-route-btn").addEventListener("click", async () => {
@@ -969,7 +937,7 @@ const LAYER_META = {
   "cartozome:mod_aura_2024_pm10_moyan":           { label: "PM10",           unit: "µg/m³",   oms: 15,  thresholds: [0, 35]    },
   "cartozome:mod_aura_2024_pm25_moyan":           { label: "PM2.5",          unit: "µg/m³",   oms: 5,   thresholds: [0, 25]     },
   "cartozome:mod_aura_2024_no2_moyan":            { label: "NO₂",            unit: "µg/m³",   oms: 10,  thresholds: [0, 40]    },
-  "cartozome:mod_aura_2024_o3_somo35":            { label: "O₃",             unit: "µg/m³·j", oms: null, thresholds: [0, 17500] },
+  "cartozome:mod_aura_2024_o3_nbjdep120":            { label: "O₃",             unit: "µg/m³·j", oms: null, thresholds: [0, 17500] },
   "cartozome:Ambroisie_2024_AURA":                { label: "Ambroisie",      unit: "gr/m³",   oms: null, thresholds: [0, 500]     },
   "cartozome:sous_indice_multibruit_orhane_2023": { label: "Indice multi-bruit", unit: "dB(A)", oms: null, thresholds: [0, 30]   },
 };
@@ -982,7 +950,7 @@ const RESULT_CATEGORIES = [
       "cartozome:mod_aura_2024_pm10_moyan",
       "cartozome:mod_aura_2024_pm25_moyan",
       "cartozome:mod_aura_2024_no2_moyan",
-      "cartozome:mod_aura_2024_o3_somo35",
+      "cartozome:mod_aura_2024_o3_nbjdep120",
     ]
   },
   {
@@ -1002,27 +970,27 @@ function getBadge(val, thresholds) {
   return                           { label: "Élevé",   cls: "badge-high" };
 }
 
-// Construit la barre de légende avec marqueur OMS et marqueur valeur
-function buildLegendBar(val, meta) {
-  const { min, max, oms, unit } = meta;
-  const pct    = v  => Math.min(100, Math.max(0, ((v - min) / (max - min)) * 100));
-  const valPct = pct(val);
-  const omsPct = oms !== null ? pct(oms) : null;
+// // Construit la barre de légende avec marqueur OMS et marqueur valeur
+// function buildLegendBar(val, meta) {
+//   const { min, max, oms, unit } = meta;
+//   const pct    = v  => Math.min(100, Math.max(0, ((v - min) / (max - min)) * 100));
+//   const valPct = pct(val);
+//   const omsPct = oms !== null ? pct(oms) : null;
 
-  return `
-    <div class="legend-bar-wrap">
-      <div class="legend-bar"></div>
-      ${omsPct !== null ? `
-        <div class="marker-oms" style="left:${omsPct}%"></div>
-        <span class="label-oms" style="left:${omsPct}%">OMS ${oms}</span>
-      ` : ''}
-      <div class="marker-val" style="left:${valPct}%"></div>
-      <div class="legend-labels">
-        <span>${min}</span>
-        <span>${max} ${unit}</span>
-      </div>
-    </div>`;
-}
+//   return `
+//     <div class="legend-bar-wrap">
+//       <div class="legend-bar"></div>
+//       ${omsPct !== null ? `
+//         <div class="marker-oms" style="left:${omsPct}%"></div>
+//         <span class="label-oms" style="left:${omsPct}%">OMS ${oms}</span>
+//       ` : ''}
+//       <div class="marker-val" style="left:${valPct}%"></div>
+//       <div class="legend-labels">
+//         <span>${min}</span>
+//         <span>${max} ${unit}</span>
+//       </div>
+//     </div>`;
+// }
 
 // Interroge GeoServer en GetFeatureInfo pour un point donné
 // Retourne la valeur numérique de la couche, ou null si absent
@@ -1067,111 +1035,549 @@ async function queryLayerAtPoint(layerName, lat, lon) {
 // layerValues : { layerName: valeur | null }
 // uvValue    : indice UV (number | null)
 
-function renderResultsPanel(address, layerValues, uvValue) {
-  const content = document.getElementById("results-content");
-  const header  = document.getElementById("results-header");
+// function renderResultsPanel(address, layerValues, uvValue) {
+//   const content = document.getElementById("results-content");
+//   const header  = document.getElementById("results-header");
 
-  document.getElementById("results-address").textContent = address;
-  document.getElementById("results-close").addEventListener("click", () => {
-      resultsPanel.classList.add("hidden");
-  });
+//   document.getElementById("results-address").textContent = address;
+//   document.getElementById("results-close").addEventListener("click", () => {
+//       resultsPanel.classList.add("hidden");
+//   });
 
-  document.getElementById("results-close").addEventListener("click", () => {
-    resultsPanel.classList.add("hidden");
-  });
+//   document.getElementById("results-close").addEventListener("click", () => {
+//     resultsPanel.classList.add("hidden");
+//   });
 
-  let html = ``;
+//   let html = ``;
 
-  // Catégories Air, Pollen, Bruit
-  for (const cat of RESULT_CATEGORIES) {
-    html += `<div class="cat-card">
-      <div class="cat-header">${cat.icon} ${cat.label}</div>
-      <div class="cat-body">`;
+//   // Catégories Air, Pollen, Bruit
+//   for (const cat of RESULT_CATEGORIES) {
+//     html += `<div class="cat-card">
+//       <div class="cat-header">${cat.icon} ${cat.label}</div>
+//       <div class="cat-body">`;
 
-    for (const layerName of cat.layers) {
-      const meta = LAYER_META[layerName];
-      if (!meta) continue;
-      const val = layerValues[layerName];
+//     for (const layerName of cat.layers) {
+//       const meta = LAYER_META[layerName];
+//       if (!meta) continue;
+//       const val = layerValues[layerName];
 
-      html += `<div class="res-row"><div class="res-top">
-        <span class="res-label">${meta.label}</span>`;
+//       html += `<div class="res-row"><div class="res-top">
+//         <span class="res-label">${meta.label}</span>`;
 
-      if (val === null || val === undefined) {
-        html += `<span class="res-value no-data">Non disponible</span>`;
-      } else {
-        const badge = getBadge(val, meta.thresholds);
-        html += `<div class="res-right">
-          <span class="res-value">${val.toFixed(1)} ${meta.unit}</span>
-          <span class="res-badge ${badge.cls}">${badge.label}</span>
-        </div>`;
-      }
+//       if (val === null || val === undefined) {
+//         html += `<span class="res-value no-data">Non disponible</span>`;
+//       } else {
+//         const badge = getBadge(val, meta.thresholds);
+//         html += `<div class="res-right">
+//           <span class="res-value">${val.toFixed(1)} ${meta.unit}</span>
+//           <span class="res-badge ${badge.cls}">${badge.label}</span>
+//         </div>`;
+//       }
 
-      html += `</div>`;
-      if (val !== null && val !== undefined) html += buildLegendBar(val, meta);
-      html += `</div>`;
+//       html += `</div>`;
+//       if (val !== null && val !== undefined) html += buildLegendBar(val, meta);
+//       html += `</div>`;
+//     }
+
+//     html += `</div></div>`;
+//   }
+
+//   // Catégorie UV
+//   html += `<div class="cat-card">
+//     <div class="cat-header"><img src="./img/uv.png" style="width:16px;height:16px;object-fit:contain;vertical-align:middle"> UV</div>
+//     <div class="cat-body">
+//       <div class="res-row"><div class="res-top">
+//         <span class="res-label">Indice UV</span>`;
+
+//   if (uvValue === null || uvValue === undefined) {
+//     html += `<span class="res-value no-data">Non disponible</span>`;
+//   } else {
+//     const badge = getBadge(uvValue, [2, 5]);
+//     html += `<div class="res-right">
+//       <span class="res-value">${uvValue}</span>
+//       <span class="res-badge ${badge.cls}">${badge.label}</span>
+//     </div>`;
+//   }
+//   html += `</div></div></div></div>`;
+
+//   content.innerHTML = html;
+// }
+
+// // Interroge toutes les couches pour un point et met à jour le panel
+// async function updateResultsForPoint(lat, lon, address) {
+
+//   let data = {};
+
+//   try {
+
+//     const res = await fetch("http://localhost:8000/indicateursPoint", {
+//       method: "POST",
+//       headers: { "Content-Type": "application/json" },
+//       body: JSON.stringify({
+//         latitude: lat,
+//         longitude: lon
+//       })
+//     });
+
+//     if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+//     data = await res.json();
+
+//   } catch (err) {
+//     console.error("Erreur API indicateurs :", err);
+//   }
+
+//   // Mapping API -> couches
+//   const layerValues = {
+//     "cartozome:mod_aura_2024_pm10_moyan": parseFloat(data["PM10"]),
+//     "cartozome:mod_aura_2024_pm25_moyan": parseFloat(data["PM2.5"]),
+//     "cartozome:mod_aura_2024_no2_moyan": parseFloat(data["NO2"]),
+//     "cartozome:mod_aura_2024_o3_nbjdep120": parseFloat(data["O3"]),
+//     "cartozome:Ambroisie_2024_AURA": parseFloat(data["Ambroisie"]),
+//     "cartozome:sous_indice_multibruit_orhane_2023": parseFloat(data["Bruit"])
+//   };
+
+//   const uvValue = parseFloat(data["UV"]);
+
+//   renderResultsPanel(address, layerValues, uvValue);
+// }
+
+// =============================================
+// SEUILS NUMERIQUES PAR INDICATEUR
+// =============================================
+
+const LAYER_THRESHOLDS = {
+
+  "cartozome:mod_aura_2024_pm10_moyan":
+    [0,8,11,15,16,35,Infinity],
+
+  "cartozome:mod_aura_2024_pm25_moyan":
+    [0,3,4,5,6,25,Infinity],
+
+  "cartozome:mod_aura_2024_no2_moyan":
+    [0,5,7,10,11,40,Infinity],
+
+  "cartozome:mod_aura_2024_o3_nbjdep120":
+    [0,4000,6000,7000,Infinity],
+
+  "cartozome:Ambroisie_2024_AURA":
+    [0,3,30,50,250,500,Infinity],
+
+  "cartozome:sous_indice_multibruit_orhane_2023":
+    [1,2,3,4,5,6,7,8],   // valeurs discrètes 1–7
+
+  "uvLayer":
+    [0,3,6,8,11,Infinity]
+};
+
+// =============================================
+// SEUILS OMS (ticks)
+// =============================================
+
+const OMS_THRESHOLDS = {
+
+  "cartozome:mod_aura_2024_pm10_moyan": 15,
+
+  "cartozome:mod_aura_2024_pm25_moyan": 5,
+
+  "cartozome:mod_aura_2024_no2_moyan": 10
+
+};
+
+// =============================================
+// COULEUR CURSEUR
+// =============================================
+
+function getLayerValueColor(layerName,value){
+
+  const legend = LAYER_LEGENDS[layerName];
+  const thresholds = LAYER_THRESHOLDS[layerName];
+
+  if(!legend || !thresholds) return "#999";
+
+  for(let i=thresholds.length-2;i>=0;i--){
+
+    if(value >= thresholds[i]){
+      return legend.entries[i].color;
     }
 
-    html += `</div></div>`;
   }
 
-  // Catégorie UV
-  html += `<div class="cat-card">
-    <div class="cat-header"><img src="./img/uv.png" style="width:16px;height:16px;object-fit:contain;vertical-align:middle"> UV</div>
-    <div class="cat-body">
-      <div class="res-row"><div class="res-top">
-        <span class="res-label">Indice UV</span>`;
+  return legend.entries[0].color;
 
-  if (uvValue === null || uvValue === undefined) {
-    html += `<span class="res-value no-data">Non disponible</span>`;
-  } else {
-    const badge = getBadge(uvValue, [2, 5]);
-    html += `<div class="res-right">
-      <span class="res-value">${uvValue}</span>
-      <span class="res-badge ${badge.cls}">${badge.label}</span>
-    </div>`;
-  }
-  html += `</div></div></div></div>`;
-
-  content.innerHTML = html;
 }
 
-// Interroge toutes les couches pour un point et met à jour le panel
-async function updateResultsForPoint(lat, lon, address) {
 
-  let data = {};
+// =============================================
+// BARRE RESULTATS
+// =============================================
 
-  try {
+function buildResultBar(layerName,value){
 
-    const res = await fetch("http://localhost:8000/indicateursPoint", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        latitude: lat,
-        longitude: lon
-      })
-    });
+  const legend = LAYER_LEGENDS[layerName];
+  const thresholds = LAYER_THRESHOLDS[layerName];
 
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  if(!legend || !thresholds) return "";
 
-    data = await res.json();
+  const entries = legend.entries;
+  const segments = thresholds.length-1;
 
-  } catch (err) {
-    console.error("Erreur API indicateurs :", err);
+  const colors = entries.map(e=>e.color);
+
+  const gradient = colors
+    .map((c,i)=>`${c} ${(i/segments)*100}% ${(i+1)/segments*100}%`)
+    .join(",");
+
+
+  // ===============================
+  // POSITION CURSEUR
+  // ===============================
+
+  let segmentIndex = segments-1;
+
+  for(let i=0;i<segments;i++){
+
+    if(value >= thresholds[i] && value < thresholds[i+1]){
+      segmentIndex = i;
+      break;
+    }
+
   }
 
-  // Mapping API -> couches
-  const layerValues = {
-    "cartozome:mod_aura_2024_pm10_moyan": parseFloat(data["PM10"]),
-    "cartozome:mod_aura_2024_pm25_moyan": parseFloat(data["PM2.5"]),
-    "cartozome:mod_aura_2024_no2_moyan": parseFloat(data["NO2"]),
-    "cartozome:mod_aura_2024_o3_somo35": parseFloat(data["O3"]),
-    "cartozome:Ambroisie_2024_AURA": parseFloat(data["Ambroisie"]),
-    "cartozome:sous_indice_multibruit_orhane_2023": parseFloat(data["Bruit"])
+  const min = thresholds[segmentIndex];
+  const max = thresholds[segmentIndex+1];
+
+  let relative;
+
+  if(layerName==="cartozome:sous_indice_multibruit_orhane_2023"){
+
+    relative = 0.5;
+
+  }else if(max===Infinity){
+
+    relative = 0.8;
+
+  }else{
+
+    relative = (value-min)/(max-min);
+
+  }
+
+  const position =
+    (segmentIndex + relative) / segments;
+
+  const left = Math.max(0,Math.min(1,position))*100;
+
+
+  // ===============================
+  // POSITION TICK OMS
+  // ===============================
+
+  let tickHTML = "";
+
+  const omsValue = OMS_THRESHOLDS[layerName];
+
+  if(omsValue !== undefined){
+
+    let tickSegment = segments-1;
+
+    for(let i=0;i<segments;i++){
+
+      if(omsValue >= thresholds[i] && omsValue < thresholds[i+1]){
+        tickSegment = i;
+        break;
+      }
+
+    }
+
+    const tmin = thresholds[tickSegment];
+    const tmax = thresholds[tickSegment+1];
+
+    let trel;
+
+    if(tmax === Infinity){
+      trel = 0.8;
+    }else{
+      trel = (omsValue - tmin)/(tmax - tmin);
+    }
+
+    const tpos =
+      (tickSegment + trel) / segments;
+
+    const tickLeft =
+      Math.max(0,Math.min(1,tpos))*100;
+
+tickHTML = `
+  <div style="
+    position:absolute;
+    left:${tickLeft}%;
+    top:-3px;
+    transform:translateX(-50%);
+    text-align:center;
+    pointer-events:none;
+  ">
+    <!-- Tick -->
+    <div style="
+      width:2px;
+      height:16px;
+      background:black;
+      margin:auto;
+      position:relative;
+    ">
+      <!-- Texte au-dessus du tick -->
+      <div style="
+        position:absolute;
+        bottom:100%;  /* juste au-dessus */
+        left:50%;
+        transform:translateX(-50%);
+        font-size:9px;
+        color:#333;
+        white-space:nowrap;
+        margin-bottom:2px; /* petit écart */
+      ">
+        Seuil OMS
+      </div>
+    </div>
+  </div>
+`;
+  }
+
+
+  const cursorColor = getLayerValueColor(layerName,value);
+
+
+  return `
+  <div style="margin-top:6px;position:relative">
+
+    <div style="
+      height:10px;
+      border-radius:6px;
+      background:linear-gradient(to right,${gradient});
+      position:relative;
+    ">
+
+      ${tickHTML}
+
+      <div style="
+        position:absolute;
+        left:${left}%;
+        top:-4px;
+        width:14px;
+        height:14px;
+        border-radius:50%;
+        border:2px solid white;
+        background:${cursorColor};
+        transform:translateX(-50%);
+        box-shadow:0 0 3px rgba(0,0,0,0.4);
+      "></div>
+
+    </div>
+
+  </div>
+  `;
+}
+
+
+// =============================================
+// PANEL RESULTATS
+// =============================================
+
+function renderResultsPanel(address, layerValues, uvValue){
+
+  const content = document.getElementById("results-content");
+  document.getElementById("results-address").textContent = address;
+
+  let html="";
+
+  for(const cat of RESULT_CATEGORIES){
+
+    html += `
+    <div class="cat-card">
+
+      <div class="cat-header">
+        ${cat.icon} ${cat.label}
+      </div>
+
+      <div class="cat-body">
+    `;
+
+    for(const layerName of cat.layers){
+
+      const meta = LAYER_META[layerName];
+      const value = layerValues[layerName];
+
+      html+=`<div class="res-row">`;
+
+      html+=`
+      <div class="res-top">
+        <span class="res-label">${meta.label}</span>
+      `;
+
+      if(value===null || isNaN(value)){
+
+        html+=`<span class="res-value no-data">Non disponible</span>`;
+
+      }else{
+
+        html+=`
+        <span class="res-value">
+          ${value.toFixed(1)} ${meta.unit}
+        </span>
+        `;
+
+      }
+
+      html+=`</div>`;
+
+      if(value!==null && !isNaN(value)){
+
+        html+=buildResultBar(layerName,value);
+
+      }
+
+      html+=`</div>`;
+
+    }
+
+    html+=`
+      </div>
+    </div>
+    `;
+
+  }
+
+
+  // ================= UV =================
+
+  html+=`
+
+  <div class="cat-card">
+
+    <div class="cat-header">
+      <img src="./img/uv.png"
+      style="width:16px;height:16px;vertical-align:middle">
+      UV
+    </div>
+
+    <div class="cat-body">
+
+      <div class="res-row">
+
+        <div class="res-top">
+
+          <span class="res-label">
+          Indice UV
+          </span>
+
+  `;
+
+  if(uvValue===null || isNaN(uvValue)){
+
+    html+=`
+    <span class="res-value no-data">
+    Non disponible
+    </span>
+    `;
+
+  }else{
+
+    html+=`
+    <span class="res-value">
+    ${uvValue}
+    </span>
+    `;
+
+  }
+
+  html+=`
+
+        </div>
+
+        ${uvValue!==null ? buildResultBar("uvLayer",uvValue) : ""}
+
+      </div>
+
+    </div>
+
+  </div>
+
+  `;
+
+
+  content.innerHTML=html;
+
+}
+
+
+
+// =============================================
+// APPEL API POINT
+// =============================================
+
+async function updateResultsForPoint(lat,lon,address){
+
+  let data={};
+
+  try{
+
+    const res=await fetch(
+      "http://localhost:8000/indicateursPoint",
+      {
+        method:"POST",
+        headers:{
+          "Content-Type":"application/json"
+        },
+        body:JSON.stringify({
+          latitude:lat,
+          longitude:lon
+        })
+      }
+    );
+
+    data=await res.json();
+
+  }catch(err){
+
+    console.error("API indicateurs erreur",err);
+
+  }
+
+
+  const layerValues={
+
+    "cartozome:mod_aura_2024_pm10_moyan":
+      parseFloat(data.PM10) || null,
+
+    "cartozome:mod_aura_2024_pm25_moyan":
+      parseFloat(data["PM2.5"]) || null,
+
+    "cartozome:mod_aura_2024_no2_moyan":
+      parseFloat(data.NO2) || null,
+
+    "cartozome:mod_aura_2024_o3_nbjdep120":
+      parseFloat(data.O3) || null,
+
+    "cartozome:Ambroisie_2024_AURA":
+      parseFloat(data.Ambroisie) || null,
+
+    "cartozome:sous_indice_multibruit_orhane_2023":
+      parseFloat(data.Bruit) || null
+
   };
 
-  const uvValue = parseFloat(data["UV"]);
 
-  renderResultsPanel(address, layerValues, uvValue);
+  const uvValue =
+    data.UV !== undefined && data.UV !== null
+    ? parseFloat(data.UV)
+    : null;
+
+
+  renderResultsPanel(
+    address,
+    layerValues,
+    uvValue
+  );
+
 }
 
 // =============================================
@@ -1215,3 +1621,4 @@ map.on("click", async (e) => {
 });
 
 // //////////////////////////////////
+
