@@ -15,10 +15,7 @@ const METROPOLE_BOUNDS = L.latLngBounds(
   [46.00, 5.25]
 );
 
-const map = L.map('map', {
-  minZoom:            10,
-  maxZoom:            20,
-}).fitBounds(METROPOLE_BOUNDS);                                      // Vue initiale centrée sur Lyon
+const map = L.map('map').fitBounds(METROPOLE_BOUNDS);                                      // Vue initiale centrée sur Lyon
 
 L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
   attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
@@ -65,7 +62,14 @@ async function loadUvLayer() {
 }
 
 // Charger la couche au démarrage
-loadUvLayer();
+(async () => {
+  await loadUvLayer();
+
+  const uvCheckbox = document.querySelector('.layer-checkbox[data-layer="uvLayer"]');
+  if (uvCheckbox && uvCheckbox.checked && uvLayer) {
+    map.addLayer(uvLayer);
+  }
+})();
 
 // Échelle
 L.control.scale({ position: 'bottomleft', imperial: false }).addTo(map);
@@ -1062,6 +1066,11 @@ async function queryLayerAtPoint(layerName, lat, lon) {
 // address    : adresse lisible affichée en titre
 // layerValues : { layerName: valeur | null }
 // uvValue    : indice UV (number | null)
+
+
+
+
+
 function renderResultsPanel(address, layerValues, uvValue) {
   const content = document.getElementById("results-content");
   const header  = document.getElementById("results-header");
