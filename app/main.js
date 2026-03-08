@@ -966,12 +966,12 @@ btnRoute.addEventListener("click", setRouteMode);
 // thresholds : [seuil_bon, seuil_modéré]
 // =============================================
 const LAYER_META = {
-  "cartozome:mod_aura_2024_pm10_moyan":           { label: "PM10",           unit: "µg/m³",   oms: 15,  thresholds: [15, 30]    },
-  "cartozome:mod_aura_2024_pm25_moyan":           { label: "PM2.5",          unit: "µg/m³",   oms: 5,   thresholds: [5, 15]     },
-  "cartozome:mod_aura_2024_no2_moyan":            { label: "NO₂",            unit: "µg/m³",   oms: 10,  thresholds: [10, 25]    },
-  "cartozome:mod_aura_2024_o3_somo35":            { label: "O₃",             unit: "µg/m³·j", oms: null, thresholds: [10000, 17500] },
-  "cartozome:Ambroisie_2024_AURA":                { label: "Ambroisie",      unit: "gr/m³",   oms: null, thresholds: [3, 10]     },
-  "cartozome:sous_indice_multibruit_orhane_2023": { label: "Indice multi-bruit", unit: "dB(A)", oms: null, thresholds: [2, 4]   },
+  "cartozome:mod_aura_2024_pm10_moyan":           { label: "PM10",           unit: "µg/m³",   oms: 15,  thresholds: [0, 35]    },
+  "cartozome:mod_aura_2024_pm25_moyan":           { label: "PM2.5",          unit: "µg/m³",   oms: 5,   thresholds: [0, 25]     },
+  "cartozome:mod_aura_2024_no2_moyan":            { label: "NO₂",            unit: "µg/m³",   oms: 10,  thresholds: [0, 40]    },
+  "cartozome:mod_aura_2024_o3_somo35":            { label: "O₃",             unit: "µg/m³·j", oms: null, thresholds: [0, 17500] },
+  "cartozome:Ambroisie_2024_AURA":                { label: "Ambroisie",      unit: "gr/m³",   oms: null, thresholds: [0, 500]     },
+  "cartozome:sous_indice_multibruit_orhane_2023": { label: "Indice multi-bruit", unit: "dB(A)", oms: null, thresholds: [0, 30]   },
 };
 
 // Structure des catégories affichées dans le panel
@@ -1067,10 +1067,6 @@ async function queryLayerAtPoint(layerName, lat, lon) {
 // layerValues : { layerName: valeur | null }
 // uvValue    : indice UV (number | null)
 
-
-
-
-
 function renderResultsPanel(address, layerValues, uvValue) {
   const content = document.getElementById("results-content");
   const header  = document.getElementById("results-header");
@@ -1141,22 +1137,39 @@ function renderResultsPanel(address, layerValues, uvValue) {
 
 // Interroge toutes les couches pour un point et met à jour le panel
 async function updateResultsForPoint(lat, lon, address) {
-  // Lance toutes les requêtes en parallèle
-  const entries = await Promise.all(
-    Object.keys(LAYER_META).map(async layerName => {
-      const val = await queryLayerAtPoint(layerName, lat, lon);
-      return [layerName, val];
-    })
-  );
-  const layerValues = Object.fromEntries(entries);
 
-  // Récupère la valeur UV depuis le JSON déjà chargé
-  let uvValue = null;
+  let data = {};
+
   try {
-    const points = await fetchUvJson();
-    const p      = closestUvPoint(points, lat, lon);
-    if (p) uvValue = extractUvMax(p).uv;
-  } catch { /* silencieux */ }
+
+    const res = await fetch("http://localhost:8000/indicateursPoint", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        latitude: lat,
+        longitude: lon
+      })
+    });
+
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+    data = await res.json();
+
+  } catch (err) {
+    console.error("Erreur API indicateurs :", err);
+  }
+
+  // Mapping API -> couches
+  const layerValues = {
+    "cartozome:mod_aura_2024_pm10_moyan": parseFloat(data["PM10"]),
+    "cartozome:mod_aura_2024_pm25_moyan": parseFloat(data["PM2.5"]),
+    "cartozome:mod_aura_2024_no2_moyan": parseFloat(data["NO2"]),
+    "cartozome:mod_aura_2024_o3_somo35": parseFloat(data["O3"]),
+    "cartozome:Ambroisie_2024_AURA": parseFloat(data["Ambroisie"]),
+    "cartozome:sous_indice_multibruit_orhane_2023": parseFloat(data["Bruit"])
+  };
+
+  const uvValue = parseFloat(data["UV"]);
 
   renderResultsPanel(address, layerValues, uvValue);
 }
