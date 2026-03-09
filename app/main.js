@@ -197,7 +197,7 @@ const LAYER_UNITS = {
   "cartozome:mod_aura_2024_pm10_moyan":  "µg/m³",
   "cartozome:mod_aura_2024_pm25_moyan":  "µg/m³",
   "cartozome:mod_aura_2024_no2_moyan":   "µg/m³",
-  "cartozome:mod_aura_2024_o3_nbjdep120":   "µg/m³·j",
+  "cartozome:mod_aura_2024_o3_nbjdep120": "jours/an",
   "cartozome:Ambroisie_2024_AURA":       "grains/m³",
   // Multi-taxons
   // Graminées
@@ -261,24 +261,30 @@ const LAYER_LEGENDS = {
   },
 
   "cartozome:mod_aura_2024_o3_nbjdep120": {
-    unit: "µg/m³·j", oms: null,
+    unit: "jours/an", oms: 25,
     entries: [
-      { color: '#5FB0A9', label: '0'    },
-      { color: '#DEDB6D', label: '4k'   },
-      { color: '#D47979', label: '6k'   },
-      { color: '#A83939', label: '7k'   },
+      { color: '#006400', label: '0'   },
+      { color: '#4caf50', label: '7'   },
+      { color: '#8bc34a', label: '10'  },
+      { color: '#cddc39', label: '12'  },
+      { color: '#ffeb3b', label: '15'  },
+      { color: '#ffc107', label: '17'  },
+      { color: '#ff5722', label: '20'  },
+      { color: '#f44336', label: '22'  },
+      { color: '#b71c1c', label: '25'  },
+      { color: '#3e0000', label: '>50' },
     ]
   },
 
   "cartozome:Ambroisie_2024_AURA": {
-    unit: "grains/m³", oms: null, centerLabels: true,
+    unit: "grains/m³", oms: null,
     entries: [
-      { color: '#b2e0e8', label: 'Très faible (0 – 3)'    },
-      { color: '#7ecdc2', label: 'Faible (3 – 30)'         },
-      { color: '#f5e96a', label: 'Modéré (30 – 50)'        },
-      { color: '#f4846a', label: 'Élevé (50 – 250)'        },
-      { color: '#c0392b', label: 'Très élevé (250 – 500)'  },
-      { color: '#8e44ad', label: 'Extrêmement élevé (>500)'},
+      { color: '#b2e8e4', label: '0'    },
+      { color: '#7ecdc2', label: '3'    },
+      { color: '#f5e96a', label: '30'   },
+      { color: '#f4846a', label: '40'   },
+      { color: '#c0392b', label: '250'  },
+      { color: '#8e44ad', label: '>500' },
     ]
   },
 
