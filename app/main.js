@@ -970,28 +970,6 @@ function getBadge(val, thresholds) {
   return                           { label: "Élevé",   cls: "badge-high" };
 }
 
-// // Construit la barre de légende avec marqueur OMS et marqueur valeur
-// function buildLegendBar(val, meta) {
-//   const { min, max, oms, unit } = meta;
-//   const pct    = v  => Math.min(100, Math.max(0, ((v - min) / (max - min)) * 100));
-//   const valPct = pct(val);
-//   const omsPct = oms !== null ? pct(oms) : null;
-
-//   return `
-//     <div class="legend-bar-wrap">
-//       <div class="legend-bar"></div>
-//       ${omsPct !== null ? `
-//         <div class="marker-oms" style="left:${omsPct}%"></div>
-//         <span class="label-oms" style="left:${omsPct}%">OMS ${oms}</span>
-//       ` : ''}
-//       <div class="marker-val" style="left:${valPct}%"></div>
-//       <div class="legend-labels">
-//         <span>${min}</span>
-//         <span>${max} ${unit}</span>
-//       </div>
-//     </div>`;
-// }
-
 // Interroge GeoServer en GetFeatureInfo pour un point donné
 // Retourne la valeur numérique de la couche, ou null si absent
 async function queryLayerAtPoint(layerName, lat, lon) {
@@ -1029,118 +1007,6 @@ async function queryLayerAtPoint(layerName, lat, lon) {
     return null;
   }
 }
-
-// Construit et injecte le HTML du panel de résultats
-// address    : adresse lisible affichée en titre
-// layerValues : { layerName: valeur | null }
-// uvValue    : indice UV (number | null)
-
-// function renderResultsPanel(address, layerValues, uvValue) {
-//   const content = document.getElementById("results-content");
-//   const header  = document.getElementById("results-header");
-
-//   document.getElementById("results-address").textContent = address;
-//   document.getElementById("results-close").addEventListener("click", () => {
-//       resultsPanel.classList.add("hidden");
-//   });
-
-//   document.getElementById("results-close").addEventListener("click", () => {
-//     resultsPanel.classList.add("hidden");
-//   });
-
-//   let html = ``;
-
-//   // Catégories Air, Pollen, Bruit
-//   for (const cat of RESULT_CATEGORIES) {
-//     html += `<div class="cat-card">
-//       <div class="cat-header">${cat.icon} ${cat.label}</div>
-//       <div class="cat-body">`;
-
-//     for (const layerName of cat.layers) {
-//       const meta = LAYER_META[layerName];
-//       if (!meta) continue;
-//       const val = layerValues[layerName];
-
-//       html += `<div class="res-row"><div class="res-top">
-//         <span class="res-label">${meta.label}</span>`;
-
-//       if (val === null || val === undefined) {
-//         html += `<span class="res-value no-data">Non disponible</span>`;
-//       } else {
-//         const badge = getBadge(val, meta.thresholds);
-//         html += `<div class="res-right">
-//           <span class="res-value">${val.toFixed(1)} ${meta.unit}</span>
-//           <span class="res-badge ${badge.cls}">${badge.label}</span>
-//         </div>`;
-//       }
-
-//       html += `</div>`;
-//       if (val !== null && val !== undefined) html += buildLegendBar(val, meta);
-//       html += `</div>`;
-//     }
-
-//     html += `</div></div>`;
-//   }
-
-//   // Catégorie UV
-//   html += `<div class="cat-card">
-//     <div class="cat-header"><img src="./img/uv.png" style="width:16px;height:16px;object-fit:contain;vertical-align:middle"> UV</div>
-//     <div class="cat-body">
-//       <div class="res-row"><div class="res-top">
-//         <span class="res-label">Indice UV</span>`;
-
-//   if (uvValue === null || uvValue === undefined) {
-//     html += `<span class="res-value no-data">Non disponible</span>`;
-//   } else {
-//     const badge = getBadge(uvValue, [2, 5]);
-//     html += `<div class="res-right">
-//       <span class="res-value">${uvValue}</span>
-//       <span class="res-badge ${badge.cls}">${badge.label}</span>
-//     </div>`;
-//   }
-//   html += `</div></div></div></div>`;
-
-//   content.innerHTML = html;
-// }
-
-// // Interroge toutes les couches pour un point et met à jour le panel
-// async function updateResultsForPoint(lat, lon, address) {
-
-//   let data = {};
-
-//   try {
-
-//     const res = await fetch("http://localhost:8000/indicateursPoint", {
-//       method: "POST",
-//       headers: { "Content-Type": "application/json" },
-//       body: JSON.stringify({
-//         latitude: lat,
-//         longitude: lon
-//       })
-//     });
-
-//     if (!res.ok) throw new Error(`HTTP ${res.status}`);
-
-//     data = await res.json();
-
-//   } catch (err) {
-//     console.error("Erreur API indicateurs :", err);
-//   }
-
-//   // Mapping API -> couches
-//   const layerValues = {
-//     "cartozome:mod_aura_2024_pm10_moyan": parseFloat(data["PM10"]),
-//     "cartozome:mod_aura_2024_pm25_moyan": parseFloat(data["PM2.5"]),
-//     "cartozome:mod_aura_2024_no2_moyan": parseFloat(data["NO2"]),
-//     "cartozome:mod_aura_2024_o3_nbjdep120": parseFloat(data["O3"]),
-//     "cartozome:Ambroisie_2024_AURA": parseFloat(data["Ambroisie"]),
-//     "cartozome:sous_indice_multibruit_orhane_2023": parseFloat(data["Bruit"])
-//   };
-
-//   const uvValue = parseFloat(data["UV"]);
-
-//   renderResultsPanel(address, layerValues, uvValue);
-// }
 
 // =============================================
 // SEUILS NUMERIQUES PAR INDICATEUR
@@ -1621,4 +1487,3 @@ map.on("click", async (e) => {
 });
 
 // //////////////////////////////////
-
