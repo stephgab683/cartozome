@@ -1022,7 +1022,7 @@ const LAYER_THRESHOLDS = {
     [0,5,7,10,11,40,Infinity],
 
   "cartozome:mod_aura_2024_o3_nbjdep120":
-    [0,4000,6000,7000,Infinity],
+    [0,7, 10, 12, 15, 17, 22, 25, 50, Infinity],
 
   "cartozome:Ambroisie_2024_AURA":
     [0,3,30,50,250,500,Infinity],
@@ -1044,7 +1044,8 @@ const OMS_THRESHOLDS = {
 
   "cartozome:mod_aura_2024_pm25_moyan": 5,
 
-  "cartozome:mod_aura_2024_no2_moyan": 10
+  "cartozome:mod_aura_2024_no2_moyan": 10,
+  "cartozome:mod_aura_2024_o3_nbjdep120":25
 
 };
 
@@ -1444,45 +1445,45 @@ async function updateResultsForPoint(lat,lon,address){
 
 }
 
-// =============================================
-// CLIC SUR LA CARTE -> POPUP INDICATEURS
-// =============================================
-map.on("click", async (e) => {
-  const { lat, lng } = e.latlng;
+// // =============================================
+// // CLIC SUR LA CARTE -> POPUP INDICATEURS
+// // =============================================
+// map.on("click", async (e) => {
+//   const { lat, lng } = e.latlng;
 
-  try {
-    const res = await fetch("http://localhost:8000/indicateursPoint", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ latitude: lat, longitude: lng })
-    });
+//   try {
+//     const res = await fetch("http://localhost:8000/indicateursPoint", {
+//       method: "POST",
+//       headers: { "Content-Type": "application/json" },
+//       body: JSON.stringify({ latitude: lat, longitude: lng })
+//     });
 
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+//     if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
-    const data = await res.json();
+//     const data = await res.json();
 
-    // Construire le contenu HTML de la popup
-    let content = `<div style="font-family:'Jost',sans-serif;font-size:0.85rem;line-height:1.4;">`;
-    content += `<b style="color:#1A4E72;">Coordonnées :</b> ${lat.toFixed(6)}, ${lng.toFixed(6)}<br>`;
+//     // Construire le contenu HTML de la popup
+//     let content = `<div style="font-family:'Jost',sans-serif;font-size:0.85rem;line-height:1.4;">`;
+//     content += `<b style="color:#1A4E72;">Coordonnées :</b> ${lat.toFixed(6)}, ${lng.toFixed(6)}<br>`;
     
-    for (const [key, value] of Object.entries(data)) {
-      content += `<b>${key}</b> : ${value ?? "n/a"}<br>`;
-    }
-    content += `</div>`;
+//     for (const [key, value] of Object.entries(data)) {
+//       content += `<b>${key}</b> : ${value ?? "n/a"}<br>`;
+//     }
+//     content += `</div>`;
 
-    L.popup({ maxWidth: 300 })
-      .setLatLng([lat, lng])
-      .setContent(content)
-      .openOn(map);
+//     L.popup({ maxWidth: 300 })
+//       .setLatLng([lat, lng])
+//       .setContent(content)
+//       .openOn(map);
 
-  } catch (err) {
-    console.error("Erreur API indicateurs :", err);
-    L.popup()
-      .setLatLng([lat, lng])
-      .setContent(`<b>Erreur</b> lors de la récupération des indicateurs : ${err.message}`)
-      .openOn(map);
-  }
-});
+//   } catch (err) {
+//     console.error("Erreur API indicateurs :", err);
+//     L.popup()
+//       .setLatLng([lat, lng])
+//       .setContent(`<b>Erreur</b> lors de la récupération des indicateurs : ${err.message}`)
+//       .openOn(map);
+//   }
+// });
 
 // ======================================== COMPARAISON ========================
 function buildCompareBars(layerName, valueA, valueB) {
