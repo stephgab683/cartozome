@@ -26,7 +26,7 @@ WFS_COMMUNES_URL = "https://data.grandlyon.com/geoserver/metropole-de-lyon/ows"
 WMS_LAYERS = {
     "Ambroisie": "cartozome:Ambroisie_2024_AURA",
     "NO2": "cartozome:mod_aura_2024_no2_moyan",
-    "O3": "cartozome:mod_aura_2024_o3_somo35",
+    "O3": "cartozome:mod_aura_2024_o3_nbjdep120",
     "PM10": "cartozome:mod_aura_2024_pm10_moyan",
     "PM2.5": "cartozome:mod_aura_2024_pm25_moyan",
     "Bruit": "cartozome:sous_indice_multibruit_orhane_2023"
