@@ -139,8 +139,8 @@ html, body {
 
 /* Description courte en gris                                                                */
 #pill-desc {
-    font-size: 0.78rem;
-    color: #999;
+    font-size: 0.82rem !important;
+    color: #2c426c;
     padding: 0 16px;
 }
 
