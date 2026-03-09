@@ -27,8 +27,7 @@ services:
       - "8000:8000"
     volumes:
       - ./api:/app
-      - ./DATA_API:/app/DATA_API:ro
-    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+    command: python -m uvicorn main:app --host 0.0.0.0 --port 8000 --reload
 
   web:
     container_name: cartozome_web

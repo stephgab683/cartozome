@@ -904,8 +904,9 @@ function attachAutocomplete(inputId) {
       // Filtre les résultats hors bounds de la métropole de Lyon
       const filtered = data.features.filter(f => {
         const [lon, lat] = f.geometry.coordinates;
-        return lat >= 45.45 && lat <= 46.00 && lon >= 4.65 && lon <= 5.25;
+        return lat >= 44 && lat <= 47 && lon >= 1.75 && lon <= 7.2;
       });
+
 
       if (filtered.length === 0) { list.classList.add('hidden'); return; }
 
@@ -1041,7 +1042,7 @@ const LAYER_THRESHOLDS = {
     [0,5,7,10,11,40,Infinity],
 
   "cartozome:mod_aura_2024_o3_nbjdep120":
-    [0,4000,6000,7000,Infinity],
+    [0,7,10,12,15,17,22,25,50, Infinity],
 
   "cartozome:Ambroisie_2024_AURA":
     [0,3,30,50,250,500,Infinity],
@@ -1063,7 +1064,8 @@ const OMS_THRESHOLDS = {
 
   "cartozome:mod_aura_2024_pm25_moyan": 5,
 
-  "cartozome:mod_aura_2024_no2_moyan": 10
+  "cartozome:mod_aura_2024_no2_moyan": 10,
+  "cartozome:mod_aura_2024_o3_nbjdep120":25
 
 };
 
@@ -1427,24 +1429,12 @@ async function updateResultsForPoint(lat,lon,address){
 
 
   const layerValues={
-
-    "cartozome:mod_aura_2024_pm10_moyan":
-      parseFloat(data.PM10) || null,
-
-    "cartozome:mod_aura_2024_pm25_moyan":
-      parseFloat(data["PM2.5"]) || null,
-
-    "cartozome:mod_aura_2024_no2_moyan":
-      parseFloat(data.NO2) || null,
-
-    "cartozome:mod_aura_2024_o3_nbjdep120":
-      parseFloat(data.O3) || null,
-
-    "cartozome:Ambroisie_2024_AURA":
-      parseFloat(data.Ambroisie) || null,
-
-    "cartozome:sous_indice_multibruit_orhane_2023":
-      parseFloat(data.Bruit) || null
+    "cartozome:mod_aura_2024_pm10_moyan": parseFloat(data.PM10) || null,
+    "cartozome:mod_aura_2024_pm25_moyan": parseFloat(data["PM2.5"]) || null,
+    "cartozome:mod_aura_2024_no2_moyan": parseFloat(data.NO2) || null,
+    "cartozome:mod_aura_2024_o3_nbjdep120": data.O3 !== undefined && data.O3 !== null ? parseFloat(data.O3) : null,
+    "cartozome:Ambroisie_2024_AURA": parseFloat(data.Ambroisie) || null,
+    "cartozome:sous_indice_multibruit_orhane_2023": parseFloat(data.Bruit) || null
 
   };
 
