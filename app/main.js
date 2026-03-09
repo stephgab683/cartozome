@@ -754,108 +754,85 @@ document.getElementById("calc-point-btn").addEventListener("click", async () => 
   updateResultsForPoint(coords[1], coords[0], pointInput);
 });
 
-// Validation comparaison : géocode les deux points et place deux marqueurs.
-// TODO : interroger les couches actives pour chaque point et afficher
-// les valeurs d'exposition en comparaison dans le panel de résultats
-document.getElementById("calc-compare-btn").addEventListener("click", async () => {
-  routingLayer.clearLayers();
-
-  const inputA = document.getElementById("compare-a").value.trim();
-  const inputB = document.getElementById("compare-b").value.trim();
-  if (!inputA) { alert("Veuillez saisir le Point A"); return; }
-  if (!inputB) { alert("Veuillez saisir le Point B"); return; }
-
-  const coordsA = await geocodeAddress(inputA);
-  if (!coordsA) { alert("Point A introuvable"); return; }
-
-  const coordsB = await geocodeAddress(inputB);
-  if (!coordsB) { alert("Point B introuvable"); return; }
-
-  const latLngA = L.latLng(coordsA[1], coordsA[0]);
-  const latLngB = L.latLng(coordsB[1], coordsB[0]);
-
-  L.marker(latLngA, { icon: iconCompareA }).addTo(routingLayer).bindPopup("Point A");
-  L.marker(latLngB, { icon: iconCompareB }).addTo(routingLayer).bindPopup("Point B");
-
-  // Centre la vue pour afficher les deux points
-  const bounds = L.latLngBounds([latLngA, latLngB]);
-  map.fitBounds(bounds, { padding: [80, 80] });
-
-  console.log("[COMPARAISON] Point A :", { lat: coordsA[1], lon: coordsA[0] });
-  console.log("[COMPARAISON] Point B :", { lat: coordsB[1], lon: coordsB[0] });
-  openResultsPanel();
-  updateResultsForPoint(coordsA[1], coordsA[0], inputA);
-});
-
 
 
 document.getElementById("calc-route-btn").addEventListener("click", async () => {
   routingLayer.clearLayers();
 
   const routeStart = document.getElementById("route-start").value.trim();
-  const routeEnd   = document.getElementById("route-end").value.trim();
-  if (!routeStart) { alert("Veuillez saisir une adresse de départ"); return; }
+  const routeEnd = document.getElementById("route-end").value.trim();
+  if (!routeStart) {
+    alert("Veuillez saisir une adresse de départ");
+    return;
+  }
 
   const startCoords = await geocodeAddress(routeStart);
-  if (!startCoords) { alert("Adresse de départ introuvable"); return; }
+  if (!startCoords) {
+    alert("Adresse de départ introuvable");
+    return;
+  }
   const startLatLng = L.latLng(startCoords[1], startCoords[0]);
   L.marker(startLatLng, { icon: iconDepart }).addTo(routingLayer).bindPopup("Départ");
 
-  if (!routeEnd) { map.setView(startLatLng, 16); return; }
+  if (!routeEnd) {
+    map.setView(startLatLng, 16);
+    return;
+  }
 
   const endCoords = await geocodeAddress(routeEnd);
-  if (!endCoords) { alert("Adresse d'arrivée introuvable"); return; }
+  if (!endCoords) {
+    alert("Adresse d'arrivée introuvable");
+    return;
+  }
   const endLatLng = L.latLng(endCoords[1], endCoords[0]);
   L.marker(endLatLng, { icon: iconArrivee }).addTo(routingLayer).bindPopup("Arrivée");
 
   const routeCoords = await getRoute(startCoords, endCoords);
-  if (!routeCoords) { alert("Impossible de calculer l'itinéraire"); return; }
+  if (!routeCoords) {
+    alert("Impossible de calculer l'itinéraire");
+    return;
+  }
 
   // Transformation en LatLng pour Leaflet
-  const latLngs = routeCoords.map(c => L.latLng(c[1], c[0]));
+  const latLngs = routeCoords.map((c) => L.latLng(c[1], c[0]));
   const routeLine = L.polyline(latLngs, { color: "#1A4E72", weight: 4, opacity: 1 }).addTo(routingLayer);
   map.fitBounds(routeLine.getBounds(), { padding: [50, 50] });
 
-  // ========== échantillonnage ==========
-  function sampleRoutePoints(latlngs, step = 10) {
+  // Échantillonnage
+  function sampleRoutePoints(latlngs, step = 20) {
     const sampled = [];
     for (let i = 0; i < latlngs.length; i += step) {
       sampled.push(latlngs[i]);
     }
-    if (latlngs.length > 0 && !sampled.includes(latlngs[latlngs.length-1])) {
-      sampled.push(latlngs[latlngs.length-1]);
+    if (latlngs.length > 0 && !sampled.includes(latlngs[latlngs.length - 1])) {
+      sampled.push(latlngs[latlngs.length - 1]);
     }
     return sampled;
   }
 
-  const sampledPoints = sampleRoutePoints(latLngs, 20); // tous les 20 points
+  const sampledPoints = sampleRoutePoints(latLngs, 20);
 
-  // ========== appel à ton endpoint Python ==========
+  // Appel à l'API pour obtenir les valeurs des polluants
   const exposures = await fetch("http://localhost:8000/indicateursItineraire", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      coords: sampledPoints.map(p => ({ latitude: p.lat, longitude: p.lng }))
-    })
-  }).then(r => r.json());
+      coords: sampledPoints.map((p) => ({ latitude: p.lat, longitude: p.lng })),
+    }),
+  }).then((r) => r.json());
 
-  // ========== ajout des markers / popups ==========
-  sampledPoints.forEach((p, i) => {
-    const data = exposures[i];
-    if (!data) return;
-    const popupContent = Object.entries(data)
-      .filter(([k]) => k !== "latitude" && k !== "longitude")
-      .map(([k, v]) => `<b>${k}</b>: ${v}`)
-      .join("<br>");
+  // Stockez les données des polluants dans une variable globale
+  window.routeExposures = {
+    points: sampledPoints,
+    data: exposures,
+    latLngs: latLngs,
+  };
 
-    L.circleMarker([p.lat, p.lng], { radius: 4, color: "#ff9800" })
-      .addTo(routingLayer)
-      .bindPopup(popupContent);
-  });
-
-  console.log("[ITINÉRAIRE] Coordonnées :", routeCoords);
   openResultsPanel();
+  renderRouteResultsPanel(routeStart, routeEnd, exposures);
 });
+
+
 
 
 // Autocomplétion : affiche des suggestions pendant la frappe (délai 250ms).
@@ -1486,4 +1463,525 @@ map.on("click", async (e) => {
   }
 });
 
-// //////////////////////////////////
+// ======================================== COMPARAISON ========================
+function buildCompareBars(layerName, valueA, valueB) {
+  const legend = LAYER_LEGENDS[layerName];
+  const thresholds = LAYER_THRESHOLDS[layerName];
+
+  if (!legend || !thresholds) return "";
+
+  const entries = legend.entries;
+  const segments = thresholds.length - 1;
+  const colors = entries.map((e) => e.color);
+
+  // Génération du dégradé pour la barre
+  const gradient = colors
+    .map((c, i) => `${c} ${(i / segments) * 100}% ${((i + 1) / segments) * 100}%`)
+    .join(",");
+
+  // Fonction pour calculer la position du curseur
+  const getCursorPosition = (value) => {
+    let segmentIndex = segments - 1;
+    for (let i = 0; i < segments; i++) {
+      if (value >= thresholds[i] && value < thresholds[i + 1]) {
+        segmentIndex = i;
+        break;
+      }
+    }
+
+    const min = thresholds[segmentIndex];
+    const max = thresholds[segmentIndex + 1];
+    let relative;
+    if (layerName === "cartozome:sous_indice_multibruit_orhane_2023") {
+      relative = 0.5;
+    } else if (max === Infinity) {
+      relative = 0.8;
+    } else {
+      relative = (value - min) / (max - min);
+    }
+
+    const position = (segmentIndex + relative) / segments;
+    return Math.max(0, Math.min(1, position)) * 100;
+  };
+
+  // Position des curseurs pour A et B
+  const leftA = getCursorPosition(valueA);
+  const leftB = getCursorPosition(valueB);
+
+  // Couleur des curseurs
+  const cursorColorA = getLayerValueColor(layerName, valueA);
+  const cursorColorB = getLayerValueColor(layerName, valueB);
+
+  // Tick OMS (si applicable)
+  let tickHTML = "";
+  const omsValue = OMS_THRESHOLDS[layerName];
+  if (omsValue !== undefined) {
+    let tickSegment = segments - 1;
+    for (let i = 0; i < segments; i++) {
+      if (omsValue >= thresholds[i] && omsValue < thresholds[i + 1]) {
+        tickSegment = i;
+        break;
+      }
+    }
+    const tmin = thresholds[tickSegment];
+    const tmax = thresholds[tickSegment + 1];
+    let trel = tmax === Infinity ? 0.8 : (omsValue - tmin) / (tmax - tmin);
+    const tpos = (tickSegment + trel) / segments;
+    const tickLeft = Math.max(0, Math.min(1, tpos)) * 100;
+
+    tickHTML = `
+      <div style="
+        position:absolute;
+        left:${tickLeft}%;
+        top:-3px;
+        transform:translateX(-50%);
+        text-align:center;
+        pointer-events:none;
+      ">
+        <div style="
+          width:2px;
+          height:16px;
+          background:black;
+          margin:auto;
+          position:relative;
+        ">
+          <div style="
+            position:absolute;
+            bottom:100%;
+            left:50%;
+            transform:translateX(-50%);
+            font-size:9px;
+            color:#333;
+            white-space:nowrap;
+            margin-bottom:2px;
+          ">
+            Seuil OMS
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  return `
+    <div style="margin-top:6px;position:relative">
+      <div style="
+        height:10px;
+        border-radius:6px;
+        background:linear-gradient(to right,${gradient});
+        position:relative;
+        margin-bottom:4px;
+      ">
+        ${tickHTML}
+        <div style="
+          position:absolute;
+          left:${leftA}%;
+          top:-4px;
+          width:14px;
+          height:14px;
+          border-radius:50%;
+          border:2px solid white;
+          background:${cursorColorA};
+          transform:translateX(-50%);
+          box-shadow:0 0 3px rgba(0,0,0,0.4);
+        "></div>
+      </div>
+      <div style="
+        height:10px;
+        border-radius:6px;
+        background:linear-gradient(to right,${gradient});
+        position:relative;
+      ">
+        ${tickHTML}
+        <div style="
+          position:absolute;
+          left:${leftB}%;
+          top:-4px;
+          width:14px;
+          height:14px;
+          border-radius:50%;
+          border:2px solid white;
+          background:${cursorColorB};
+          transform:translateX(-50%);
+          box-shadow:0 0 3px rgba(0,0,0,0.4);
+        "></div>
+      </div>
+    </div>
+  `;
+}
+
+function renderCompareResultsPanel(addressA, addressB, layerValuesA, layerValuesB, uvValueA, uvValueB) {
+  const content = document.getElementById("results-content");
+  document.getElementById("results-address").textContent = `Comparaison: ${addressA} vs ${addressB}`;
+
+  let html = "";
+
+  for (const cat of RESULT_CATEGORIES) {
+    html += `
+      <div class="cat-card">
+        <div class="cat-header">
+          ${cat.icon} ${cat.label}
+        </div>
+        <div class="cat-body">
+    `;
+
+    for (const layerName of cat.layers) {
+      const meta = LAYER_META[layerName];
+      const valueA = layerValuesA[layerName];
+      const valueB = layerValuesB[layerName];
+
+      html += `<div class="res-row">`;
+      html += `
+        <div class="res-top">
+          <span class="res-label">${meta.label}</span>
+      `;
+
+      if (valueA === null || isNaN(valueA) || valueB === null || isNaN(valueB)) {
+        html += `<span class="res-value no-data">Non disponible</span>`;
+      } else {
+        html += `
+          <span class="res-value">
+            Point A: ${valueA.toFixed(1)} ${meta.unit}<br>
+            Point B: ${valueB.toFixed(1)} ${meta.unit}
+          </span>
+        `;
+      }
+
+      html += `</div>`;
+
+      if (valueA !== null && !isNaN(valueA) && valueB !== null && !isNaN(valueB)) {
+        html += buildCompareBars(layerName, valueA, valueB);
+      }
+
+      html += `</div>`;
+    }
+
+    html += `
+        </div>
+      </div>
+    `;
+  }
+
+  // Ajoutez la section UV si nécessaire
+  if (uvValueA !== null && uvValueB !== null) {
+    html += `
+      <div class="cat-card">
+        <div class="cat-header">
+          <img src="./img/uv.png" style="width:16px;height:16px;vertical-align:middle">
+          UV
+        </div>
+        <div class="cat-body">
+          <div class="res-row">
+            <div class="res-top">
+              <span class="res-label">Indice UV</span>
+              <span class="res-value">
+                Point A: ${uvValueA}<br>
+                Point B: ${uvValueB}
+              </span>
+            </div>
+            ${buildCompareBars("uvLayer", uvValueA, uvValueB)}
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  content.innerHTML = html;
+}
+
+async function updateResultsForCompare(latA, lonA, addressA, latB, lonB, addressB) {
+  let dataA = {};
+  let dataB = {};
+
+  try {
+    const resA = await fetch("http://localhost:8000/indicateursPoint", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ latitude: latA, longitude: lonA }),
+    });
+    dataA = await resA.json();
+
+    const resB = await fetch("http://localhost:8000/indicateursPoint", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ latitude: latB, longitude: lonB }),
+    });
+    dataB = await resB.json();
+  } catch (err) {
+    console.error("API indicateurs erreur", err);
+  }
+
+  const layerValuesA = {
+    "cartozome:mod_aura_2024_pm10_moyan": parseFloat(dataA.PM10) || null,
+    "cartozome:mod_aura_2024_pm25_moyan": parseFloat(dataA["PM2.5"]) || null,
+    "cartozome:mod_aura_2024_no2_moyan": parseFloat(dataA.NO2) || null,
+    "cartozome:mod_aura_2024_o3_nbjdep120": parseFloat(dataA.O3) || null,
+    "cartozome:Ambroisie_2024_AURA": parseFloat(dataA.Ambroisie) || null,
+    "cartozome:sous_indice_multibruit_orhane_2023": parseFloat(dataA.Bruit) || null,
+  };
+
+  const layerValuesB = {
+    "cartozome:mod_aura_2024_pm10_moyan": parseFloat(dataB.PM10) || null,
+    "cartozome:mod_aura_2024_pm25_moyan": parseFloat(dataB["PM2.5"]) || null,
+    "cartozome:mod_aura_2024_no2_moyan": parseFloat(dataB.NO2) || null,
+    "cartozome:mod_aura_2024_o3_nbjdep120": parseFloat(dataB.O3) || null,
+    "cartozome:Ambroisie_2024_AURA": parseFloat(dataB.Ambroisie) || null,
+    "cartozome:sous_indice_multibruit_orhane_2023": parseFloat(dataB.Bruit) || null,
+  };
+
+  const uvValueA = dataA.UV !== undefined && dataA.UV !== null ? parseFloat(dataA.UV) : null;
+  const uvValueB = dataB.UV !== undefined && dataB.UV !== null ? parseFloat(dataB.UV) : null;
+
+  renderCompareResultsPanel(addressA, addressB, layerValuesA, layerValuesB, uvValueA, uvValueB);
+}
+
+document.getElementById("calc-compare-btn").addEventListener("click", async () => {
+  routingLayer.clearLayers();
+
+  const inputA = document.getElementById("compare-a").value.trim();
+  const inputB = document.getElementById("compare-b").value.trim();
+  if (!inputA) { alert("Veuillez saisir le Point A"); return; }
+  if (!inputB) { alert("Veuillez saisir le Point B"); return; }
+
+  const coordsA = await geocodeAddress(inputA);
+  if (!coordsA) { alert("Point A introuvable"); return; }
+
+  const coordsB = await geocodeAddress(inputB);
+  if (!coordsB) { alert("Point B introuvable"); return; }
+
+  const latLngA = L.latLng(coordsA[1], coordsA[0]);
+  const latLngB = L.latLng(coordsB[1], coordsB[0]);
+
+  L.marker(latLngA, { icon: iconCompareA }).addTo(routingLayer).bindPopup("Point A");
+  L.marker(latLngB, { icon: iconCompareB }).addTo(routingLayer).bindPopup("Point B");
+
+  // Centre la vue pour afficher les deux points
+  const bounds = L.latLngBounds([latLngA, latLngB]);
+  map.fitBounds(bounds, { padding: [80, 80] });
+
+  openResultsPanel();
+  updateResultsForCompare(coordsA[1], coordsA[0], inputA, coordsB[1], coordsB[0], inputB);
+});
+
+// ======================================== ITINERAIRE ========================
+function buildSegmentedRouteBar(layerName, values) {
+  const legend = LAYER_LEGENDS[layerName];
+  const thresholds = LAYER_THRESHOLDS[layerName];
+
+  if (!legend || !thresholds || !values || values.length === 0) {
+    return "";
+  }
+
+  // Calcul de la largeur de chaque segment (25 segments = 4% chacun)
+  const segmentWidth = 100 / values.length;
+
+  // Génération des segments
+  const segments = values.map((value, index) => {
+    const color = getLayerValueColor(layerName, value);
+    const left = index * segmentWidth;
+    return `
+      <div style="
+        position: absolute;
+        left: ${left}%;
+        width: ${segmentWidth}%;
+        height: 10px;
+        background-color: ${color};
+        
+        box-sizing: border-box;
+      "></div>
+    `;
+  }).join("");
+
+  // Ajout du tick OMS si applicable
+  let tickHTML = "";
+  const omsValue = OMS_THRESHOLDS[layerName];
+  if (omsValue !== undefined) {
+    // Trouver la position du seuil OMS dans la barre
+    let omsPosition = 0;
+    for (let i = 0; i < thresholds.length - 1; i++) {
+      if (omsValue >= thresholds[i] && omsValue < thresholds[i + 1]) {
+        omsPosition = (i + (omsValue - thresholds[i]) / (thresholds[i + 1] - thresholds[i])) / (thresholds.length - 1);
+        break;
+      }
+    }
+    const omsLeft = omsPosition * 100;
+    
+  }
+
+  return `
+    <div style="margin-top: 6px; position: relative; height: 10px; width: 100%; border-radius: 4px; overflow: hidden;">
+      ${segments}
+      ${tickHTML}
+    </div>
+  `;
+}
+
+function colorRouteByPollutant(pollutant) {
+  if (!window.routeExposures) return;
+
+  const { points, data } = window.routeExposures;
+
+  // Déterminez la couche correspondante au polluant
+  const layerMap = {
+    PM10: "cartozome:mod_aura_2024_pm10_moyan",
+    "PM2.5": "cartozome:mod_aura_2024_pm25_moyan",
+    NO2: "cartozome:mod_aura_2024_no2_moyan",
+    O3: "cartozome:mod_aura_2024_o3_nbjdep120",
+    Ambroisie: "cartozome:Ambroisie_2024_AURA",
+    Bruit: "cartozome:sous_indice_multibruit_orhane_2023",
+    UV: "uvLayer",
+  };
+
+  const layerName = layerMap[pollutant];
+  if (!layerName) return;
+
+  // Récupérez les valeurs du polluant
+  const values = data.map((exp) => {
+    if (pollutant === "UV") return parseFloat(exp.UV);
+    if (pollutant === "PM2.5") return parseFloat(exp["PM2.5"]);
+    return parseFloat(exp[pollutant]);
+  });
+
+  // Créez un tableau de couleurs pour chaque segment
+  const colors = values.map((value) => getLayerValueColor(layerName, value));
+
+  // Effacez l'itinéraire actuel
+  routingLayer.eachLayer((layer) => {
+    if (layer instanceof L.Polyline) {
+      routingLayer.removeLayer(layer);
+    }
+  });
+
+  // Créez un tableau de LatLngs avec des segments colorés
+  const segments = [];
+  for (let i = 0; i < points.length - 1; i++) {
+    segments.push({
+      latlngs: [points[i], points[i + 1]],
+      color: colors[i],
+    });
+  }
+
+  // Ajoutez les segments colorés
+  segments.forEach((segment) => {
+    L.polyline(segment.latlngs, {
+      color: segment.color,
+      weight: 4,
+      opacity: 1,
+    }).addTo(routingLayer);
+  });
+}
+
+function renderRouteResultsPanel(startAddress, endAddress, exposures) {
+  const content = document.getElementById("results-content");
+  document.getElementById("results-address").textContent = `Itinéraire: ${startAddress} → ${endAddress}`;
+
+  let html = `
+    <div class="pollutant-checkboxes">
+      <label><input type="checkbox" data-pollutant="PM10" class="pollutant-checkbox"> PM10</label>
+      <label><input type="checkbox" data-pollutant="PM2.5" class="pollutant-checkbox"> PM2.5</label>
+      <label><input type="checkbox" data-pollutant="NO2" class="pollutant-checkbox"> NO₂</label>
+      <label><input type="checkbox" data-pollutant="O3" class="pollutant-checkbox"> O₃</label>
+      <label><input type="checkbox" data-pollutant="Ambroisie" class="pollutant-checkbox"> Ambroisie</label>
+      <label><input type="checkbox" data-pollutant="Bruit" class="pollutant-checkbox"> Bruit</label>
+      <label><input type="checkbox" data-pollutant="UV" class="pollutant-checkbox"> UV</label>
+    </div>
+  `;
+
+  // Préparation des données par catégorie
+  const routeValues = {
+    "cartozome:mod_aura_2024_pm10_moyan": exposures.map((exp) => parseFloat(exp.PM10) || null),
+    "cartozome:mod_aura_2024_pm25_moyan": exposures.map((exp) => parseFloat(exp["PM2.5"]) || null),
+    "cartozome:mod_aura_2024_no2_moyan": exposures.map((exp) => parseFloat(exp.NO2) || null),
+    "cartozome:mod_aura_2024_o3_nbjdep120": exposures.map((exp) => parseFloat(exp.O3) || null),
+    "cartozome:Ambroisie_2024_AURA": exposures.map((exp) => parseFloat(exp.Ambroisie) || null),
+    "cartozome:sous_indice_multibruit_orhane_2023": exposures.map((exp) => parseFloat(exp.Bruit) || null),
+  };
+
+  // Section UV
+  const uvValues = exposures.map((exp) => parseFloat(exp.UV) || null);
+
+  // Ajoutez le reste du contenu du panel de résultats
+  for (const cat of RESULT_CATEGORIES) {
+    html += `
+      <div class="cat-card">
+        <div class="cat-header">
+          ${cat.icon} ${cat.label}
+        </div>
+        <div class="cat-body">
+    `;
+
+    for (const layerName of cat.layers) {
+      const meta = LAYER_META[layerName];
+      const values = routeValues[layerName];
+
+      html += `<div class="res-row">`;
+      html += `
+        <div class="res-top">
+          <span class="res-label">${meta.label}</span>
+        </div>
+      `;
+
+      if (!values || values.some((val) => val === null || isNaN(val))) {
+        html += `<span class="res-value no-data">Non disponible</span>`;
+      } else {
+        html += buildSegmentedRouteBar(layerName, values);
+      }
+
+      html += `</div>`;
+    }
+
+    html += `
+        </div>
+      </div>
+    `;
+  }
+
+  // Ajout de la section UV
+  if (uvValues && uvValues.length > 0) {
+    html += `
+      <div class="cat-card">
+        <div class="cat-header">
+          <img src="./img/uv.png" style="width:16px;height:16px;vertical-align:middle">
+          UV
+        </div>
+        <div class="cat-body">
+          <div class="res-row">
+            <div class="res-top">
+              <span class="res-label">Indice UV</span>
+            </div>
+            ${buildSegmentedRouteBar("uvLayer", uvValues)}
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  content.innerHTML = html;
+
+  // Ajoutez l'écouteur d'événement pour les checkboxes après avoir mis à jour le contenu
+  document.querySelectorAll(".pollutant-checkbox").forEach((checkbox) => {
+    checkbox.addEventListener("change", function () {
+      // Décochez toutes les autres checkboxes
+      document.querySelectorAll(".pollutant-checkbox").forEach((otherCheckbox) => {
+        if (otherCheckbox !== this) {
+          otherCheckbox.checked = false;
+        }
+      });
+
+      if (this.checked) {
+        const pollutant = this.getAttribute("data-pollutant");
+        colorRouteByPollutant(pollutant);
+      } else {
+        // Si aucune checkbox n'est cochée, réaffichez l'itinéraire par défaut
+        if (window.routeExposures) {
+          routingLayer.eachLayer((layer) => {
+            if (layer instanceof L.Polyline) {
+              routingLayer.removeLayer(layer);
+            }
+          });
+          const latLngs = window.routeExposures.latLngs;
+          L.polyline(latLngs, { color: "#1A4E72", weight: 4, opacity: 1 }).addTo(routingLayer);
+        }
+      }
+    });
+  });
+}
