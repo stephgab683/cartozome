@@ -1000,6 +1000,42 @@ html, body {
     margin: 10px;
 }
 
+/* ========================================================================================= */
+/* SÉLECTEUR DE MODE DE TRANSPORT — Affiché dans le panel itinéraire                       */
+/* ========================================================================================= */
+#transport-selector {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 10px;
+    background: white;
+    border-radius: 20px;
+    padding: 4px;
+}
+
+.transport-btn {
+    flex: 1;
+    height: 32px;
+    border-radius: 16px;
+    border: none;
+    background: transparent;
+    color: #2c426c;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s, color 0.15s;
+}
+
+.transport-btn:hover:not(.active) {
+    background: #fff0f6;
+    color: #e71d73;
+}
+
+.transport-btn.active {
+    background: #2c426c;
+    color: white;
+}
+
 /* =============================================
     PANEL DE RÉSULTATS - BOUTON PARTAGER
     ============================================= */
