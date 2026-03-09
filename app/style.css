@@ -259,6 +259,7 @@ html, body {
 /* Champs de saisie d'adresse — style pill, bordure fine qui passe en bleu au focus        */
 #search-panel input {
     width: 100%;
+    min-width: 0;
     padding: 10px 16px;
     margin-bottom: 8px;
     border-radius: 24px;
@@ -275,7 +276,7 @@ html, body {
 
 /* Bouton Valider — pleine largeur, fond bleu, majuscule. :not(.geolocate-btn) pour ne pas */
 /* affecter le bouton GPS qui est aussi dans #search-panel                                  */
-#search-panel button:not(.geolocate-btn) {
+#search-panel button:not(.geolocate-btn):not(.clear-btn) {
     width: 100%;
     padding: 10px;
     background-color: #2c426c;
@@ -292,7 +293,7 @@ html, body {
 }
 
 /* Hover rose CLB sur le bouton Valider                                                     */
-#search-panel button:not(.geolocate-btn):hover { background-color: #e71d73; }
+#search-panel button:not(.geolocate-btn):not(.clear-btn):hover { background-color: #e71d73; }
 
 /* ========================================================================================= */
 /* BOUTON GÉOLOCALISATION                                                                    */
@@ -328,6 +329,34 @@ html, body {
 }
 
 .geolocate-btn:hover { border-color: #e71d73; color: #e71d73; background: #fff0f6; }
+
+/* =============================================
+    BOUTON EFFACER
+    Même gabarit que le bouton géolocalisation,
+    positionné juste à sa droite dans search-row.
+    Vide le champ de saisie au clic.
+    ============================================= */
+.clear-btn {
+    width: 36px !important;
+    height: 36px !important;
+    border-radius: 50% !important;
+    border: 1.5px solid #e0e0e0;
+    background: white;
+    color: #2c426c;
+    cursor: pointer;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0 !important;
+    transition: border-color 0.2s, color 0.2s, background 0.2s;
+}
+
+.clear-btn:hover {
+    border-color: #e71d73;
+    color: #e71d73;
+    background: #fff0f6;
+}
 
 /* ========================================================================================= */
 /* AUTOCOMPLÉTION — Liste déroulante absolue affichée sous le champ de saisie pendant la    */
