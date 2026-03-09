@@ -4,24 +4,28 @@ from pydantic import BaseModel
 import httpx
 from pyproj import Transformer
 import asyncio
-from shapely.geometry import shape
+import json
+import math
+from pathlib import Path
 
 app = FastAPI()
 
-# ======== Autoriser le front ========
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://localhost","http://localhost:80","http://127.0.0.1"], 
+    allow_origins=[
+        "http://localhost:5173",
+        "http://localhost",
+        "http://localhost:80",
+        "http://127.0.0.1"
+    ],
     allow_methods=["*"],
     allow_headers=["*"],
     allow_credentials=True
 )
 
-
-# ======== Constantes ========
-WMS_URL = "http://localhost:8081/geoserver/cartozome/ows"
-UV_URL = "https://api.open-meteo.com/v1/forecast"
-WFS_COMMUNES_URL = "https://data.grandlyon.com/geoserver/metropole-de-lyon/ows"
+WMS_URL = "http://geoserver:8080/geoserver/cartozome/ows"
+DATA_DIR = Path("/app/DATA_API")
+UV_POINTS_FILE = DATA_DIR / "openmeteo_uv_meteofrance_enriched.json"
 
 WMS_LAYERS = {
     "Ambroisie": "cartozome:Ambroisie_2024_AURA",
@@ -32,26 +36,66 @@ WMS_LAYERS = {
     "Bruit": "cartozome:sous_indice_multibruit_orhane_2023"
 }
 
-
-
-# Conversion WGS84 -> Lambert 93
 transformer = Transformer.from_crs("EPSG:4326", "EPSG:2154", always_xy=True)
+
 
 class Coord(BaseModel):
     latitude: float
     longitude: float
 
+
 class CoordList(BaseModel):
     coords: list[Coord]
 
-# ======== fonction WMS/UV pour un point ========
-async def fetch_point_data(client, lat, lon):
-    # bbox autour du point
+
+def load_uv_points():
+    if not UV_POINTS_FILE.exists():
+        return []
+
+    try:
+        with UV_POINTS_FILE.open("r", encoding="utf-8") as f:
+            data = json.load(f)
+        return data if isinstance(data, list) else []
+    except Exception:
+        return []
+
+
+def get_uv_value_from_point_record(record):
+    daily = record.get("daily", {})
+    values = daily.get("uv_index_max", [])
+    if not values:
+        return None
+    value = values[0]
+    return float(value) if isinstance(value, (int, float)) else None
+
+
+def find_nearest_uv(lat, lon, uv_points):
+    best_uv = None
+    best_dist = None
+
+    for p in uv_points:
+        plat = p.get("latitude")
+        plon = p.get("longitude")
+        if not isinstance(plat, (int, float)) or not isinstance(plon, (int, float)):
+            continue
+
+        uv = get_uv_value_from_point_record(p)
+        if uv is None:
+            continue
+
+        dist = math.hypot(lat - plat, lon - plon)
+        if best_dist is None or dist < best_dist:
+            best_dist = dist
+            best_uv = uv
+
+    return best_uv
+
+
+async def fetch_point_data(client, lat, lon, uv_points):
     x, y = transformer.transform(lon, lat)
     delta = 5
     bbox = f"{x-delta},{y-delta},{x+delta},{y+delta}"
 
-    # WMS en parallèle
     async def fetch_wms(layer):
         params = {
             "service": "WMS",
@@ -68,109 +112,57 @@ async def fetch_point_data(client, lat, lon):
             "x": 50,
             "y": 50
         }
-        r = await client.get(WMS_URL, params=params)
-        data = r.json()
-        if "features" in data and len(data["features"]) > 0:
-            return data["features"][0]["properties"].get("GRAY_INDEX")
+
+        try:
+            r = await client.get(WMS_URL, params=params)
+            r.raise_for_status()
+            data = r.json()
+            if "features" in data and len(data["features"]) > 0:
+                return data["features"][0]["properties"].get("GRAY_INDEX")
+        except Exception:
+            return None
+
         return None
 
     wms_tasks = [fetch_wms(layer) for layer in WMS_LAYERS.values()]
     wms_values = await asyncio.gather(*wms_tasks)
 
-    # UV
-    try:
-        r = await client.get(UV_URL, params={"latitude": lat, "longitude": lon, "current": "uv_index"})
-        uv_value = r.json().get("current", {}).get("uv_index")
-    except:
-        uv_value = None
+    uv_value = find_nearest_uv(lat, lon, uv_points)
 
     result = {key: value for key, value in zip(WMS_LAYERS.keys(), wms_values)}
     result["UV"] = uv_value
     return result
 
-# ======== endpoint optimisé pour liste de points ========
+
 @app.post("/indicateursItineraire")
 async def get_itineraire_data(coord_list: CoordList):
+    uv_points = load_uv_points()
+
     async with httpx.AsyncClient(timeout=30) as client:
-        # toutes les requêtes en parallèle
-        tasks = [fetch_point_data(client, c.latitude, c.longitude) for c in coord_list.coords]
+        tasks = [
+            fetch_point_data(client, c.latitude, c.longitude, uv_points)
+            for c in coord_list.coords
+        ]
         results = await asyncio.gather(*tasks)
+
     return results
+
 
 @app.post("/indicateursPoint")
 async def get_point_data(coord: Coord):
+    uv_points = load_uv_points()
+
     async with httpx.AsyncClient(timeout=10) as client:
-        data = await fetch_point_data(client, coord.latitude, coord.longitude)
+        data = await fetch_point_data(client, coord.latitude, coord.longitude, uv_points)
+
     return data
 
 
-
-
-
-# ======== fonction pour afficher les données des UV ========
-
-# -------- récupération des communes --------
-async def fetch_communes():
-    params = {
-        "SERVICE": "WFS",
-        "VERSION": "2.0.0",
-        "REQUEST": "GetFeature",
-        "TYPENAME": "metropole-de-lyon:adr_voie_lieu.adrcomgl_2024",
-        "OUTPUTFORMAT": "application/json",
-        "SRSNAME": "EPSG:4326",
-        "startIndex": 0,
-        "count": 100
-    }
-
-    async with httpx.AsyncClient(timeout=30) as client:
-        r = await client.get(WFS_COMMUNES_URL, params=params)
-        r.raise_for_status()
-        return r.json()
-
-# -------- récupération UV avec retry --------
-async def get_uv(client, lat, lon, retries=3):
-    for _ in range(retries):
-        try:
-            r = await client.get(
-                UV_URL,
-                params={
-                    "latitude": lat,
-                    "longitude": lon,
-                    "current": "uv_index"
-                }
-            )
-            if r.status_code == 200:
-                uv = r.json().get("current", {}).get("uv_index")
-                if uv is not None:
-                    return uv
-        except Exception:
-            pass
-        await asyncio.sleep(0.5)
-    return None
-
-
-# -------- enrichissement des communes --------
-async def enrich_with_uv(communes_geojson):
-    async with httpx.AsyncClient(timeout=30) as client:
-        tasks = []
-
-        for feature in communes_geojson["features"]:
-            geom = shape(feature["geometry"])
-            lat, lon = geom.centroid.y, geom.centroid.x
-            tasks.append(get_uv(client, lat, lon))
-
-        uv_values = await asyncio.gather(*tasks)
-
-        for feature, uv in zip(communes_geojson["features"], uv_values):
-            feature["properties"]["uv"] = uv
-
-    return communes_geojson
-
-# -------- endpoint API --------
 @app.get("/uvCommunes")
 async def uv_communes():
+    geojson_file = DATA_DIR / "communes_uv.geojson"
+    if not geojson_file.exists():
+        return {"type": "FeatureCollection", "features": []}
 
-    communes = await fetch_communes()
-    communes_uv = await enrich_with_uv(communes)
-
-    return communes_uv
+    with geojson_file.open("r", encoding="utf-8") as f:
+        return json.load(f)

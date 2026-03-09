@@ -42,32 +42,47 @@ let uvLayer = null; // variable globale pour la couche UV
 
 // Fonction pour récupérer les données UV et créer la couche GeoJSON
 async function loadUvLayer() {
-  const res = await fetch("http://localhost:8000/uvCommunes");
+  const res = await fetch("/data/communes_uv.geojson");
+  if (!res.ok) {
+    throw new Error(`Erreur chargement UV : HTTP ${res.status}`);
+  }
+
   const communesGeojson = await res.json();
 
   uvLayer = L.geoJSON(communesGeojson, {
     style: feature => {
-      const uv = feature.properties.uv;
+      const uv = feature.properties.uv_max;
       return {
-        fillColor: getColor(uv), // ta fonction pour définir la couleur selon l'UV
+        fillColor: getColor(uv),
         weight: 1,
         color: "#555",
         fillOpacity: 0.7
       };
     },
     onEachFeature: (feature, layer) => {
-      layer.bindPopup(`Commune: ${feature.properties.nom}<br>UV: ${feature.properties.uv}`);
+      const uv = feature.properties.uv_max;
+      const nom =
+        feature.properties.nom ||
+        feature.properties.nom_commune ||
+        feature.properties.libelle ||
+        "Commune";
+
+      layer.bindPopup(`Commune : ${nom}<br>UV : ${uv ?? "n/a"}`);
     }
   });
 }
 
 // Charger la couche au démarrage
 (async () => {
-  await loadUvLayer();
+  try {
+    await loadUvLayer();
 
-  const uvCheckbox = document.querySelector('.layer-checkbox[data-layer="uvLayer"]');
-  if (uvCheckbox && uvCheckbox.checked && uvLayer) {
-    map.addLayer(uvLayer);
+    const uvCheckbox = document.querySelector('.layer-checkbox[data-layer="uvLayer"]');
+    if (uvCheckbox && uvCheckbox.checked && uvLayer) {
+      map.addLayer(uvLayer);
+    }
+  } catch (err) {
+    console.error("[UV LOAD ERROR]", err);
   }
 })();
 
@@ -528,8 +543,12 @@ document.querySelectorAll('.layer-checkbox').forEach(checkbox => {
       });
 
       // Initialise la couche si pas encore en cache
-      if (!layerInstances[layerName]) layerInstances[layerName] = await initLayer(layerName, isWFS);
-      map.addLayer(layerInstances[layerName]);
+      if (!layerInstances[layerName]) {
+        layerInstances[layerName] = await initLayer(layerName, isWFS);
+      }
+      if (layerInstances[layerName]) {
+        map.addLayer(layerInstances[layerName]);
+      }      
 
       // Affiche la légende
       updateLegend(layerName);
