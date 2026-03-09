@@ -702,6 +702,20 @@ function setRouteMode() {
   resultsPanel.classList.add("hidden");
 }
 
+// Branche les boutons "effacer" sur chaque champ de saisie.
+// Au clic : vide le champ et remet le focus dessus.
+function attachClearButtons() {
+  document.querySelectorAll('.clear-btn').forEach(btn => {
+    const targetId = btn.dataset.target;
+    const inputEl  = document.getElementById(targetId);
+    if (!inputEl) return;
+    btn.addEventListener('click', () => {
+      inputEl.value = '';
+      inputEl.focus();
+    });
+  });
+}
+
 // Branche les boutons de géolocalisation sur chaque champ.
 // Au clic : récupère la position GPS et remplit le champ via reverse géocodage
 function attachGeolocate() {
@@ -899,6 +913,7 @@ function attachAutocomplete(inputId) {
 // Initialisation au chargement
 setAddressMode();
 attachGeolocate();
+attachClearButtons();
 attachAutocomplete('point-start');
 attachAutocomplete('compare-a');
 attachAutocomplete('compare-b');
