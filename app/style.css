@@ -1000,6 +1000,47 @@ html, body {
     margin: 10px;
 }
 
+/* =============================================
+    PANEL DE RÉSULTATS - BOUTON PARTAGER
+    ============================================= */
+.results-actions {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+}
+
+.action-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: 20px;
+    border: 1.5px solid #1A4E72;
+    background: white;
+    color: #1A4E72;
+    font-family: 'Jost', sans-serif;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+}
+
+.action-btn:hover {
+    background: #1A4E72;
+    color: white;
+}
+
+.action-btn svg {
+    flex-shrink: 0;
+    transition: stroke 0.15s;
+}
+
+.action-btn:hover svg {
+    stroke: white;
+}
+
 /* ========================================================================================= */
 /* PANEL DE RÉSULTATS — CONTENU                                                             */
 /* ========================================================================================= */
