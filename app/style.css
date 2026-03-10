@@ -1036,6 +1036,13 @@ html, body {
     color: white;
 }
 
+.transport-btn:disabled,
+.transport-btn.disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
 /* =============================================
     PANEL DE RÉSULTATS - BOUTON PARTAGER
     ============================================= */
