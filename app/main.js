@@ -1454,6 +1454,106 @@ async function updateResultsForPoint(lat,lon,address){
 }
 
 // =============================================
+// BOUTON 'TELECHARGER EN PDF' - IMPRESSION / EXPORT PDF
+// =============================================
+document.getElementById("btn-share").addEventListener("click", async () => {
+  const panel   = document.getElementById("results-panel");
+  const content = document.getElementById("results-content");
+  const header  = document.getElementById("results-header");
+
+  // Sauvegarde les styles contraignants
+  const savedPanelMaxHeight   = panel.style.maxHeight;
+  const savedPanelOverflow    = panel.style.overflow;
+  const savedContentMaxHeight = content.style.maxHeight;
+  const savedContentOverflow  = content.style.overflow;
+  const savedHeaderDisplay    = header.style.display;
+
+  // Retire temporairement les limites de hauteur
+  panel.style.maxHeight   = "none";
+  panel.style.overflow    = "visible";
+  content.style.maxHeight = "none";
+  content.style.overflow  = "visible";
+
+  // Cache le header (bouton partager + croix) du PDF
+  header.style.display = "none";
+
+  // Laisse le navigateur recalculer le layout
+  await new Promise(r => setTimeout(r, 100));
+
+  const canvas = await html2canvas(panel, {
+    scale: 2,
+    useCORS: true,
+    backgroundColor: "#ffffff",
+    scrollY: 0,
+    windowWidth:  panel.scrollWidth,
+    windowHeight: panel.scrollHeight,
+    height:       panel.scrollHeight,
+    width:        panel.scrollWidth,
+  });
+
+  // Remet les styles d'origine
+  panel.style.maxHeight   = savedPanelMaxHeight;
+  panel.style.overflow    = savedPanelOverflow;
+  content.style.maxHeight = savedContentMaxHeight;
+  content.style.overflow  = savedContentOverflow;
+  header.style.display    = savedHeaderDisplay;
+
+  const imgData = canvas.toDataURL("image/png");
+
+  // Détecte le mode actif et construit le titre
+  let address = "Résultats Cartozome";
+
+  if (document.getElementById("btn-address").classList.contains("active")) {
+    const val = document.getElementById("point-start").value.trim();
+    if (val) address = val;
+
+  } else if (document.getElementById("btn-compare").classList.contains("active")) {
+    const a = document.getElementById("compare-a").value.trim();
+    const b = document.getElementById("compare-b").value.trim();
+    if (a && b) address = `${a}  VS  ${b}`;
+    else if (a) address = a;
+
+  } else if (document.getElementById("btn-route").classList.contains("active")) {
+    const start = document.getElementById("route-start").value.trim();
+    const end   = document.getElementById("route-end").value.trim();
+    if (start && end) address = `${start}  VERS  ${end}`;
+    else if (start) address = start;
+  }
+
+  const { jsPDF } = window.jspdf;
+  const margin   = 15;
+  const imgScale = 0.6;
+  const imgWidth  = (210 - margin * 2) * imgScale;
+  const imgHeight = (canvas.height * imgWidth) / canvas.width;
+  const imgLeft   = (210 - imgWidth) / 2;
+
+  // PDF temporaire pour calculer la hauteur du titre
+  const pdfTemp = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+  pdfTemp.setFont("helvetica", "bold");
+  pdfTemp.setFontSize(12);
+  const lines       = pdfTemp.splitTextToSize(address, 210 - margin * 2);
+  const titleHeight = lines.length * 6 + 4;
+
+  // PDF final avec hauteur exacte
+  const pdf = new jsPDF({
+    orientation: "portrait",
+    unit: "mm",
+    format: [210, imgHeight + margin * 2 + titleHeight],
+  });
+
+  // Titre
+  pdf.setFont("helvetica", "bold");
+  pdf.setFontSize(8);
+  pdf.setTextColor(44, 66, 108);
+  pdf.text(lines, margin, margin + 6);
+
+  // Image centrée sous le titre
+  pdf.addImage(imgData, "PNG", imgLeft, margin + titleHeight, imgWidth, imgHeight);
+
+  pdf.save("cartozome-resultats.pdf");
+});
+
+// =============================================
 // CLIC SUR LA CARTE -> POPUP INDICATEURS
 // =============================================
 map.on("click", async (e) => {

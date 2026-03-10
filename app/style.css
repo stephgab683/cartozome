@@ -1044,7 +1044,7 @@ html, body {
 }
 
 /* =============================================
-    PANEL DE RÉSULTATS - BOUTON PARTAGER
+    PANEL DE RÉSULTATS - BOUTON 'TELECHARGE EN PDF'
     ============================================= */
 #results-address {
     display: none;
@@ -1091,6 +1091,36 @@ html, body {
     color: #e71d73;
     background: #fff0f6;
 }
+
+/* ========================================================================================= */
+/* IMPRESSION / EXPORT PDF                                                                   */
+/* ========================================================================================= */
+@media print {
+
+    /* Cache tout */
+    body * { visibility: hidden; }
+  
+    /* Affiche uniquement le panel de résultats */
+    #results-panel,
+    #results-panel * { visibility: visible; }
+  
+    /* Le positionne en haut à gauche, pleine largeur */
+    #results-panel {
+      position: absolute !important;
+      top: 0 !important;
+      left: 0 !important;
+      width: 100% !important;
+      max-height: none !important;
+      overflow: visible !important;
+      box-shadow: none !important;
+      border-radius: 0 !important;
+      animation: none !important;
+    }
+  
+    /* Cache le bouton partager et la croix dans le PDF */
+    #btn-share,
+    #results-close { display: none !important; }
+  }
 
 /* ========================================================================================= */
 /* PANEL DE RÉSULTATS — CONTENU                                                             */
