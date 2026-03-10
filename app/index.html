@@ -87,6 +87,13 @@
   <body>
 
     <!-- ========================================================================================= -->
+    <!-- PARTAGER EN PDF                                                                           -->
+    <!-- Librairies html2canvas + jsPDF                                                            -->
+    <!-- ========================================================================================= -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <!-- ========================================================================================= -->
     <!-- BANDEAU HAUT — Barre fixe en haut de page. Logo Cartozome + titre à gauche,               -->
     <!-- logo Centre Léon Bérard à droite. Hauteur fixée à 55px via flex: 0 0 55px dans le CSS.    -->
     <!-- ========================================================================================= -->
@@ -206,6 +213,40 @@
                 </svg>
               </button>
             </div>
+            <!-- Boutons Choix du mode de transport -->
+            <div id="transport-selector">
+              <!-- Bouton A pied -->
+              <button class="transport-btn active" data-mode="pedestrian" title="À pied">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="4" r="2"/>
+                  <path d="M9 20l1-6-2-3 3-4 2 3h3"/>
+                  <path d="M6 11l2-1"/>
+                  <path d="M15 20l-1-6"/>
+                </svg>
+              </button>
+              <!-- Bouton Vélo -->
+              <button class="transport-btn" data-mode="cycling" title="En vélo" disabled>
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="5" cy="16" r="3.5"/>
+                  <circle cx="19" cy="16" r="3.5"/>
+                  <path d="M5 16l5-9h3"/>
+                  <path d="M13 7l3 9"/>
+                  <path d="M11 7h5"/>
+                  <path d="M16 7l1-2"/>
+                </svg>
+              </button>
+              <!-- Bouton Transport en commun -->
+              <button class="transport-btn" data-mode="transit" title="En transports en commun" disabled>
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="4" y="3" width="16" height="14" rx="2"/>
+                  <path d="M4 11h16"/>
+                  <path d="M8 17l-2 4"/>
+                  <path d="M16 17l2 4"/>
+                  <circle cx="9" cy="7.5" r="1" fill="currentColor"/>
+                  <circle cx="15" cy="7.5" r="1" fill="currentColor"/>
+                </svg>
+              </button>
+            </div>
             <button id="calc-route-btn">Valider</button>
           </div>
 
@@ -223,8 +264,18 @@
       <!-- ========================================================================================= -->
       <div id="results-panel" class="hidden">
         <div id="results-header">
-          <div class="panel-address-title" id="results-address"></div>
-          <button id="results-close">✖</button>
+          <span id="results-address"></span>
+          <div id="results-header-actions">
+            <button class="share-btn" id="btn-share" title="Télécharger PDF">
+              <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
+                <polyline points="16 6 12 2 8 6"/>
+                <line x1="12" y1="2" x2="12" y2="15"/>
+              </svg>
+              Télécharger en PDF
+            </button>
+            <button id="results-close">✖</button>
+          </div>
         </div>
         <div id="results-content"></div>
       </div>

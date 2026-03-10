@@ -944,7 +944,7 @@ html, body {
     border-radius: 16px;
     box-shadow: 0 4px 20px rgba(0,0,0,0.15);
     z-index: 1000;
-    max-height: 60vh;
+    max-height: 52vh;
     overflow: hidden;
     display: flex;
     flex-direction: column;
@@ -1001,9 +1001,130 @@ html, body {
 }
 
 /* ========================================================================================= */
+/* SÉLECTEUR DE MODE DE TRANSPORT — Affiché dans le panel itinéraire                       */
+/* ========================================================================================= */
+#transport-selector {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 10px;
+    background: white;
+    border-radius: 20px;
+    padding: 4px;
+}
+
+.transport-btn {
+    flex: 1;
+    height: 32px;
+    border-radius: 16px;
+    border: none;
+    background: transparent;
+    color: #2c426c;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s, color 0.15s;
+}
+
+.transport-btn:hover:not(.active) {
+    background: #fff0f6;
+    color: #e71d73;
+}
+
+.transport-btn.active {
+    background: #2c426c;
+    color: white;
+}
+
+.transport-btn:disabled,
+.transport-btn.disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/* =============================================
+    PANEL DE RÉSULTATS - BOUTON 'TELECHARGE EN PDF'
+    ============================================= */
+#results-address {
+    display: none;
+}
+
+#results-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 14px 14px 10px 14px;
+    border-bottom: 1px solid #f0f0f0;
+    flex-shrink: 0;
+    gap: 8px;
+}
+
+#results-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex: 1;
+}
+
+.share-btn {
+    flex: 1;
+    padding: 8px 14px;
+    background: white;
+    color: #2c426c;
+    border: 1.5px solid #2c426c;
+    border-radius: 28px;
+    cursor: pointer;
+    font-family: 'Jost', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: border-color 0.2s, color 0.2s, background 0.2s;
+}
+
+.share-btn:hover {
+    border-color: #e71d73;
+    color: #e71d73;
+    background: #fff0f6;
+}
+
+/* ========================================================================================= */
+/* IMPRESSION / EXPORT PDF                                                                   */
+/* ========================================================================================= */
+@media print {
+
+    /* Cache tout */
+    body * { visibility: hidden; }
+  
+    /* Affiche uniquement le panel de résultats */
+    #results-panel,
+    #results-panel * { visibility: visible; }
+  
+    /* Le positionne en haut à gauche, pleine largeur */
+    #results-panel {
+      position: absolute !important;
+      top: 0 !important;
+      left: 0 !important;
+      width: 100% !important;
+      max-height: none !important;
+      overflow: visible !important;
+      box-shadow: none !important;
+      border-radius: 0 !important;
+      animation: none !important;
+    }
+  
+    /* Cache le bouton partager et la croix dans le PDF */
+    #btn-share,
+    #results-close { display: none !important; }
+  }
+
+/* ========================================================================================= */
 /* PANEL DE RÉSULTATS — CONTENU                                                             */
 /* ========================================================================================= */
-
 /* Titre gris majuscule affiché en haut du panel (adresse saisie ou "Point A / Point B")   */
 .panel-address-title {
     font-size: 0.75rem;
