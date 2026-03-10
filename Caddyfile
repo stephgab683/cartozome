@@ -1,7 +1,7 @@
 :80 {
-    handle_path /api/* {
-        uri strip_prefix /api
-        reverse_proxy api:8000
+    handle_path /cartozome_api/* {
+        uri strip_prefix /cartozome_api
+        reverse_proxy cartozome_api:8000
     }
     
     root * /srv
