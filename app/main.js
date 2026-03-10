@@ -242,7 +242,7 @@ const LAYER_LEGENDS = {
   "cartozome:mod_aura_2024_pm25_moyan": {
     unit: "µg/m³", oms: 5,
     entries: [
-      { color: '#5C85A1', label: '0'   },
+      { color: '#bd1513', label: '0'   },
       { color: '#5FB0A9', label: '3'   },
       { color: '#DEDB6D', label: '4'   },
       { color: '#D47979', label: '5'   },
@@ -255,11 +255,11 @@ const LAYER_LEGENDS = {
     unit: "µg/m³", oms: 15,
     entries: [
       { color: '#5C85A1', label: '0'    },
-      { color: '#5FB0A9', label: '8'    },
-      { color: '#DEDB6D', label: '11'   },
-      { color: '#D47979', label: '15'   },
-      { color: '#A83939', label: '16'   },
-      { color: '#BD37AC', label: '>35'  },
+      { color: '#5FB0A9', label: '10'    },
+      { color: '#DEDB6D', label: '20'   },
+      { color: '#D47979', label: '30'   },
+      { color: '#A83939', label: '40'   },
+      { color: '#BD37AC', label: '80'  },
     ]
   },
 
@@ -292,14 +292,13 @@ const LAYER_LEGENDS = {
   },
 
   "cartozome:Ambroisie_2024_AURA": {
-    unit: "grains/m³", oms: null,
+    unit: "Nb de jour avec un RAEP >3", oms: null,
     entries: [
-      { color: '#b2e8e4', label: '0'    },
-      { color: '#7ecdc2', label: '3'    },
-      { color: '#f5e96a', label: '30'   },
-      { color: '#f4846a', label: '40'   },
-      { color: '#c0392b', label: '250'  },
-      { color: '#8e44ad', label: '>500' },
+      { color: '#9ac111', label: '5'    },
+      { color: '#ecc13b', label: '15'    },
+      { color: '#ea6319', label: '25'   },
+      { color: '#ab131c', label: '35'   },
+      { color: '#491111', label: '45'  },
     ]
   },
 
