@@ -10,7 +10,7 @@ services:
     ports:
       - "8081:8080"
     volumes:
-      - ./geoserver/opt:/opt/geoserver_data
+      - ./cartozome_geoserver/opt:/opt/geoserver_data
   
   uv_fetcher:
     container_name: cartozome_uv_fetcher
@@ -22,12 +22,12 @@ services:
 
   api:
     container_name: cartozome_api
-    build: ./api
+    build: ./cartozome_api
     ports:
       - "8000:8000"
     volumes:
-      - ./api:/app
-    command: python -m uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+      - ./cartozome_api:/app
+    command: python -m uvicorn main:cartozome_app --host 0.0.0.0 --port 8000 --reload
 
   web:
     container_name: cartozome_web
@@ -36,5 +36,5 @@ services:
       - "80:80"
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile
-      - ./app/dist/:/srv
+      - ./cartozome_app/dist/:/srv
       - ./DATA_API:/srv/data:ro
