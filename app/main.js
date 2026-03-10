@@ -686,6 +686,7 @@ const searchPanel = document.getElementById("search-panel");
 
 // Affiche le panel adresse, cache les autres
 function setAddressMode() {
+  document.getElementById('point-start').value = '';
   document.getElementById('panel-address').classList.remove('hidden');
   document.getElementById('panel-compare').classList.add('hidden');
   document.getElementById('panel-route').classList.add('hidden');
@@ -698,6 +699,8 @@ function setAddressMode() {
 
 // Affiche le panel comparaison, cache les autres
 function setCompareMode() {
+  document.getElementById('compare-a').value = '';
+  document.getElementById('compare-b').value = '';
   document.getElementById('panel-compare').classList.remove('hidden');
   document.getElementById('panel-address').classList.add('hidden');
   document.getElementById('panel-route').classList.add('hidden');
@@ -710,6 +713,8 @@ function setCompareMode() {
 
 // Affiche le panel itinéraire, cache les autres
 function setRouteMode() {
+  document.getElementById('route-start').value = '';
+  document.getElementById('route-end').value = '';
   document.getElementById('panel-route').classList.remove('hidden');
   document.getElementById('panel-address').classList.add('hidden');
   document.getElementById('panel-compare').classList.add('hidden');
