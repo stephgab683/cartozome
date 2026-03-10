@@ -1,0 +1,8 @@
+fastapi
+uvicorn
+rasterio
+requests
+pyproj
+pydantic
+httpx
+Shapely
