@@ -1039,48 +1039,55 @@ html, body {
 /* =============================================
     PANEL DE RÉSULTATS - BOUTON PARTAGER
     ============================================= */
-.results-actions {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 14px;
-    flex-wrap: wrap;
+#results-address {
+    display: none;
 }
 
-.action-btn {
-    display: inline-flex;
+#results-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 14px 14px 10px 14px;
+    border-bottom: 1px solid #f0f0f0;
+    flex-shrink: 0;
+    gap: 8px;
+}
+
+#results-header-actions {
+    display: flex;
     align-items: center;
     gap: 6px;
-    padding: 6px 14px;
-    border-radius: 20px;
-    border: 1.5px solid #1A4E72;
+    flex: 1;
+}
+
+.share-btn {
+    flex: 1;
+    padding: 8px 14px;
     background: white;
-    color: #1A4E72;
-    font-family: 'Jost', sans-serif;
-    font-size: 0.78rem;
-    font-weight: 700;
-    letter-spacing: 0.04em;
+    color: #2c426c;
+    border: 1.5px solid #2c426c;
+    border-radius: 28px;
     cursor: pointer;
-    transition: background 0.15s, color 0.15s;
+    font-family: 'Jost', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: border-color 0.2s, color 0.2s, background 0.2s;
 }
 
-.action-btn:hover {
-    background: #1A4E72;
-    color: white;
-}
-
-.action-btn svg {
-    flex-shrink: 0;
-    transition: stroke 0.15s;
-}
-
-.action-btn:hover svg {
-    stroke: white;
+.share-btn:hover {
+    border-color: #e71d73;
+    color: #e71d73;
+    background: #fff0f6;
 }
 
 /* ========================================================================================= */
 /* PANEL DE RÉSULTATS — CONTENU                                                             */
 /* ========================================================================================= */
-
 /* Titre gris majuscule affiché en haut du panel (adresse saisie ou "Point A / Point B")   */
 .panel-address-title {
     font-size: 0.75rem;
