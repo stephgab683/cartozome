@@ -1034,28 +1034,15 @@ async function queryLayerAtPoint(layerName, lat, lon) {
 // SEUILS NUMERIQUES PAR INDICATEUR
 // =============================================
 
+
 const LAYER_THRESHOLDS = {
-
-  "cartozome:mod_aura_2024_pm10_moyan":
-    [0,8,11,15,16,35,Infinity],
-
-  "cartozome:mod_aura_2024_pm25_moyan":
-    [0,3,4,5,6,25,Infinity],
-
-  "cartozome:mod_aura_2024_no2_moyan":
-    [0,5,7,10,11,40,Infinity],
-
-  "cartozome:mod_aura_2024_o3_nbjdep120":
-    [0,7,10,12,15,17,22,25,50, Infinity],
-
-  "cartozome:Ambroisie_2024_AURA":
-    [0,3,30,50,250,500,Infinity],
-
-  "cartozome:sous_indice_multibruit_orhane_2023":
-    [1,2,3,4,5,6,7,8],   // valeurs discrètes 1–7
-
-  "uvLayer":
-    [0,3,6,8,11,Infinity]
+  "cartozome:mod_aura_2024_pm10_moyan":[0,8,11,15,16,35,Infinity],
+  "cartozome:mod_aura_2024_pm25_moyan": [0,3,4,5,6,25,Infinity],
+  "cartozome:mod_aura_2024_no2_moyan": [0,5,7,10,11,40,Infinity],
+  "cartozome:mod_aura_2024_o3_nbjdep120": [0,7,10,12,15,17,22,25,50, Infinity],
+  "cartozome:Ambroisie_2024_AURA": [0,5,15,25,35,45,Infinity],
+  "cartozome:sous_indice_multibruit_orhane_2023": [1,2,3,4,5,6,7,8],   // valeurs discrètes 1–7
+  "uvLayer":[0,3,6,8,11,Infinity]
 };
 
 // =============================================
@@ -1063,14 +1050,10 @@ const LAYER_THRESHOLDS = {
 // =============================================
 
 const OMS_THRESHOLDS = {
-
   "cartozome:mod_aura_2024_pm10_moyan": 15,
-
   "cartozome:mod_aura_2024_pm25_moyan": 5,
-
   "cartozome:mod_aura_2024_no2_moyan": 10,
   "cartozome:mod_aura_2024_o3_nbjdep120":25
-
 };
 
 // =============================================
@@ -1083,17 +1066,12 @@ function getLayerValueColor(layerName,value){
   const thresholds = LAYER_THRESHOLDS[layerName];
 
   if(!legend || !thresholds) return "#999";
-
   for(let i=thresholds.length-2;i>=0;i--){
-
     if(value >= thresholds[i]){
       return legend.entries[i].color;
     }
-
   }
-
   return legend.entries[0].color;
-
 }
 
 
@@ -1110,46 +1088,33 @@ function buildResultBar(layerName,value){
 
   const entries = legend.entries;
   const segments = thresholds.length-1;
-
   const colors = entries.map(e=>e.color);
-
   const gradient = colors
     .map((c,i)=>`${c} ${(i/segments)*100}% ${(i+1)/segments*100}%`)
     .join(",");
-
 
   // ===============================
   // POSITION CURSEUR
   // ===============================
 
   let segmentIndex = segments-1;
-
   for(let i=0;i<segments;i++){
-
     if(value >= thresholds[i] && value < thresholds[i+1]){
       segmentIndex = i;
       break;
     }
-
   }
 
   const min = thresholds[segmentIndex];
   const max = thresholds[segmentIndex+1];
-
   let relative;
 
   if(layerName==="cartozome:sous_indice_multibruit_orhane_2023"){
-
     relative = 0.5;
-
   }else if(max===Infinity){
-
     relative = 0.8;
-
   }else{
-
     relative = (value-min)/(max-min);
-
   }
 
   const position =
@@ -1157,26 +1122,20 @@ function buildResultBar(layerName,value){
 
   const left = Math.max(0,Math.min(1,position))*100;
 
-
   // ===============================
   // POSITION TICK OMS
   // ===============================
-
   let tickHTML = "";
-
   const omsValue = OMS_THRESHOLDS[layerName];
-
   if(omsValue !== undefined){
 
     let tickSegment = segments-1;
 
     for(let i=0;i<segments;i++){
-
       if(omsValue >= thresholds[i] && omsValue < thresholds[i+1]){
         tickSegment = i;
         break;
       }
-
     }
 
     const tmin = thresholds[tickSegment];
@@ -1231,9 +1190,7 @@ tickHTML = `
 `;
   }
 
-
   const cursorColor = getLayerValueColor(layerName,value);
-
 
   return `
   <div style="margin-top:6px;position:relative">
@@ -1265,7 +1222,6 @@ tickHTML = `
   </div>
   `;
 }
-
 
 // =============================================
 // PANEL RESULTATS
@@ -1323,11 +1279,9 @@ function renderResultsPanel(address, layerValues, uvValue){
         html+=buildResultBar(layerName,value);
 
       }
-
       html+=`</div>`;
 
     }
-
     html+=`
       </div>
     </div>
@@ -1397,8 +1351,6 @@ function renderResultsPanel(address, layerValues, uvValue){
 
 }
 
-
-
 // =============================================
 // APPEL API POINT
 // =============================================
@@ -1431,7 +1383,6 @@ async function updateResultsForPoint(lat,lon,address){
 
   }
 
-
   const layerValues={
     "cartozome:mod_aura_2024_pm10_moyan": parseFloat(data.PM10) || null,
     "cartozome:mod_aura_2024_pm25_moyan": parseFloat(data["PM2.5"]) || null,
@@ -1442,12 +1393,10 @@ async function updateResultsForPoint(lat,lon,address){
 
   };
 
-
   const uvValue =
     data.UV !== undefined && data.UV !== null
     ? parseFloat(data.UV)
     : null;
-
 
   renderResultsPanel(
     address,
