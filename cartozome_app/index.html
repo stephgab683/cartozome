@@ -13,10 +13,10 @@
   <!-- Définis ici comme <template> pour être clonés dans main.js via markerIcon(templateId).    -->
   <!-- Chaque template contient un SVG : rectangle arrondi + pointe basse + lettre ou point.     -->
   <!-- tpl-marker-point    : pin bleu foncé (#1A4E72) + rond blanc — mode point unique           -->
-  <!-- tpl-marker-compare-a: pin vert (#27ae60) + lettre A — mode comparaison, point A           -->
-  <!-- tpl-marker-compare-b: pin rouge (#e74c3c) + lettre B — mode comparaison, point B          -->
-  <!-- tpl-marker-depart   : pin vert (#27ae60) + lettre D — mode itinéraire, point de départ    -->
-  <!-- tpl-marker-arrivee  : pin rouge (#e74c3c) + lettre A — mode itinéraire, point d'arrivée   -->
+  <!-- tpl-marker-compare-a: pin bleu clair (#5aacbe) + lettre A — mode comparaison, point A           -->
+  <!-- tpl-marker-compare-b: pin rose (#e8928f) + lettre B — mode comparaison, point B          -->
+  <!-- tpl-marker-depart   : pin bleu clair (#5aacbe) + lettre D — mode itinéraire, point de départ    -->
+  <!-- tpl-marker-arrivee  : pin rose (#e8928f) + lettre A — mode itinéraire, point d'arrivée   -->
   <!-- ========================================================================================= -->
 
   <template id="tpl-marker-point">
@@ -39,8 +39,8 @@
           <feDropShadow dx="0" dy="3" stdDeviation="3" flood-color="rgba(0,0,0,0.4)"/>
         </filter>
       </defs>
-      <rect x="0" y="0" width="32" height="32" rx="16" fill="#27ae60" filter="url(#shadow)"/>
-      <polygon points="10,30 22,30 16,40" fill="#27ae60" filter="url(#shadow)"/>
+      <rect x="0" y="0" width="32" height="32" rx="16" fill="#5aacbe" filter="url(#shadow)"/>
+      <polygon points="10,30 22,30 16,40" fill="#5aacbe" filter="url(#shadow)"/>
       <text x="16" y="21" text-anchor="middle" fill="white" font-family="Jost,sans-serif" font-size="14" font-weight="700">A</text>
     </svg>
   </template>
@@ -52,8 +52,8 @@
           <feDropShadow dx="0" dy="3" stdDeviation="3" flood-color="rgba(0,0,0,0.4)"/>
         </filter>
       </defs>
-      <rect x="0" y="0" width="32" height="32" rx="16" fill="#e74c3c" filter="url(#shadow)"/>
-      <polygon points="10,30 22,30 16,40" fill="#e74c3c" filter="url(#shadow)"/>
+      <rect x="0" y="0" width="32" height="32" rx="16" fill="#e8928f" filter="url(#shadow)"/>
+      <polygon points="10,30 22,30 16,40" fill="#e8928f" filter="url(#shadow)"/>
       <text x="16" y="21" text-anchor="middle" fill="white" font-family="Jost,sans-serif" font-size="14" font-weight="700">B</text>
     </svg>
   </template>
@@ -65,8 +65,8 @@
           <feDropShadow dx="0" dy="3" stdDeviation="3" flood-color="rgba(0,0,0,0.4)"/>
         </filter>
       </defs>
-      <rect x="0" y="0" width="32" height="32" rx="16" fill="#27ae60" filter="url(#shadow)"/>
-      <polygon points="10,30 22,30 16,40" fill="#27ae60" filter="url(#shadow)"/>
+      <rect x="0" y="0" width="32" height="32" rx="16" fill="#5aacbe" filter="url(#shadow)"/>
+      <polygon points="10,30 22,30 16,40" fill="#5aacbe" filter="url(#shadow)"/>
       <text x="16" y="21" text-anchor="middle" fill="white" font-family="Jost,sans-serif" font-size="14" font-weight="700">D</text>
     </svg>
   </template>
@@ -78,8 +78,8 @@
           <feDropShadow dx="0" dy="3" stdDeviation="3" flood-color="rgba(0,0,0,0.4)"/>
         </filter>
       </defs>
-      <rect x="0" y="0" width="32" height="32" rx="16" fill="#e74c3c" filter="url(#shadow)"/>
-      <polygon points="10,30 22,30 16,40" fill="#e74c3c" filter="url(#shadow)"/>
+      <rect x="0" y="0" width="32" height="32" rx="16" fill="#e8928f" filter="url(#shadow)"/>
+      <polygon points="10,30 22,30 16,40" fill="#e8928f" filter="url(#shadow)"/>
       <text x="16" y="21" text-anchor="middle" fill="white" font-family="Jost,sans-serif" font-size="14" font-weight="700">A</text>
     </svg>
   </template>
@@ -240,6 +240,19 @@
               <!-- Bouton Transport en commun -->
               <span title="Non disponible pour le moment">
                 <button class="transport-btn" data-mode="transit" title="En transports en commun" disabled>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="4" y="3" width="16" height="14" rx="2"/>
+                    <path d="M4 11h16"/>
+                    <path d="M8 17l-2 4"/>
+                    <path d="M16 17l2 4"/>
+                    <circle cx="9" cy="7.5" r="1" fill="currentColor"/>
+                    <circle cx="15" cy="7.5" r="1" fill="currentColor"/>
+                  </svg>
+                </button>
+              </span>
+              <!-- Bouton En voiture -->
+              <span title="Non disponible pour le moment">
+                <button class="transport-btn" data-mode="transit" title="En voiture" disabled>
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <rect x="4" y="3" width="16" height="14" rx="2"/>
                     <path d="M4 11h16"/>
