@@ -1,8 +1,9 @@
 import 'leaflet/dist/leaflet.css';                                           // Import du CSS de Leaflet pour le style des cartes
 import L from 'leaflet';                                                     // Import de la bibliothèque Leaflet pour la gestion des cartes
 
-console.log("MAIN JS CHARGÉ");
-
+// URLs GeoServer local (WMS pour les rasters, WFS pour le bruit aérien)
+const GEOSERVER_URL = "http://localhost:8081/geoserver/wms";
+const GEOSERVER_WFS = "http://localhost:8081/geoserver/wfs";
 
 // =============================================
 // CARTE LEAFLET
@@ -536,10 +537,6 @@ function updateLegend(layerName) {
   wrapper.innerHTML = html;
   content.appendChild(wrapper);
 }
-
-// URLs GeoServer local (WMS pour les rasters, WFS pour le bruit aérien)
-const GEOSERVER_URL = "http://localhost:8081/geoserver/wms";
-const GEOSERVER_WFS = "http://localhost:8081/geoserver/wfs";
 
 // =============================================
 // GESTION DES COUCHES (WMS + WFS + UV)
