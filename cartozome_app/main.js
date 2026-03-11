@@ -9,7 +9,7 @@ import L from 'leaflet';                                                     // 
 // Fond de carte OpenStreetMap.
 // =============================================
 
-// Bounds de la métropole de Lyon — utilisées aussi pour filtrer l'autocomplétion
+// Bounds de la métropole de Lyon
 const METROPOLE_BOUNDS = L.latLngBounds(
   [45.45, 4.65],
   [46.00, 5.25]
@@ -17,11 +17,16 @@ const METROPOLE_BOUNDS = L.latLngBounds(
 
 const map = L.map('map').fitBounds(METROPOLE_BOUNDS);                                      // Vue initiale centrée sur Lyon
 
+// Crédits
 L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-  attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+  attribution:
+    'Données : <a href="https://www.atmo-auvergnerhonealpes.fr/" target="_blank">Atmo AURA</a> · ' +
+    '<a href="https://www.orhane.fr/" target="_blank">ORHANE</a> · ' +
+    '<a href="https://open-meteo.com/en/docs" target="_blank">Open-Meteo</a> · ' +
+    'Fond de carte : &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> · ' +
+    '&copy; <a href="https://carto.com/attributions" target="_blank">CARTO</a>',
   subdomains: 'abcd',
 }).addTo(map);
-
 
 
 // =============================================
@@ -687,6 +692,7 @@ const searchPanel = document.getElementById("search-panel");
 
 // Affiche le panel adresse, cache les autres
 function setAddressMode() {
+  routingLayer.clearLayers();
   document.getElementById('point-start').value = '';
   document.getElementById('panel-address').classList.remove('hidden');
   document.getElementById('panel-compare').classList.add('hidden');
@@ -700,6 +706,7 @@ function setAddressMode() {
 
 // Affiche le panel comparaison, cache les autres
 function setCompareMode() {
+  routingLayer.clearLayers();
   document.getElementById('compare-a').value = '';
   document.getElementById('compare-b').value = '';
   document.getElementById('panel-compare').classList.remove('hidden');
@@ -714,6 +721,7 @@ function setCompareMode() {
 
 // Affiche le panel itinéraire, cache les autres
 function setRouteMode() {
+  routingLayer.clearLayers();
   document.getElementById('route-start').value = '';
   document.getElementById('route-end').value = '';
   document.getElementById('panel-route').classList.remove('hidden');
@@ -1515,7 +1523,7 @@ document.getElementById("btn-share").addEventListener("click", async () => {
   } else if (document.getElementById("btn-compare").classList.contains("active")) {
     const a = document.getElementById("compare-a").value.trim();
     const b = document.getElementById("compare-b").value.trim();
-    if (a && b) address = `${a}  VS  ${b}`;
+    if (a && b) address = `Point A : ${a}  VS  Point B : ${b}`;
     else if (a) address = a;
 
   } else if (document.getElementById("btn-route").classList.contains("active")) {
