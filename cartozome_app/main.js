@@ -247,7 +247,7 @@ const LAYER_LEGENDS = {
       { color: '#DEDB6D', label: '4'   },
       { color: '#D47979', label: '5'   },
       { color: '#A83939', label: '6'   },
-      { color: '#BD37AC', label: '>25' },
+      { color: '#BD37AC', label: '25' },
     ]
   },
 
@@ -259,7 +259,7 @@ const LAYER_LEGENDS = {
       { color: '#DEDB6D', label: '11'   },
       { color: '#D47979', label: '15'   },
       { color: '#A83939', label: '16'   },
-      { color: '#BD37AC', label: '>35'  },
+      { color: '#BD37AC', label: '35'  },
     ]
   },
 
@@ -271,7 +271,7 @@ const LAYER_LEGENDS = {
       { color: '#DEDB6D', label: '7'    },
       { color: '#D47979', label: '10'   },
       { color: '#A83939', label: '11'   },
-      { color: '#BD37AC', label: '>40'  },
+      { color: '#BD37AC', label: '40'  },
     ]
   },
 
@@ -287,7 +287,7 @@ const LAYER_LEGENDS = {
       { color: '#ff5722', label: '20'  },
       { color: '#f44336', label: '22'  },
       { color: '#b71c1c', label: '25'  },
-      { color: '#3e0000', label: '>50' },
+      { color: '#3e0000', label: '50' },
     ]
   },
 
@@ -299,7 +299,7 @@ const LAYER_LEGENDS = {
       { color: '#f5e96a', label: '30'   },
       { color: '#f4846a', label: '40'   },
       { color: '#c0392b', label: '250'  },
-      { color: '#8e44ad', label: '>500' },
+      { color: '#8e44ad', label: '500' },
     ]
   },
 
@@ -877,8 +877,6 @@ document.getElementById("calc-route-btn").addEventListener("click", async () => 
 });
 
 
-
-
 // Autocomplétion : affiche des suggestions pendant la frappe (délai 250ms).
 // Appelle l'API géocodage avec limit=50, filtre côté client sur les bounds métropole.
 function attachAutocomplete(inputId) {
@@ -1064,14 +1062,10 @@ const LAYER_THRESHOLDS = {
 // =============================================
 
 const OMS_THRESHOLDS = {
-
   "cartozome:mod_aura_2024_pm10_moyan": 15,
-
   "cartozome:mod_aura_2024_pm25_moyan": 5,
-
   "cartozome:mod_aura_2024_no2_moyan": 10,
   "cartozome:mod_aura_2024_o3_nbjdep120":25
-
 };
 
 // =============================================
@@ -1079,36 +1073,25 @@ const OMS_THRESHOLDS = {
 // =============================================
 
 function getLayerValueColor(layerName,value){
-
   const legend = LAYER_LEGENDS[layerName];
   const thresholds = LAYER_THRESHOLDS[layerName];
-
   if(!legend || !thresholds) return "#999";
-
   for(let i=thresholds.length-2;i>=0;i--){
-
     if(value >= thresholds[i]){
       return legend.entries[i].color;
     }
-
   }
-
   return legend.entries[0].color;
-
 }
-
 
 // =============================================
 // BARRE RESULTATS
 // =============================================
 
 function buildResultBar(layerName,value){
-
   const legend = LAYER_LEGENDS[layerName];
   const thresholds = LAYER_THRESHOLDS[layerName];
-
   if(!legend || !thresholds) return "";
-
   const entries = legend.entries;
   const segments = thresholds.length-1;
 
