@@ -1301,7 +1301,7 @@ tickHTML = `
 
 
   return `
-  <div style="margin-top:6px;position:relative">
+  <div style="margin-top:6px;padding-top:18px;position:relative">
 
     <div style="
       height:10px;
@@ -1830,30 +1830,41 @@ function renderCompareResultsPanel(addressA, addressB, layerValuesA, layerValues
       const valueA = layerValuesA[layerName];
       const valueB = layerValuesB[layerName];
 
-      html += `<div class="res-row">`;
+      // Raccourci : barre unique pour un seul point (réutilise buildResultBar)
+      const barA = (valueA !== null && !isNaN(valueA)) ? buildResultBar(layerName, valueA) : "";
+      const barB = (valueB !== null && !isNaN(valueB)) ? buildResultBar(layerName, valueB) : "";
+
+      // Nom court de l'adresse (avant la première virgule) pour ne pas surcharger
       html += `
-        <div class="res-top">
-          <span class="res-label">${meta.label}</span>
+        <div class="res-row">
+          <!-- Titre de l'indicateur -->
+          <div class="res-top">
+            <span class="res-label">${meta.label}</span>
+          </div>
+
+          <!-- Point A -->
+          <div class="compare-point-block compare-point-a">
+            <div class="compare-point-header" style="justify-content: space-between">
+              <span class="compare-dot compare-dot-a">A</span>
+              ${valueA !== null && !isNaN(valueA)
+                ? `<span class="res-value">${valueA.toFixed(1)} ${meta.unit}</span>`
+                : `<span class="res-value no-data">N/D</span>`}
+            </div>
+            ${barA}
+          </div>
+
+          <!-- Point B -->
+          <div class="compare-point-block compare-point-b">
+            <div class="compare-point-header" style="justify-content: space-between">
+              <span class="compare-dot compare-dot-b">B</span>
+              ${valueB !== null && !isNaN(valueB)
+                ? `<span class="res-value">${valueB.toFixed(1)} ${meta.unit}</span>`
+                : `<span class="res-value no-data">N/D</span>`}
+            </div>
+            ${barB}
+          </div>
+        </div>
       `;
-
-      if (valueA === null || isNaN(valueA) || valueB === null || isNaN(valueB)) {
-        html += `<span class="res-value no-data">Non disponible</span>`;
-      } else {
-        html += `
-          <span class="res-value">
-            Point A: ${valueA.toFixed(1)} ${meta.unit}<br>
-            Point B: ${valueB.toFixed(1)} ${meta.unit}
-          </span>
-        `;
-      }
-
-      html += `</div>`;
-
-      if (valueA !== null && !isNaN(valueA) && valueB !== null && !isNaN(valueB)) {
-        html += buildCompareBars(layerName, valueA, valueB);
-      }
-
-      html += `</div>`;
     }
 
     html += `
@@ -1862,29 +1873,44 @@ function renderCompareResultsPanel(addressA, addressB, layerValuesA, layerValues
     `;
   }
 
-  // Ajoutez la section UV si nécessaire
-  if (uvValueA !== null && uvValueB !== null) {
-    html += `
-      <div class="cat-card">
-        <div class="cat-header">
-          <img src="./img/uv.png" style="width:16px;height:16px;vertical-align:middle">
-          UV
+  // Section UV
+  html += `
+  <div class="cat-card">
+    <div class="cat-header">
+      <img src="./img/uv.png" style="width:16px;height:16px;vertical-align:middle">
+      UV
+    </div>
+    <div class="cat-body">
+      <div class="res-row">
+        <div class="res-top">
+          <span class="res-label">Indice UV</span>
         </div>
-        <div class="cat-body">
-          <div class="res-row">
-            <div class="res-top">
-              <span class="res-label">Indice UV</span>
-              <span class="res-value">
-                Point A: ${uvValueA}<br>
-                Point B: ${uvValueB}
-              </span>
-            </div>
-            ${buildCompareBars("uvLayer", uvValueA, uvValueB)}
+
+        <!-- Point A -->
+        <div class="compare-point-block compare-point-a">
+          <div class="compare-point-header" style="justify-content: space-between">
+            <span class="compare-dot compare-dot-a">A</span>
+            ${uvValueA !== null
+              ? `<span class="res-value">${uvValueA}</span>`
+              : `<span class="res-value no-data">N/D</span>`}
           </div>
+          ${uvValueA !== null ? buildResultBar("uvLayer", uvValueA) : ""}
+        </div>
+
+        <!-- Point B -->
+        <div class="compare-point-block compare-point-b">
+          <div class="compare-point-header" style="justify-content: space-between">
+            <span class="compare-dot compare-dot-b">B</span>
+            ${uvValueB !== null
+              ? `<span class="res-value">${uvValueB}</span>`
+              : `<span class="res-value no-data">N/D</span>`}
+          </div>
+          ${uvValueB !== null ? buildResultBar("uvLayer", uvValueB) : ""}
         </div>
       </div>
-    `;
-  }
+    </div>
+  </div>
+  `;
 
   content.innerHTML = html;
 }
@@ -2009,11 +2035,25 @@ function buildSegmentedRouteBar(layerName, values) {
   }
 
   return `
-    <div style="margin-top: 6px; position: relative; height: 10px; width: 100%; border-radius: 4px; overflow: hidden;">
+  <div style="margin-top: 6px; display: flex; align-items: center; gap: 6px;">
+    <span style="
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 18px; height: 18px; border-radius: 50%;
+      background: #5aacbe; color: white;
+      font-size: 0.68rem; font-weight: 700; flex-shrink: 0;
+    ">D</span>
+    <div style="position: relative; height: 10px; flex: 1; border-radius: 4px; overflow: hidden;">
       ${segments}
       ${tickHTML}
     </div>
-  `;
+    <span style="
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 18px; height: 18px; border-radius: 50%;
+      background: #e8928f; color: white;
+      font-size: 0.68rem; font-weight: 700; flex-shrink: 0;
+    ">A</span>
+  </div>
+`;
 }
 
 function colorRouteByPollutant(pollutant) {

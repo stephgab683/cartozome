@@ -1193,6 +1193,57 @@ html, body {
 .badge-mid  { background: #fff8e1; color: #f39c12; }
 .badge-high { background: #fdecea; color: #e74c3c; }
 
+/* =============================================
+   COMPARAISON — blocs Point A / Point B
+   ============================================= */
+
+/* Bloc englobant un point dans la comparaison */
+.compare-point-block {
+    margin-top: 8px;
+    padding: 8px 10px;
+    border-radius: 8px;
+}
+
+/* Ligne : pastille + valeur */
+.compare-point-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+    margin-bottom: 4px;
+}
+
+/* Pastille ronde A / B */
+.compare-dot {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: white;
+    flex-shrink: 0;
+}
+
+/* Fond très léger vert pour A, rose pour B */
+.compare-point-a { background: #dceff2; border-left: 3px solid #5aacbe; }
+.compare-point-b { background: #ffeded; border-left: 3px solid #e8928f; }
+
+.compare-dot-a { background: #5aacbe; color: white; }
+.compare-dot-b { background: #e8928f; color: white; }
+
+/* Adresse courte — prend l'espace disponible */
+.compare-point-label {
+    flex: 1;
+    font-size: 0.75rem;
+    color: #555;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 /* ========================================================================================= */
 /* BARRE DE LÉGENDE — Affichée sous chaque sous-catégorie quand une valeur est disponible  */
 /* ========================================================================================= */
