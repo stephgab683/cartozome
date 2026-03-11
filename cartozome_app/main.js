@@ -635,6 +635,7 @@ async function getRoute(start, end) {
     `&start=${start.join(',')}` +
     `&end=${end.join(',')}` +
     `&profile=pedestrian` +
+    `&timeUnit=minute` +
     `&crs=EPSG:4326`;
   try {
     const res  = await fetch(url);
@@ -645,6 +646,7 @@ async function getRoute(start, end) {
     return null;
   }
 }
+
 
 // =============================================
 // PANEL DE RÉSULTATS
@@ -1107,7 +1109,6 @@ function buildResultBar(layerName,value){
   // ===============================
 
   let segmentIndex = segments-1;
-
   for(let i=0;i<segments;i++){
 
     if(value >= thresholds[i] && value < thresholds[i+1]){
@@ -1121,46 +1122,29 @@ function buildResultBar(layerName,value){
   const max = thresholds[segmentIndex+1];
 
   let relative;
-
-  if(layerName==="cartozome:sous_indice_multibruit_orhane_2023"){
-
-    relative = 0.5;
-
-  }else if(max===Infinity){
-
-    relative = 0.8;
-
-  }else{
-
-    relative = (value-min)/(max-min);
-
-  }
+  if(layerName==="cartozome:sous_indice_multibruit_orhane_2023"){relative = 0.5;}
+  else if(max===Infinity){relative = 0.8;}
+  else{relative = (value-min)/(max-min);}
 
   const position =
     (segmentIndex + relative) / segments;
 
   const left = Math.max(0,Math.min(1,position))*100;
 
-
   // ===============================
   // POSITION TICK OMS
   // ===============================
 
   let tickHTML = "";
-
   const omsValue = OMS_THRESHOLDS[layerName];
-
   if(omsValue !== undefined){
 
     let tickSegment = segments-1;
-
     for(let i=0;i<segments;i++){
-
       if(omsValue >= thresholds[i] && omsValue < thresholds[i+1]){
         tickSegment = i;
         break;
       }
-
     }
 
     const tmin = thresholds[tickSegment];
@@ -1168,11 +1152,8 @@ function buildResultBar(layerName,value){
 
     let trel;
 
-    if(tmax === Infinity){
-      trel = 0.8;
-    }else{
-      trel = (omsValue - tmin)/(tmax - tmin);
-    }
+    if(tmax === Infinity){trel = 0.8;}
+    else{trel = (omsValue - tmin)/(tmax - tmin);}
 
     const tpos =
       (tickSegment + trel) / segments;
@@ -1215,9 +1196,7 @@ tickHTML = `
 `;
   }
 
-
   const cursorColor = getLayerValueColor(layerName,value);
-
 
   return `
   <div style="margin-top:6px;position:relative">
