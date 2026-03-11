@@ -1,6 +1,8 @@
 import 'leaflet/dist/leaflet.css';                                           // Import du CSS de Leaflet pour le style des cartes
 import L from 'leaflet';                                                     // Import de la bibliothèque Leaflet pour la gestion des cartes
 
+console.log("MAIN JS CHARGÉ");
+
 
 // =============================================
 // CARTE LEAFLET
@@ -1448,7 +1450,9 @@ async function updateResultsForPoint(lat,lon,address){
       }
     );
 
-    data=await res.json();
+//    data=await res.json();
+data = await res.json();
+console.log("[indicateursPoint]", data);
 
   }catch(err){
 
