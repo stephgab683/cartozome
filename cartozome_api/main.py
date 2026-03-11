@@ -65,8 +65,13 @@ def get_uv_value_from_point_record(record):
     values = daily.get("uv_index_max", [])
     if not values:
         return None
+
     value = values[0]
-    return float(value) if isinstance(value, (int, float)) else None
+
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return None
 
 
 def find_nearest_uv(lat, lon, uv_points):
