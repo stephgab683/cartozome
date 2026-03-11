@@ -9,7 +9,7 @@ import L from 'leaflet';                                                     // 
 // Fond de carte OpenStreetMap.
 // =============================================
 
-// Bounds de la métropole de Lyon — utilisées aussi pour filtrer l'autocomplétion
+// Bounds de la métropole de Lyon
 const METROPOLE_BOUNDS = L.latLngBounds(
   [45.45, 4.65],
   [46.00, 5.25]
@@ -17,11 +17,16 @@ const METROPOLE_BOUNDS = L.latLngBounds(
 
 const map = L.map('map').fitBounds(METROPOLE_BOUNDS);                                      // Vue initiale centrée sur Lyon
 
+// Crédits
 L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-  attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+  attribution:
+    'Données : <a href="https://www.atmo-auvergnerhonealpes.fr/" target="_blank">Atmo AURA</a> · ' +
+    '<a href="https://www.orhane.fr/" target="_blank">ORHANE</a> · ' +
+    '<a href="https://open-meteo.com/en/docs" target="_blank">Open-Meteo</a> · ' +
+    'Fond de carte : &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> · ' +
+    '&copy; <a href="https://carto.com/attributions" target="_blank">CARTO</a>',
   subdomains: 'abcd',
 }).addTo(map);
-
 
 
 // =============================================
@@ -292,7 +297,7 @@ const LAYER_LEGENDS = {
   },
 
   "cartozome:Ambroisie_2024_AURA": {
-    unit: "grains/m³", oms: null,
+    unit: "Nombre de jour avec un RAEP >3", oms: null,
     entries: [
       { color: '#b2e8e4', label: '0'    },
       { color: '#7ecdc2', label: '3'    },
@@ -411,33 +416,27 @@ function buildLegendHTML(layerName) {
  */
 function buildSegmentedBar(def) {
   const n = def.entries.length;
+  const unitLabel = def.unit ? `<div class="lgd-col-unit">${def.unit}</div>` : '';
 
   const segments = def.entries.map((e, i) => {
     const radius = i === 0 ? '4px 0 0 4px' : i === n - 1 ? '0 4px 4px 0' : '0';
     return `<div class="lgd-seg" style="background:${e.color};opacity:${LAYER_OPACITY};border-radius:${radius};flex:1"></div>`;
   }).join('');
 
-  // Mode columnLabels : liste verticale case + label (bruit)
   if (def.centerLabels) {
-    const unitLabel = def.unit ? `<div class="lgd-col-unit">${def.unit}</div>` : '';
-    const rows = def.entries.map((e, i) => {
-      return `<div class="lgd-col-row">
+    const rows = def.entries.map((e) => `<div class="lgd-col-row">
         <span class="lgd-col-swatch" style="background:${e.color};opacity:${LAYER_OPACITY}"></span>
         <span class="lgd-col-label">${e.label}</span>
-      </div>`;
-    }).join('');
+      </div>`).join('');
     return `<div class="lgd-col-list">${unitLabel}${rows}</div>`;
   }
 
-  // Mode défaut : labels aux bordures gauches + seuil OMS au-dessus
   const borderLabels = def.entries.map((e, i) => {
     const pct = (i / n) * 100;
     return `<span class="lgd-border-label" style="left:${pct}%">${e.label}</span>`;
   }).join('');
 
-  const omsIdx = def.oms != null
-    ? def.entries.findIndex(e => e.label === String(def.oms))
-    : -1;
+  const omsIdx = def.oms != null ? def.entries.findIndex(e => e.label === String(def.oms)) : -1;
   const omsAbove = omsIdx >= 0 ? (() => {
     const pct = (omsIdx / n) * 100;
     return `<div class="lgd-oms-above" style="left:${pct}%">
@@ -447,7 +446,8 @@ function buildSegmentedBar(def) {
   })() : '';
 
   return `
-    <div class="lgd-bar-outer">
+    <div class="lgd-bar-outer${def.oms == null ? ' lgd-bar-outer--no-oms' : ''}">
+      ${unitLabel}
       ${omsAbove}
       <div class="lgd-seg-bar">${segments}</div>
       <div class="lgd-border-labels">${borderLabels}</div>
@@ -687,6 +687,7 @@ const searchPanel = document.getElementById("search-panel");
 
 // Affiche le panel adresse, cache les autres
 function setAddressMode() {
+  routingLayer.clearLayers();
   document.getElementById('point-start').value = '';
   document.getElementById('panel-address').classList.remove('hidden');
   document.getElementById('panel-compare').classList.add('hidden');
@@ -700,6 +701,7 @@ function setAddressMode() {
 
 // Affiche le panel comparaison, cache les autres
 function setCompareMode() {
+  routingLayer.clearLayers();
   document.getElementById('compare-a').value = '';
   document.getElementById('compare-b').value = '';
   document.getElementById('panel-compare').classList.remove('hidden');
@@ -714,6 +716,7 @@ function setCompareMode() {
 
 // Affiche le panel itinéraire, cache les autres
 function setRouteMode() {
+  routingLayer.clearLayers();
   document.getElementById('route-start').value = '';
   document.getElementById('route-end').value = '';
   document.getElementById('panel-route').classList.remove('hidden');
@@ -1515,7 +1518,7 @@ document.getElementById("btn-share").addEventListener("click", async () => {
   } else if (document.getElementById("btn-compare").classList.contains("active")) {
     const a = document.getElementById("compare-a").value.trim();
     const b = document.getElementById("compare-b").value.trim();
-    if (a && b) address = `${a}  VS  ${b}`;
+    if (a && b) address = `Point A : ${a}  VS  Point B : ${b}`;
     else if (a) address = a;
 
   } else if (document.getElementById("btn-route").classList.contains("active")) {
