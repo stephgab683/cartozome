@@ -33,12 +33,13 @@ function getColor(uv) {
   else if (uv >= 8)  return '#f44336'; // Très Fort
   else if (uv >= 6)  return '#ff9800'; // Fort
   else if (uv >= 3)  return '#ffeb3b'; // Modéré
-  else if (uv >= 0) return '#8bc34a';  // Faible
-  else              return '#FFFFFF';
+  else if (uv > 0)   return '#8bc34a'; // Faible
+  else               return '#FFFFFF';
 }
 
 const routingLayer = L.layerGroup().addTo(map);
 let uvLayer = null; // variable globale pour la couche UV
+let uvLastUpdate = null;  // date/heure de dernière mise à jour UV
 
 // Fonction pour récupérer les données UV et créer la couche GeoJSON
 async function loadUvLayer() {
@@ -47,11 +48,28 @@ async function loadUvLayer() {
     throw new Error(`Erreur chargement UV : HTTP ${res.status}`);
   }
 
+  const lastModifiedHeader = res.headers.get("Last-Modified");
+  if (lastModifiedHeader) {
+    uvLastUpdate = new Date(lastModifiedHeader);
+  } else {
+    uvLastUpdate = null;
+  }
+
   const communesGeojson = await res.json();
 
-  uvLayer = L.geoJSON(communesGeojson, {
+  const filteredFeatures = communesGeojson.features.filter(feature => {
+    const uv = Number(feature.properties.uv_max);
+    return Number.isFinite(uv) && uv > 0;
+  });
+
+  const filteredGeojson = {
+    ...communesGeojson,
+    features: filteredFeatures
+  };
+
+  uvLayer = L.geoJSON(filteredGeojson, {
     style: feature => {
-      const uv = feature.properties.uv_max;
+      const uv = Number(feature.properties.uv_max);
       return {
         fillColor: getColor(uv),
         weight: 1,
@@ -60,14 +78,14 @@ async function loadUvLayer() {
       };
     },
     onEachFeature: (feature, layer) => {
-      const uv = feature.properties.uv_max;
+      const uv = Number(feature.properties.uv_max);
       const nom =
         feature.properties.nom ||
         feature.properties.nom_commune ||
         feature.properties.libelle ||
         "Commune";
 
-      layer.bindPopup(`Commune : ${nom}<br>UV : ${uv ?? "n/a"}`);
+      layer.bindPopup(`Commune : ${nom}<br>UV : ${uv}`);
     }
   });
 }
@@ -390,18 +408,59 @@ const LAYER_LEGENDS = {
 
 };
 
+function buildUvUpdateHTML() {
+  if (!uvLastUpdate || isNaN(uvLastUpdate.getTime())) {
+    return `
+      <div class="uv-update-block" style="
+        margin-top:10px;
+        padding-top:10px;
+        border-top:1px solid #d9d9d9;
+        font-size:0.85rem;
+        line-height:1.4;
+        color:#444;
+      ">
+        <strong>Dernière mise à jour :</strong><br>
+        Non disponible
+      </div>
+    `;
+  }
+
+  const date = uvLastUpdate.toLocaleDateString("fr-FR");
+  const heure = uvLastUpdate.toLocaleTimeString("fr-FR", {
+    hour: "2-digit",
+    minute: "2-digit"
+  });
+
+  return `
+    <div class="uv-update-block" style="
+      margin-top:10px;
+      padding-top:10px;
+      border-top:1px solid #d9d9d9;
+      font-size:0.85rem;
+      line-height:1.4;
+      color:#444;
+    ">
+      <strong>Dernière mise à jour :</strong><br>
+      ${date}<br>
+      ${heure}
+    </div>
+  `;
+}
 
 /**
  * Construit le HTML de la légende pour un data-layer donné.
  */
 function buildLegendHTML(layerName) {
-
-  // UV → même logique que les autres couches
-
-  // Autres couches → barre dégradée
   const def = LAYER_LEGENDS[layerName];
   if (!def) return '';
-  return buildSegmentedBar(def);
+
+  let html = buildSegmentedBar(def);
+
+  if (layerName === "uvLayer") {
+    html += buildUvUpdateHTML();
+  }
+
+  return html;
 }
 
 /**
