@@ -687,6 +687,7 @@ async function reverseGeocode(lat, lon) {
 
 // Calcule un itinéraire piéton entre deux points via bdtopo-osrm
 // Retourne un tableau de coordonnées [lon, lat]
+// Modifiez la fonction getRoute pour retourner les données complètes
 async function getRoute(start, end) {
   const url =
     `https://data.geopf.fr/navigation/itineraire?resource=bdtopo-osrm` +
@@ -696,14 +697,90 @@ async function getRoute(start, end) {
     `&timeUnit=minute` +
     `&crs=EPSG:4326`;
   try {
-    const res  = await fetch(url);
+    const res = await fetch(url);
     const data = await res.json();
-    return data.geometry?.coordinates ?? null;
+    return data; // Retourne toutes les données de l'itinéraire
   } catch (err) {
     console.error("[ROUTING ERROR]", err);
     return null;
   }
 }
+
+// Mise à jour de l'écouteur pour le bouton "calc-route-btn"
+document.getElementById("calc-route-btn").addEventListener("click", async () => {
+  routingLayer.clearLayers();
+
+  const routeStart = document.getElementById("route-start").value.trim();
+  const routeEnd = document.getElementById("route-end").value.trim();
+  if (!routeStart) {
+    alert("Veuillez saisir une adresse de départ");
+    return;
+  }
+
+  const startCoords = await geocodeAddress(routeStart);
+  if (!startCoords) {
+    alert("Adresse de départ introuvable");
+    return;
+  }
+  const startLatLng = L.latLng(startCoords[1], startCoords[0]);
+  L.marker(startLatLng, { icon: iconDepart }).addTo(routingLayer).bindPopup("Départ");
+
+  if (!routeEnd) {
+    map.setView(startLatLng, 16);
+    return;
+  }
+
+  const endCoords = await geocodeAddress(routeEnd);
+  if (!endCoords) {
+    alert("Adresse d'arrivée introuvable");
+    return;
+  }
+  const endLatLng = L.latLng(endCoords[1], endCoords[0]);
+  L.marker(endLatLng, { icon: iconArrivee }).addTo(routingLayer).bindPopup("Arrivée");
+
+  // Récupérer l'itinéraire complet
+  const routeData = await getRoute(startCoords, endCoords);
+  if (!routeData) {
+    alert("Impossible de calculer l'itinéraire");
+    return;
+  }
+
+  // Extraire les coordonnées et les durées
+  const latLngs = routeData.geometry.coordinates.map(c => L.latLng(c[1], c[0]));
+  const routeLine = L.polyline(latLngs, { color: "#1A4E72", weight: 4, opacity: 1 }).addTo(routingLayer);
+  map.fitBounds(routeLine.getBounds(), { padding: [50, 50] });
+
+  // Extraire les durées des tronçons
+  const durations = routeData.portions.flatMap(portion =>
+    portion.steps.map(step => step.duration)
+  );
+
+  // Extraire les coordonnées des points (sans échantillonnage)
+  const allPoints = latLngs;
+
+  // Appel à l'API pour obtenir les valeurs des indicateurs pour TOUS les points
+  const exposures = await fetch("http://localhost:8000/indicateursItineraire", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      coords: allPoints.map(p => ({ latitude: p.lat, longitude: p.lng })),
+    }),
+  }).then(r => r.json());
+
+  // Stocker les données dans une variable globale
+  window.routeExposures = {
+    points: allPoints,          // Tous les points de l'itinéraire
+    durations: durations,       // Durées réelles des tronçons
+    data: exposures,             // Valeurs des indicateurs
+    latLngs: latLngs,            // Pour l'affichage
+    totalDuration: durations.reduce((a, b) => a + b, 0),  // Durée totale
+  };
+
+  openResultsPanel();
+  renderRouteResultsPanel(routeStart, routeEnd, exposures);
+});
+
+
 
 
 // =============================================
@@ -863,81 +940,7 @@ document.getElementById("calc-point-btn").addEventListener("click", async () => 
 
 
 
-document.getElementById("calc-route-btn").addEventListener("click", async () => {
-  routingLayer.clearLayers();
 
-  const routeStart = document.getElementById("route-start").value.trim();
-  const routeEnd = document.getElementById("route-end").value.trim();
-  if (!routeStart) {
-    alert("Veuillez saisir une adresse de départ");
-    return;
-  }
-
-  const startCoords = await geocodeAddress(routeStart);
-  if (!startCoords) {
-    alert("Adresse de départ introuvable");
-    return;
-  }
-  const startLatLng = L.latLng(startCoords[1], startCoords[0]);
-  L.marker(startLatLng, { icon: iconDepart }).addTo(routingLayer).bindPopup("Départ");
-
-  if (!routeEnd) {
-    map.setView(startLatLng, 16);
-    return;
-  }
-
-  const endCoords = await geocodeAddress(routeEnd);
-  if (!endCoords) {
-    alert("Adresse d'arrivée introuvable");
-    return;
-  }
-  const endLatLng = L.latLng(endCoords[1], endCoords[0]);
-  L.marker(endLatLng, { icon: iconArrivee }).addTo(routingLayer).bindPopup("Arrivée");
-
-  const routeCoords = await getRoute(startCoords, endCoords);
-  if (!routeCoords) {
-    alert("Impossible de calculer l'itinéraire");
-    return;
-  }
-
-  // Transformation en LatLng pour Leaflet
-  const latLngs = routeCoords.map((c) => L.latLng(c[1], c[0]));
-  const routeLine = L.polyline(latLngs, { color: "#1A4E72", weight: 4, opacity: 1 }).addTo(routingLayer);
-  map.fitBounds(routeLine.getBounds(), { padding: [50, 50] });
-
-  // Échantillonnage
-  function sampleRoutePoints(latlngs, step = 20) {
-    const sampled = [];
-    for (let i = 0; i < latlngs.length; i += step) {
-      sampled.push(latlngs[i]);
-    }
-    if (latlngs.length > 0 && !sampled.includes(latlngs[latlngs.length - 1])) {
-      sampled.push(latlngs[latlngs.length - 1]);
-    }
-    return sampled;
-  }
-
-  const sampledPoints = sampleRoutePoints(latLngs, 20);
-
-  // Appel à l'API pour obtenir les valeurs des polluants
-  const exposures = await fetch("http://localhost:8000/indicateursItineraire", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      coords: sampledPoints.map((p) => ({ latitude: p.lat, longitude: p.lng })),
-    }),
-  }).then((r) => r.json());
-
-  // Stockez les données des polluants dans une variable globale
-  window.routeExposures = {
-    points: sampledPoints,
-    data: exposures,
-    latLngs: latLngs,
-  };
-
-  openResultsPanel();
-  renderRouteResultsPanel(routeStart, routeEnd, exposures);
-});
 
 
 // Autocomplétion : affiche des suggestions pendant la frappe (délai 250ms).
@@ -1949,78 +1952,206 @@ document.getElementById("calc-compare-btn").addEventListener("click", async () =
 });
 
 // ======================================== ITINERAIRE ========================
+// Calcul de la moyenne pondérée pour les polluants
+function calculateWeightedAverage(values, durations, totalDuration) {
+  let weightedSum = 0;
+  for (let i = 0; i < values.length - 1; i++) {
+    const segmentValue = (values[i] + values[i + 1]) / 2;
+    weightedSum += segmentValue * durations[i];
+  }
+  return weightedSum / totalDuration;
+}
+
+// Calcul de la moyenne simple pour les autres indicateurs
+function calculateSimpleAverage(values) {
+  return values.reduce((a, b) => a + b, 0) / values.length;
+}
+
+function renderRouteResultsPanel(startAddress, endAddress, exposures) {
+  const content = document.getElementById("results-content");
+  document.getElementById("results-address").textContent = `Itinéraire: ${startAddress} → ${endAddress}`;
+
+  // Récupérer les données de l'itinéraire
+  const { points, durations, data, totalDuration } = window.routeExposures;
+
+  // Préparer les valeurs des indicateurs
+  const routeValues = {
+    // Polluants (moyenne pondérée)
+    "cartozome:mod_aura_2024_pm10_moyan": data.map(exp => parseFloat(exp.PM10) || null),
+    "cartozome:mod_aura_2024_pm25_moyan": data.map(exp => parseFloat(exp["PM2.5"]) || null),
+    "cartozome:mod_aura_2024_no2_moyan": data.map(exp => parseFloat(exp.NO2) || null),
+    "cartozome:mod_aura_2024_o3_nbjdep120": data.map(exp => parseFloat(exp.O3) || null),
+    // Autres indicateurs (moyenne simple)
+    "cartozome:Ambroisie_2024_AURA": data.map(exp => parseFloat(exp.Ambroisie) || null),
+    "cartozome:sous_indice_multibruit_orhane_2023": data.map(exp => parseFloat(exp.Bruit) || null),
+  };
+
+  // Calculer les moyennes pondérées pour les polluants
+  const weightedAverages = {};
+  for (const [layerName, values] of Object.entries(routeValues)) {
+    if (values.some(val => val === null || isNaN(val))) continue;
+    if (["cartozome:mod_aura_2024_pm10_moyan", "cartozome:mod_aura_2024_pm25_moyan", "cartozome:mod_aura_2024_no2_moyan", "cartozome:mod_aura_2024_o3_nbjdep120"].includes(layerName)) {
+      weightedAverages[layerName] = calculateWeightedAverage(values, durations, totalDuration);
+    }
+  }
+
+  // Calculer les moyennes simples pour les autres indicateurs
+  const simpleAverages = {};
+  for (const [layerName, values] of Object.entries(routeValues)) {
+    if (values.some(val => val === null || isNaN(val))) continue;
+    if (!["cartozome:mod_aura_2024_pm10_moyan", "cartozome:mod_aura_2024_pm25_moyan", "cartozome:mod_aura_2024_no2_moyan", "cartozome:mod_aura_2024_o3_nbjdep120"].includes(layerName)) {
+      simpleAverages[layerName] = calculateSimpleAverage(values);
+    }
+  }
+
+  // Calculer la moyenne simple pour les UV
+  const uvValues = data.map(exp => parseFloat(exp.UV) || null);
+  const uvAverage = calculateSimpleAverage(uvValues);
+
+  // Générer le HTML
+  let html = `
+    <div class="pollutant-checkboxes">
+      <!-- Checkboxes pour sélectionner le polluant à afficher -->
+      <label><input type="checkbox" data-pollutant="PM10" class="pollutant-checkbox"> PM10</label>
+      <label><input type="checkbox" data-pollutant="PM2.5" class="pollutant-checkbox"> PM2.5</label>
+      <label><input type="checkbox" data-pollutant="NO2" class="pollutant-checkbox"> NO₂</label>
+      <label><input type="checkbox" data-pollutant="O3" class="pollutant-checkbox"> O₃</label>
+      <label><input type="checkbox" data-pollutant="Ambroisie" class="pollutant-checkbox"> Ambroisie</label>
+      <label><input type="checkbox" data-pollutant="Bruit" class="pollutant-checkbox"> Bruit</label>
+      <label><input type="checkbox" data-pollutant="UV" class="pollutant-checkbox"> UV</label>
+    </div>
+  `;
+
+  // Ajouter les cartes par catégorie
+  for (const cat of RESULT_CATEGORIES) {
+    html += `
+      <div class="cat-card">
+        <div class="cat-header">
+          ${cat.icon} ${cat.label}
+        </div>
+        <div class="cat-body">
+    `;
+
+    for (const layerName of cat.layers) {
+      const meta = LAYER_META[layerName];
+      const values = routeValues[layerName];
+      const isPollutant = ["cartozome:mod_aura_2024_pm10_moyan", "cartozome:mod_aura_2024_pm25_moyan", "cartozome:mod_aura_2024_no2_moyan", "cartozome:mod_aura_2024_o3_nbjdep120"].includes(layerName);
+      const average = isPollutant ? weightedAverages[layerName] : simpleAverages[layerName];
+
+      html += `<div class="res-row">`;
+      html += `
+        <div class="res-top">
+          <span class="res-label">${meta.label}</span>
+          ${average !== undefined ? `<span class="res-average">Moyenne : ${average.toFixed(1)} ${meta.unit}</span>` : ''}
+        </div>
+      `;
+
+      if (values && !values.some(val => val === null || isNaN(val))) {
+        html += buildSegmentedRouteBar(layerName, values);
+      } else {
+        html += `<span class="res-value no-data">Non disponible</span>`;
+      }
+
+      html += `</div>`;
+    }
+
+    html += `
+        </div>
+      </div>
+    `;
+  }
+
+  // Section UV
+  html += `
+    <div class="cat-card">
+      <div class="cat-header">
+        <img src="./img/uv.png" style="width:16px;height:16px;vertical-align:middle">
+        UV
+      </div>
+      <div class="cat-body">
+        <div class="res-row">
+          <div class="res-top">
+            <span class="res-label">Indice UV</span>
+            <span class="res-average">Moyenne : ${uvAverage.toFixed(1)}</span>
+          </div>
+          ${buildSegmentedRouteBar("uvLayer", uvValues)}
+        </div>
+      </div>
+    </div>
+  `;
+
+  content.innerHTML = html;
+
+  // Ajouter l'écouteur d'événement pour les checkboxes
+  document.querySelectorAll(".pollutant-checkbox").forEach((checkbox) => {
+    checkbox.addEventListener("change", function () {
+      document.querySelectorAll(".pollutant-checkbox").forEach((otherCheckbox) => {
+        if (otherCheckbox !== this) {
+          otherCheckbox.checked = false;
+        }
+      });
+
+      if (this.checked) {
+        const pollutant = this.getAttribute("data-pollutant");
+        colorRouteByPollutant(pollutant);
+      } else {
+        if (window.routeExposures) {
+          routingLayer.eachLayer((layer) => {
+            if (layer instanceof L.Polyline) {
+              routingLayer.removeLayer(layer);
+            }
+          });
+          const latLngs = window.routeExposures.latLngs;
+          L.polyline(latLngs, { color: "#1A4E72", weight: 4, opacity: 1 }).addTo(routingLayer);
+        }
+      }
+    });
+  });
+}
+
 function buildSegmentedRouteBar(layerName, values) {
   const legend = LAYER_LEGENDS[layerName];
   const thresholds = LAYER_THRESHOLDS[layerName];
 
-  if (!legend || !thresholds || !values || values.length === 0) {
+  if (!legend || !thresholds || !values || values.length < 2) {
     return "";
   }
 
-  // Calcul de la largeur de chaque segment (25 segments = 4% chacun)
-  const segmentWidth = 100 / values.length;
-
-  // Génération des segments
-  const segments = values.map((value, index) => {
-    const color = getLayerValueColor(layerName, value);
-    const left = index * segmentWidth;
-    return `
-      <div style="
-        position: absolute;
-        left: ${left}%;
-        width: ${segmentWidth}%;
-        height: 10px;
-        background-color: ${color};
-        
-        box-sizing: border-box;
-      "></div>
-    `;
-  }).join("");
-
-  // Ajout du tick OMS si applicable
-  let tickHTML = "";
-  const omsValue = OMS_THRESHOLDS[layerName];
-  if (omsValue !== undefined) {
-    // Trouver la position du seuil OMS dans la barre
-    let omsPosition = 0;
-    for (let i = 0; i < thresholds.length - 1; i++) {
-      if (omsValue >= thresholds[i] && omsValue < thresholds[i + 1]) {
-        omsPosition = (i + (omsValue - thresholds[i]) / (thresholds[i + 1] - thresholds[i])) / (thresholds.length - 1);
-        break;
-      }
-    }
-    const omsLeft = omsPosition * 100;
-    
+  // Calculer la couleur pour chaque segment
+  const segments = [];
+  for (let i = 0; i < values.length - 1; i++) {
+    const segmentValue = (values[i] + values[i + 1]) / 2;
+    const color = getLayerValueColor(layerName, segmentValue);
+    segments.push(color);
   }
 
+  // Générer le HTML pour la barre segmentée
+  const segmentWidth = 100 / segments.length;
+  const segmentsHTML = segments.map((color, i) => `
+    <div style="
+      position: absolute;
+      left: ${i * segmentWidth}%;
+      width: ${segmentWidth}%;
+      height: 10px;
+      background-color: ${color};
+      box-sizing: border-box;
+    "></div>
+  `).join("");
+
   return `
-  <div style="margin-top: 6px; display: flex; align-items: center; gap: 6px;">
-    <span style="
-      display: inline-flex; align-items: center; justify-content: center;
-      width: 18px; height: 18px; border-radius: 50%;
-      background: #5aacbe; color: white;
-      font-size: 0.68rem; font-weight: 700; flex-shrink: 0;
-    ">D</span>
-    <div style="position: relative; height: 10px; flex: 1; border-radius: 4px; overflow: hidden;">
-      ${segments}
-      ${tickHTML}
+    <div style="margin-top: 6px; position: relative; height: 10px;">
+      ${segmentsHTML}
     </div>
-    <span style="
-      display: inline-flex; align-items: center; justify-content: center;
-      width: 18px; height: 18px; border-radius: 50%;
-      background: #e8928f; color: white;
-      font-size: 0.68rem; font-weight: 700; flex-shrink: 0;
-    ">A</span>
-  </div>
-`;
+  `;
 }
+
 
 function colorRouteByPollutant(pollutant) {
   if (!window.routeExposures) return;
 
   const { points, data } = window.routeExposures;
 
-  // Déterminez la couche correspondante au polluant
+  // Déterminer la couche correspondante au polluant
   const layerMap = {
     PM10: "cartozome:mod_aura_2024_pm10_moyan",
     "PM2.5": "cartozome:mod_aura_2024_pm25_moyan",
@@ -2034,24 +2165,30 @@ function colorRouteByPollutant(pollutant) {
   const layerName = layerMap[pollutant];
   if (!layerName) return;
 
-  // Récupérez les valeurs du polluant
+  // Récupérer les valeurs du polluant
   const values = data.map((exp) => {
     if (pollutant === "UV") return parseFloat(exp.UV);
     if (pollutant === "PM2.5") return parseFloat(exp["PM2.5"]);
     return parseFloat(exp[pollutant]);
   });
 
-  // Créez un tableau de couleurs pour chaque segment
-  const colors = values.map((value) => getLayerValueColor(layerName, value));
-
-  // Effacez l'itinéraire actuel
+  // Effacer l'itinéraire actuel
   routingLayer.eachLayer((layer) => {
     if (layer instanceof L.Polyline) {
       routingLayer.removeLayer(layer);
     }
   });
 
-  // Créez un tableau de LatLngs avec des segments colorés
+  // Créer un tableau de couleurs pour chaque segment
+  const colors = [];
+  for (let i = 0; i < values.length - 1; i++) {
+    // Calculer la moyenne des deux points du segment
+    const segmentValue = (values[i] + values[i + 1]) / 2;
+    // Obtenir la couleur correspondante
+    colors.push(getLayerValueColor(layerName, segmentValue));
+  }
+
+  // Créer un tableau de segments colorés
   const segments = [];
   for (let i = 0; i < points.length - 1; i++) {
     segments.push({
@@ -2060,128 +2197,12 @@ function colorRouteByPollutant(pollutant) {
     });
   }
 
-  // Ajoutez les segments colorés
+  // Ajouter les segments colorés à la carte
   segments.forEach((segment) => {
     L.polyline(segment.latlngs, {
       color: segment.color,
       weight: 4,
       opacity: 1,
     }).addTo(routingLayer);
-  });
-}
-
-function renderRouteResultsPanel(startAddress, endAddress, exposures) {
-  const content = document.getElementById("results-content");
-  document.getElementById("results-address").textContent = `Itinéraire: ${startAddress} → ${endAddress}`;
-
-  let html = `
-    <div class="pollutant-checkboxes">
-      <label><input type="checkbox" data-pollutant="PM10" class="pollutant-checkbox"> PM10</label>
-      <label><input type="checkbox" data-pollutant="PM2.5" class="pollutant-checkbox"> PM2.5</label>
-      <label><input type="checkbox" data-pollutant="NO2" class="pollutant-checkbox"> NO₂</label>
-      <label><input type="checkbox" data-pollutant="O3" class="pollutant-checkbox"> O₃</label>
-      <label><input type="checkbox" data-pollutant="Ambroisie" class="pollutant-checkbox"> Ambroisie</label>
-      <label><input type="checkbox" data-pollutant="Bruit" class="pollutant-checkbox"> Bruit</label>
-      <label><input type="checkbox" data-pollutant="UV" class="pollutant-checkbox"> UV</label>
-    </div>
-  `;
-
-  // Préparation des données par catégorie
-  const routeValues = {
-    "cartozome:mod_aura_2024_pm10_moyan": exposures.map((exp) => parseFloat(exp.PM10) || null),
-    "cartozome:mod_aura_2024_pm25_moyan": exposures.map((exp) => parseFloat(exp["PM2.5"]) || null),
-    "cartozome:mod_aura_2024_no2_moyan": exposures.map((exp) => parseFloat(exp.NO2) || null),
-    "cartozome:mod_aura_2024_o3_nbjdep120": exposures.map((exp) => parseFloat(exp.O3) || null),
-    "cartozome:Ambroisie_2024_AURA": exposures.map((exp) => parseFloat(exp.Ambroisie) || null),
-    "cartozome:sous_indice_multibruit_orhane_2023": exposures.map((exp) => parseFloat(exp.Bruit) || null),
-  };
-
-  // Section UV
-  const uvValues = exposures.map((exp) => parseFloat(exp.UV) || null);
-
-  // Ajoutez le reste du contenu du panel de résultats
-  for (const cat of RESULT_CATEGORIES) {
-    html += `
-      <div class="cat-card">
-        <div class="cat-header">
-          ${cat.icon} ${cat.label}
-        </div>
-        <div class="cat-body">
-    `;
-
-    for (const layerName of cat.layers) {
-      const meta = LAYER_META[layerName];
-      const values = routeValues[layerName];
-
-      html += `<div class="res-row">`;
-      html += `
-        <div class="res-top">
-          <span class="res-label">${meta.label}</span>
-        </div>
-      `;
-
-      if (!values || values.some((val) => val === null || isNaN(val))) {
-        html += `<span class="res-value no-data">Non disponible</span>`;
-      } else {
-        html += buildSegmentedRouteBar(layerName, values);
-      }
-
-      html += `</div>`;
-    }
-
-    html += `
-        </div>
-      </div>
-    `;
-  }
-
-  // Ajout de la section UV
-  if (uvValues && uvValues.length > 0) {
-    html += `
-      <div class="cat-card">
-        <div class="cat-header">
-          <img src="./img/uv.png" style="width:16px;height:16px;vertical-align:middle">
-          UV
-        </div>
-        <div class="cat-body">
-          <div class="res-row">
-            <div class="res-top">
-              <span class="res-label">Indice UV</span>
-            </div>
-            ${buildSegmentedRouteBar("uvLayer", uvValues)}
-          </div>
-        </div>
-      </div>
-    `;
-  }
-
-  content.innerHTML = html;
-
-  // Ajoutez l'écouteur d'événement pour les checkboxes après avoir mis à jour le contenu
-  document.querySelectorAll(".pollutant-checkbox").forEach((checkbox) => {
-    checkbox.addEventListener("change", function () {
-      // Décochez toutes les autres checkboxes
-      document.querySelectorAll(".pollutant-checkbox").forEach((otherCheckbox) => {
-        if (otherCheckbox !== this) {
-          otherCheckbox.checked = false;
-        }
-      });
-
-      if (this.checked) {
-        const pollutant = this.getAttribute("data-pollutant");
-        colorRouteByPollutant(pollutant);
-      } else {
-        // Si aucune checkbox n'est cochée, réaffichez l'itinéraire par défaut
-        if (window.routeExposures) {
-          routingLayer.eachLayer((layer) => {
-            if (layer instanceof L.Polyline) {
-              routingLayer.removeLayer(layer);
-            }
-          });
-          const latLngs = window.routeExposures.latLngs;
-          L.polyline(latLngs, { color: "#1A4E72", weight: 4, opacity: 1 }).addTo(routingLayer);
-        }
-      }
-    });
   });
 }
