@@ -297,7 +297,7 @@ const LAYER_LEGENDS = {
   },
 
   "cartozome:Ambroisie_2024_AURA": {
-    unit: "grains/m³", oms: null,
+    unit: "Nombre de jour avec un RAEP >3", oms: null,
     entries: [
       { color: '#b2e8e4', label: '0'    },
       { color: '#7ecdc2', label: '3'    },
@@ -416,33 +416,27 @@ function buildLegendHTML(layerName) {
  */
 function buildSegmentedBar(def) {
   const n = def.entries.length;
+  const unitLabel = def.unit ? `<div class="lgd-col-unit">${def.unit}</div>` : '';
 
   const segments = def.entries.map((e, i) => {
     const radius = i === 0 ? '4px 0 0 4px' : i === n - 1 ? '0 4px 4px 0' : '0';
     return `<div class="lgd-seg" style="background:${e.color};opacity:${LAYER_OPACITY};border-radius:${radius};flex:1"></div>`;
   }).join('');
 
-  // Mode columnLabels : liste verticale case + label (bruit)
   if (def.centerLabels) {
-    const unitLabel = def.unit ? `<div class="lgd-col-unit">${def.unit}</div>` : '';
-    const rows = def.entries.map((e, i) => {
-      return `<div class="lgd-col-row">
+    const rows = def.entries.map((e) => `<div class="lgd-col-row">
         <span class="lgd-col-swatch" style="background:${e.color};opacity:${LAYER_OPACITY}"></span>
         <span class="lgd-col-label">${e.label}</span>
-      </div>`;
-    }).join('');
+      </div>`).join('');
     return `<div class="lgd-col-list">${unitLabel}${rows}</div>`;
   }
 
-  // Mode défaut : labels aux bordures gauches + seuil OMS au-dessus
   const borderLabels = def.entries.map((e, i) => {
     const pct = (i / n) * 100;
     return `<span class="lgd-border-label" style="left:${pct}%">${e.label}</span>`;
   }).join('');
 
-  const omsIdx = def.oms != null
-    ? def.entries.findIndex(e => e.label === String(def.oms))
-    : -1;
+  const omsIdx = def.oms != null ? def.entries.findIndex(e => e.label === String(def.oms)) : -1;
   const omsAbove = omsIdx >= 0 ? (() => {
     const pct = (omsIdx / n) * 100;
     return `<div class="lgd-oms-above" style="left:${pct}%">
@@ -452,7 +446,8 @@ function buildSegmentedBar(def) {
   })() : '';
 
   return `
-    <div class="lgd-bar-outer">
+    <div class="lgd-bar-outer${def.oms == null ? ' lgd-bar-outer--no-oms' : ''}">
+      ${unitLabel}
       ${omsAbove}
       <div class="lgd-seg-bar">${segments}</div>
       <div class="lgd-border-labels">${borderLabels}</div>

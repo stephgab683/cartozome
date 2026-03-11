@@ -584,6 +584,10 @@ html, body {
     padding-bottom: 14px;
 }
 
+.lgd-bar-outer--no-oms {
+    padding-top: 6px;
+}
+
 .lgd-bar-outer--center {
     padding-top: 0;
 }
@@ -620,7 +624,7 @@ html, body {
 
 .lgd-oms-line {
     position: absolute;
-    top: 24px;
+    top: 40px;
     height: 20px;
     width: 2px;
     background: #333;
@@ -631,7 +635,7 @@ html, body {
 
 .lgd-oms-above {
     position: absolute;
-    top: 0;
+    top: 10px;
     display: flex;
     flex-direction: column;
     align-items: center;
