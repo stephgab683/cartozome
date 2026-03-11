@@ -738,27 +738,22 @@ document.getElementById("calc-route-btn").addEventListener("click", async () => 
   const endLatLng = L.latLng(endCoords[1], endCoords[0]);
   L.marker(endLatLng, { icon: iconArrivee }).addTo(routingLayer).bindPopup("Arrivée");
 
-  // Récupérer l'itinéraire complet
   const routeData = await getRoute(startCoords, endCoords);
   if (!routeData) {
     alert("Impossible de calculer l'itinéraire");
     return;
   }
 
-  // Extraire les coordonnées et les durées
   const latLngs = routeData.geometry.coordinates.map(c => L.latLng(c[1], c[0]));
   const routeLine = L.polyline(latLngs, { color: "#1A4E72", weight: 4, opacity: 1 }).addTo(routingLayer);
   map.fitBounds(routeLine.getBounds(), { padding: [50, 50] });
 
-  // Extraire les durées des tronçons
   const durations = routeData.portions.flatMap(portion =>
     portion.steps.map(step => step.duration)
   );
 
-  // Extraire les coordonnées des points (sans échantillonnage)
   const allPoints = latLngs;
 
-  // Appel à l'API pour obtenir les valeurs des indicateurs pour TOUS les points
   const exposures = await fetch("http://localhost:8000/indicateursItineraire", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -767,18 +762,23 @@ document.getElementById("calc-route-btn").addEventListener("click", async () => 
     }),
   }).then(r => r.json());
 
-  // Stocker les données dans une variable globale
+  if (!exposures || !Array.isArray(exposures) || exposures.length === 0) {
+    alert("Erreur lors de la récupération des indicateurs.");
+    return;
+  }
+
   window.routeExposures = {
-    points: allPoints,          // Tous les points de l'itinéraire
-    durations: durations,       // Durées réelles des tronçons
-    data: exposures,             // Valeurs des indicateurs
-    latLngs: latLngs,            // Pour l'affichage
-    totalDuration: durations.reduce((a, b) => a + b, 0),  // Durée totale
+    points: allPoints,
+    durations: durations,
+    data: exposures,
+    latLngs: latLngs,
+    totalDuration: durations.reduce((a, b) => a + b, 0),
   };
 
   openResultsPanel();
   renderRouteResultsPanel(routeStart, routeEnd, exposures);
 });
+
 
 
 
@@ -1954,64 +1954,94 @@ document.getElementById("calc-compare-btn").addEventListener("click", async () =
 // ======================================== ITINERAIRE ========================
 // Calcul de la moyenne pondérée pour les polluants
 function calculateWeightedAverage(values, durations, totalDuration) {
-  let weightedSum = 0;
-  for (let i = 0; i < values.length - 1; i++) {
-    const segmentValue = (values[i] + values[i + 1]) / 2;
-    weightedSum += segmentValue * durations[i];
+  if (!values || !durations || values.length < 2 || durations.length < 1 || totalDuration <= 0) {
+    console.error("Données invalides pour le calcul de la moyenne pondérée");
+    return null;
   }
-  return weightedSum / totalDuration;
+
+  let weightedSum = 0;
+  let validDurationSum = 0;
+
+  for (let i = 0; i < values.length - 1; i++) {
+    const startValue = values[i];
+    const endValue = values[i + 1];
+    const duration = durations[i];
+
+    if (isNaN(startValue) || isNaN(endValue) || isNaN(duration) || duration <= 0) {
+      continue;
+    }
+
+    const segmentValue = (startValue + endValue) / 2;
+    weightedSum += segmentValue * duration;
+    validDurationSum += duration;
+  }
+
+  if (validDurationSum <= 0) {
+    return null;
+  }
+
+  return weightedSum / validDurationSum;
 }
+
 
 // Calcul de la moyenne simple pour les autres indicateurs
 function calculateSimpleAverage(values) {
-  return values.reduce((a, b) => a + b, 0) / values.length;
+  if (!values || values.length === 0) {
+    return null;
+  }
+  const validValues = values.filter(val => !isNaN(val));
+  if (validValues.length === 0) {
+    return null;
+  }
+  return validValues.reduce((a, b) => a + b, 0) / validValues.length;
 }
+
 
 function renderRouteResultsPanel(startAddress, endAddress, exposures) {
   const content = document.getElementById("results-content");
   document.getElementById("results-address").textContent = `Itinéraire: ${startAddress} → ${endAddress}`;
 
-  // Récupérer les données de l'itinéraire
   const { points, durations, data, totalDuration } = window.routeExposures;
 
-  // Préparer les valeurs des indicateurs
+  if (!points || !durations || !data || !totalDuration) {
+    content.innerHTML = "<p>Erreur : données manquantes pour l'itinéraire.</p>";
+    return;
+  }
+
   const routeValues = {
-    // Polluants (moyenne pondérée)
-    "cartozome:mod_aura_2024_pm10_moyan": data.map(exp => parseFloat(exp.PM10) || null),
-    "cartozome:mod_aura_2024_pm25_moyan": data.map(exp => parseFloat(exp["PM2.5"]) || null),
-    "cartozome:mod_aura_2024_no2_moyan": data.map(exp => parseFloat(exp.NO2) || null),
-    "cartozome:mod_aura_2024_o3_nbjdep120": data.map(exp => parseFloat(exp.O3) || null),
-    // Autres indicateurs (moyenne simple)
-    "cartozome:Ambroisie_2024_AURA": data.map(exp => parseFloat(exp.Ambroisie) || null),
-    "cartozome:sous_indice_multibruit_orhane_2023": data.map(exp => parseFloat(exp.Bruit) || null),
+    "cartozome:mod_aura_2024_pm10_moyan": data.map(exp => parseFloat(exp.PM10)),
+    "cartozome:mod_aura_2024_pm25_moyan": data.map(exp => parseFloat(exp["PM2.5"])),
+    "cartozome:mod_aura_2024_no2_moyan": data.map(exp => parseFloat(exp.NO2)),
+    "cartozome:mod_aura_2024_o3_nbjdep120": data.map(exp => parseFloat(exp.O3)),
+    "cartozome:Ambroisie_2024_AURA": data.map(exp => parseFloat(exp.Ambroisie)),
+    "cartozome:sous_indice_multibruit_orhane_2023": data.map(exp => parseFloat(exp.Bruit)),
   };
 
-  // Calculer les moyennes pondérées pour les polluants
   const weightedAverages = {};
-  for (const [layerName, values] of Object.entries(routeValues)) {
-    if (values.some(val => val === null || isNaN(val))) continue;
-    if (["cartozome:mod_aura_2024_pm10_moyan", "cartozome:mod_aura_2024_pm25_moyan", "cartozome:mod_aura_2024_no2_moyan", "cartozome:mod_aura_2024_o3_nbjdep120"].includes(layerName)) {
-      weightedAverages[layerName] = calculateWeightedAverage(values, durations, totalDuration);
-    }
-  }
-
-  // Calculer les moyennes simples pour les autres indicateurs
   const simpleAverages = {};
-  for (const [layerName, values] of Object.entries(routeValues)) {
-    if (values.some(val => val === null || isNaN(val))) continue;
-    if (!["cartozome:mod_aura_2024_pm10_moyan", "cartozome:mod_aura_2024_pm25_moyan", "cartozome:mod_aura_2024_no2_moyan", "cartozome:mod_aura_2024_o3_nbjdep120"].includes(layerName)) {
+
+  // Calcul des moyennes pondérées pour les polluants
+  ["cartozome:mod_aura_2024_pm10_moyan", "cartozome:mod_aura_2024_pm25_moyan", "cartozome:mod_aura_2024_no2_moyan", "cartozome:mod_aura_2024_o3_nbjdep120"].forEach(layerName => {
+    const values = routeValues[layerName].filter(val => !isNaN(val));
+    if (values.length > 0) {
+      weightedAverages[layerName] = calculateWeightedAverage(values, durations.slice(0, values.length - 1), totalDuration);
+    }
+  });
+
+  // Calcul des moyennes simples pour les autres indicateurs
+  ["cartozome:Ambroisie_2024_AURA", "cartozome:sous_indice_multibruit_orhane_2023"].forEach(layerName => {
+    const values = routeValues[layerName].filter(val => !isNaN(val));
+    if (values.length > 0) {
       simpleAverages[layerName] = calculateSimpleAverage(values);
     }
-  }
+  });
 
-  // Calculer la moyenne simple pour les UV
-  const uvValues = data.map(exp => parseFloat(exp.UV) || null);
-  const uvAverage = calculateSimpleAverage(uvValues);
+  // Calcul de la moyenne simple pour les UV
+  const uvValues = data.map(exp => parseFloat(exp.UV)).filter(val => !isNaN(val));
+  const uvAverage = uvValues.length > 0 ? calculateSimpleAverage(uvValues) : null;
 
-  // Générer le HTML
   let html = `
     <div class="pollutant-checkboxes">
-      <!-- Checkboxes pour sélectionner le polluant à afficher -->
       <label><input type="checkbox" data-pollutant="PM10" class="pollutant-checkbox"> PM10</label>
       <label><input type="checkbox" data-pollutant="PM2.5" class="pollutant-checkbox"> PM2.5</label>
       <label><input type="checkbox" data-pollutant="NO2" class="pollutant-checkbox"> NO₂</label>
@@ -2022,7 +2052,6 @@ function renderRouteResultsPanel(startAddress, endAddress, exposures) {
     </div>
   `;
 
-  // Ajouter les cartes par catégorie
   for (const cat of RESULT_CATEGORIES) {
     html += `
       <div class="cat-card">
@@ -2042,11 +2071,11 @@ function renderRouteResultsPanel(startAddress, endAddress, exposures) {
       html += `
         <div class="res-top">
           <span class="res-label">${meta.label}</span>
-          ${average !== undefined ? `<span class="res-average">Moyenne : ${average.toFixed(1)} ${meta.unit}</span>` : ''}
+          ${average !== undefined && average !== null ? `<span class="res-average">Moyenne : ${average.toFixed(1)} ${meta.unit}</span>` : '<span class="res-value no-data">Non disponible</span>'}
         </div>
       `;
 
-      if (values && !values.some(val => val === null || isNaN(val))) {
+      if (values && values.some(val => !isNaN(val))) {
         html += buildSegmentedRouteBar(layerName, values);
       } else {
         html += `<span class="res-value no-data">Non disponible</span>`;
@@ -2072,9 +2101,9 @@ function renderRouteResultsPanel(startAddress, endAddress, exposures) {
         <div class="res-row">
           <div class="res-top">
             <span class="res-label">Indice UV</span>
-            <span class="res-average">Moyenne : ${uvAverage.toFixed(1)}</span>
+            ${uvAverage !== undefined && uvAverage !== null ? `<span class="res-average">Moyenne : ${uvAverage.toFixed(1)}</span>` : '<span class="res-value no-data">Non disponible</span>'}
           </div>
-          ${buildSegmentedRouteBar("uvLayer", uvValues)}
+          ${uvValues.length > 0 ? buildSegmentedRouteBar("uvLayer", uvValues) : '<span class="res-value no-data">Non disponible</span>'}
         </div>
       </div>
     </div>
@@ -2082,7 +2111,6 @@ function renderRouteResultsPanel(startAddress, endAddress, exposures) {
 
   content.innerHTML = html;
 
-  // Ajouter l'écouteur d'événement pour les checkboxes
   document.querySelectorAll(".pollutant-checkbox").forEach((checkbox) => {
     checkbox.addEventListener("change", function () {
       document.querySelectorAll(".pollutant-checkbox").forEach((otherCheckbox) => {
@@ -2109,23 +2137,27 @@ function renderRouteResultsPanel(startAddress, endAddress, exposures) {
   });
 }
 
+
 function buildSegmentedRouteBar(layerName, values) {
   const legend = LAYER_LEGENDS[layerName];
   const thresholds = LAYER_THRESHOLDS[layerName];
 
   if (!legend || !thresholds || !values || values.length < 2) {
-    return "";
+    return "<span class='res-value no-data'>Non disponible</span>";
   }
 
-  // Calculer la couleur pour chaque segment
+  const validValues = values.filter(val => !isNaN(val));
+  if (validValues.length < 2) {
+    return "<span class='res-value no-data'>Non disponible</span>";
+  }
+
   const segments = [];
-  for (let i = 0; i < values.length - 1; i++) {
-    const segmentValue = (values[i] + values[i + 1]) / 2;
+  for (let i = 0; i < validValues.length - 1; i++) {
+    const segmentValue = (validValues[i] + validValues[i + 1]) / 2;
     const color = getLayerValueColor(layerName, segmentValue);
     segments.push(color);
   }
 
-  // Générer le HTML pour la barre segmentée
   const segmentWidth = 100 / segments.length;
   const segmentsHTML = segments.map((color, i) => `
     <div style="
@@ -2151,7 +2183,6 @@ function colorRouteByPollutant(pollutant) {
 
   const { points, data } = window.routeExposures;
 
-  // Déterminer la couche correspondante au polluant
   const layerMap = {
     PM10: "cartozome:mod_aura_2024_pm10_moyan",
     "PM2.5": "cartozome:mod_aura_2024_pm25_moyan",
@@ -2165,30 +2196,24 @@ function colorRouteByPollutant(pollutant) {
   const layerName = layerMap[pollutant];
   if (!layerName) return;
 
-  // Récupérer les valeurs du polluant
   const values = data.map((exp) => {
     if (pollutant === "UV") return parseFloat(exp.UV);
     if (pollutant === "PM2.5") return parseFloat(exp["PM2.5"]);
     return parseFloat(exp[pollutant]);
   });
 
-  // Effacer l'itinéraire actuel
   routingLayer.eachLayer((layer) => {
     if (layer instanceof L.Polyline) {
       routingLayer.removeLayer(layer);
     }
   });
 
-  // Créer un tableau de couleurs pour chaque segment
   const colors = [];
   for (let i = 0; i < values.length - 1; i++) {
-    // Calculer la moyenne des deux points du segment
     const segmentValue = (values[i] + values[i + 1]) / 2;
-    // Obtenir la couleur correspondante
     colors.push(getLayerValueColor(layerName, segmentValue));
   }
 
-  // Créer un tableau de segments colorés
   const segments = [];
   for (let i = 0; i < points.length - 1; i++) {
     segments.push({
@@ -2197,7 +2222,6 @@ function colorRouteByPollutant(pollutant) {
     });
   }
 
-  // Ajouter les segments colorés à la carte
   segments.forEach((segment) => {
     L.polyline(segment.latlngs, {
       color: segment.color,
@@ -2206,3 +2230,4 @@ function colorRouteByPollutant(pollutant) {
     }).addTo(routingLayer);
   });
 }
+
