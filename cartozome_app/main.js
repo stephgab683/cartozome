@@ -844,14 +844,9 @@ document.getElementById("calc-route-btn").addEventListener("click", async () => 
   L.marker(endLatLng, { icon: iconArrivee }).addTo(routingLayer).bindPopup("Arrivée");
 
   // Passez aussi routeStart et routeEnd à getRoute
-  const routeData = await getRoute(startCoords, endCoords, routeStart, routeEnd);
-  if (!routeData) {
-    alert("Impossible de calculer l'itinéraire");
-    return;
-  }
-
-  // ... reste du code
+  await getRoute(startCoords, endCoords, routeStart, routeEnd);
 });
+
 
 
 
@@ -2096,7 +2091,7 @@ function renderRouteResultsPanel(startAddress, endAddress, exposures) {
   const simpleAverages = {};
 
   // Calcul des moyennes pondérées pour les polluants
-  ["cartozome:mod_aura_2024_pm10_moyan", "cartozome:mod_aura_2024_pm25_moyan", "cartozome:mod_aura_2024_no2_moyan", "cartozome:mod_aura_2024_o3_nbjdep120"].forEach(layerName => {
+  ["cartozome:mod_aura_2024_pm10_moyan", "cartozome:mod_aura_2024_pm25_moyan", "cartozome:mod_aura_2024_no2_moyan"].forEach(layerName => {
     const values = routeValues[layerName].filter(val => !isNaN(val));
     if (values.length > 0) {
       weightedAverages[layerName] = calculateWeightedAverage(values, durations.slice(0, values.length - 1), totalDuration);
@@ -2104,7 +2099,7 @@ function renderRouteResultsPanel(startAddress, endAddress, exposures) {
   });
 
   // Calcul des moyennes simples pour les autres indicateurs
-  ["cartozome:Ambroisie_2024_AURA", "cartozome:sous_indice_multibruit_orhane_2023"].forEach(layerName => {
+  ["cartozome:Ambroisie_2024_AURA", "cartozome:sous_indice_multibruit_orhane_2023", "cartozome:mod_aura_2024_o3_nbjdep120"].forEach(layerName => {
     const values = routeValues[layerName].filter(val => !isNaN(val));
     if (values.length > 0) {
       simpleAverages[layerName] = calculateSimpleAverage(values);
