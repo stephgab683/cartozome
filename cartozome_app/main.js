@@ -107,8 +107,6 @@ async function loadUvLayer() {
         feature.properties.nom_commune ||
         feature.properties.libelle ||
         "Commune";
-
-      layer.bindPopup(`Commune : ${nom}<br>UV : ${uv}`);
     }
   });
 }
