@@ -193,7 +193,7 @@ npm install
 npm start
 ```
 
-Le front-end est alors accessible sur **http://localhost:5173** et se connecte aux services back-end démarrés via Docker Compose.
+Le front-end est alors accessible sur un port local affiché dans le temrinal **http://localhost:####** et se connecte aux services back-end démarrés via Docker Compose.
 
 ### Reconstruire les conteneurs
 
