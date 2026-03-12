@@ -954,7 +954,7 @@ html, body {
     border-radius: 16px;
     box-shadow: 0 4px 20px rgba(0,0,0,0.15);
     z-index: 1000;
-    max-height: 60vh;
+    max-height: 52vh;
     overflow: hidden;
     display: flex;
     flex-direction: column;

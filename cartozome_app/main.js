@@ -107,6 +107,8 @@ async function loadUvLayer() {
         feature.properties.nom_commune ||
         feature.properties.libelle ||
         "Commune";
+
+      layer.bindPopup(`Commune : ${nom}<br>UV : ${uv}`);
     }
   });
 }
@@ -811,6 +813,7 @@ async function getRoute(startCoords, endCoords, routeStart, routeEnd) {
 
 // Mise à jour de l'écouteur pour le bouton "calc-route-btn"
 document.getElementById("calc-route-btn").addEventListener("click", async () => {
+  resetResultsPanel();
   routingLayer.clearLayers();
 
   const routeStart = document.getElementById("route-start").value.trim();
@@ -876,9 +879,18 @@ function openResultsPanel() {
   resultsPanel.classList.remove("hidden");
 }
 
+// Réinitialise et cache le panel de résultats
+function resetResultsPanel() {
+  resultsPanel.classList.add("hidden");
+  const content = document.getElementById("results-content");
+  if (content) content.innerHTML = "";
+  const address = document.getElementById("results-address");
+  if (address) address.textContent = "";
+}
+
 // Ferme le panel au clic sur la croix
 document.getElementById("results-close").addEventListener("click", () => {
-  resultsPanel.classList.add("hidden");
+  resetResultsPanel();
 });
 
 // =============================================
@@ -997,6 +1009,7 @@ function attachGeolocate() {
 // Validation point unique : géocode l'adresse, place un marqueur, centre la vue.
 // TODO : interroger les couches actives pour ce point et afficher les valeurs d'exposition
 document.getElementById("calc-point-btn").addEventListener("click", async () => {
+  resetResultsPanel();
   routingLayer.clearLayers();
 
   const pointInput = document.getElementById("point-start").value.trim();
@@ -1089,6 +1102,11 @@ btnAddress.addEventListener("click", setAddressMode);
 btnCompare.addEventListener("click", setCompareMode);
 btnRoute.addEventListener("click", setRouteMode);
 
+// Reset le panel de résultats dès que l'utilisateur commence à modifier un champ
+["point-start", "compare-a", "compare-b", "route-start", "route-end"].forEach(id => {
+  const el = document.getElementById(id);
+  if (el) el.addEventListener("input", () => resetResultsPanel());
+});
 
 // =============================================
 // MÉTADONNÉES POUR LE PANEL DE RÉSULTATS
@@ -2000,6 +2018,7 @@ async function updateResultsForCompare(latA, lonA, addressA, latB, lonB, address
 }
 
 document.getElementById("calc-compare-btn").addEventListener("click", async () => {
+  resetResultsPanel();
   routingLayer.clearLayers();
 
   const inputA = document.getElementById("compare-a").value.trim();
