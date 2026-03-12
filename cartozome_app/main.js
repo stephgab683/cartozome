@@ -2212,7 +2212,6 @@ function renderRouteResultsPanel(startAddress, endAddress, exposures) {
   });
 }
 
-
 function buildSegmentedRouteBar(layerName, values) {
   const legend = LAYER_LEGENDS[layerName];
   const thresholds = LAYER_THRESHOLDS[layerName];
@@ -2245,9 +2244,26 @@ function buildSegmentedRouteBar(layerName, values) {
     "></div>
   `).join("");
 
+  const pillStyle = `
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: white;
+    flex-shrink: 0;
+  `;
+
   return `
-    <div style="margin-top: 6px; position: relative; height: 10px;">
-      ${segmentsHTML}
+    <div style="margin-top: 6px; display: flex; align-items: center; gap: 6px;">
+      <span style="${pillStyle} background: #5aacbe;">D</span>
+      <div style="position: relative; height: 10px; flex: 1; border-radius: 4px; overflow: hidden;">
+        ${segmentsHTML}
+      </div>
+      <span style="${pillStyle} background: #e8928f;">A</span>
     </div>
   `;
 }
