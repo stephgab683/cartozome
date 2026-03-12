@@ -237,7 +237,7 @@ const LAYER_LABELS = {
   "cartozome:mod_aura_2024_pm10_moyan":  "PM10",
   "cartozome:mod_aura_2024_pm25_moyan":  "PM2,5",
   "cartozome:mod_aura_2024_no2_moyan":   "NO2",
-  "cartozome:mod_aura_2024_o3_nbjdep120":  "O3 SOMO35",
+  "cartozome:mod_aura_2024_o3_nbjdep120":  "O3",
   "cartozome:Ambroisie_2024_AURA":       "Ambroisie",
   // Multi-taxons
   // Graminées
@@ -261,7 +261,7 @@ const LAYER_UNITS = {
   // Bouleau
   // Aulne
   // Armoise
-  "cartozome:sous_indice_multibruit_orhane_2023":"dB(A)",
+  "cartozome:sous_indice_multibruit_orhane_2023":" ",
 
 };
 
@@ -345,7 +345,7 @@ const LAYER_LEGENDS = {
   },
 
   "cartozome:sous_indice_multibruit_orhane_2023": {
-    unit: "dB(A)", oms: null, centerLabels: true,
+    unit: " ", oms: null, centerLabels: true,
     entries: [
       { color: '#78c679', label: 'Zone préservée ou Absence de données' },
       { color: '#addd8e', label: 'Zone peu altérée'                     },
@@ -1094,9 +1094,9 @@ const LAYER_META = {
   "cartozome:mod_aura_2024_pm10_moyan":           { label: "PM10",           unit: "µg/m³",   oms: 15,  thresholds: [0, 35]    },
   "cartozome:mod_aura_2024_pm25_moyan":           { label: "PM2.5",          unit: "µg/m³",   oms: 5,   thresholds: [0, 25]     },
   "cartozome:mod_aura_2024_no2_moyan":            { label: "NO₂",            unit: "µg/m³",   oms: 10,  thresholds: [0, 40]    },
-  "cartozome:mod_aura_2024_o3_nbjdep120":            { label: "O₃",             unit: "µg/m³·j", oms: null, thresholds: [0, 17500] },
-  "cartozome:Ambroisie_2024_AURA":                { label: "Ambroisie",      unit: "gr/m³",   oms: null, thresholds: [0, 500]     },
-  "cartozome:sous_indice_multibruit_orhane_2023": { label: "Indice multi-bruit", unit: "dB(A)", oms: null, thresholds: [0, 30]   },
+  "cartozome:mod_aura_2024_o3_nbjdep120":            { label: "O₃",             unit: "jours par an au-dessus du seuil", oms: null, thresholds: [0, 17500] },
+  "cartozome:Ambroisie_2024_AURA":                { label: "Ambroisie",      unit: "jours au-dessus du seuil",   oms: null, thresholds: [0, 500]     },
+  "cartozome:sous_indice_multibruit_orhane_2023": { label: "Indice multi-bruit", unit: " ", oms: null, thresholds: [0, 30]   },
 };
 
 // Structure des catégories affichées dans le panel
@@ -2099,7 +2099,7 @@ function renderRouteResultsPanel(startAddress, endAddress, exposures) {
   });
 
   // Calcul des moyennes simples pour les autres indicateurs
-  ["cartozome:Ambroisie_2024_AURA", "cartozome:sous_indice_multibruit_orhane_2023", "cartozome:mod_aura_2024_o3_nbjdep120"].forEach(layerName => {
+  ["cartozome:Ambroisie_2024_AURA", "cartozome:sous_indice_multibruit_orhane_2023","cartozome:mod_aura_2024_o3_nbjdep120" ].forEach(layerName => {
     const values = routeValues[layerName].filter(val => !isNaN(val));
     if (values.length > 0) {
       simpleAverages[layerName] = calculateSimpleAverage(values);
@@ -2134,14 +2134,16 @@ function renderRouteResultsPanel(startAddress, endAddress, exposures) {
     for (const layerName of cat.layers) {
       const meta = LAYER_META[layerName];
       const values = routeValues[layerName];
-      const isPollutant = ["cartozome:mod_aura_2024_pm10_moyan", "cartozome:mod_aura_2024_pm25_moyan", "cartozome:mod_aura_2024_no2_moyan", "cartozome:mod_aura_2024_o3_nbjdep120"].includes(layerName);
-      const average = isPollutant ? weightedAverages[layerName] : simpleAverages[layerName];
+      const isPollutant = ["cartozome:mod_aura_2024_pm10_moyan", "cartozome:mod_aura_2024_pm25_moyan", "cartozome:mod_aura_2024_no2_moyan"].includes(layerName);
+      
+      const average = (layerName === "cartozome:mod_aura_2024_o3_nbjdep120") ? simpleAverages[layerName] : (isPollutant ? weightedAverages[layerName] : simpleAverages[layerName]);
+
 
       html += `<div class="res-row">`;
       html += `
         <div class="res-top">
           <span class="res-label">${meta.label}</span>
-          ${average !== undefined && average !== null ? `<span class="res-average">Moyenne : ${average.toFixed(1)} ${meta.unit}</span>` : '<span class="res-value no-data">Non disponible</span>'}
+          ${average !== undefined && average !== null ? `<span class="res-average">Moy. : ${average.toFixed(1)} ${meta.unit}</span>` : '<span class="res-value no-data">Non disponible</span>'}
         </div>
       `;
 
@@ -2171,7 +2173,7 @@ function renderRouteResultsPanel(startAddress, endAddress, exposures) {
         <div class="res-row">
           <div class="res-top">
             <span class="res-label">Indice UV</span>
-            ${uvAverage !== undefined && uvAverage !== null ? `<span class="res-average">Moyenne : ${uvAverage.toFixed(1)}</span>` : '<span class="res-value no-data">Non disponible</span>'}
+            ${uvAverage !== undefined && uvAverage !== null ? `<span class="res-average">Moy. : ${uvAverage.toFixed(1)}</span>` : '<span class="res-value no-data">Non disponible</span>'}
           </div>
           ${uvValues.length > 0 ? buildSegmentedRouteBar("uvLayer", uvValues) : '<span class="res-value no-data">Non disponible</span>'}
         </div>
