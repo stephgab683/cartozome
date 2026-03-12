@@ -61,7 +61,7 @@ Cette commande télécharge les images Docker nécessaires et démarre les quatr
 > [!NOTE]
 > Le premier lancement peut prendre plusieurs minutes selon la connexion réseau.
 
-➡️ L'application est ensuite accessible à l'adresse : **http://localhost:5173/**
+➡️ L'application est ensuite accessible sur un port local affiché dans le temrinal : **http://localhost:####/**
 
 ### 3. Arrêter l'application
 
