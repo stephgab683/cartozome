@@ -27,7 +27,6 @@ html, body {
 /* POPUP DE BIENVENUE                                                                        */
 /* ========================================================================================= */
 
-/* Fond noir semi-transparent qui couvre toute la page et centre la boîte blanche           */
 #welcome-overlay {
     display: none;
     position: fixed;
@@ -41,20 +40,18 @@ html, body {
     align-items: center;
 }
 
-/* Boîte blanche centrée avec bordure bleue gauche, ombre portée et coins arrondis          */
 #welcome-popup {
     background: #fff;
     border-radius: 12px;
     padding: 30px 40px;
     max-width: 500px;
     width: 90%;
-    text-align: center;
     position: relative;
     box-shadow: 0 6px 30px rgba(0,0,0,0.25);
     border-left: 4px solid #2c426c;
+    animation: slideIn 0.2s ease;
 }
 
-/* Croix de fermeture positionnée en absolu en haut à droite de la boîte                   */
 #welcome-close {
     position: absolute;
     top: 12px;
@@ -68,17 +65,42 @@ html, body {
 
 #welcome-close:hover { color: #e71d73; }
 
-#welcome-popup h2 {
-    margin: 0 0 15px 0;
-    font-size: 1.5rem;
-    color: #2c426c;
+#welcome-content {
+    max-height: 60vh;
+    overflow-y: auto;
+    padding-right: 6px;
+    margin-top: 10px;
 }
 
-#welcome-popup p {
-    font-size: 1rem;
-    line-height: 1.6;
-    color: #444;
+#welcome-content::-webkit-scrollbar       { width: 6px; }
+#welcome-content::-webkit-scrollbar-thumb { background-color: #2c426c; border-radius: 3px; }
+
+/* Titre principal centré */
+#welcome-content h2:first-child {
+    margin: 0 0 20px 0;
+    font-size: 1.5rem;
+    color: #2c426c;
+    text-align: center;
 }
+
+/* Titres de section */
+#welcome-content h2 {
+    margin: 16px 0 4px 0;
+    font-size: 1rem;
+    color: #2c426c;
+    text-align: left;
+}
+
+#welcome-content p,
+#welcome-content ul,
+#welcome-content li {
+    font-size: 0.85rem;
+    line-height: 1.8;
+    color: #444;
+    margin: 0;
+}
+
+#welcome-content ul { padding-left: 18px; }
 
 /* ========================================================================================= */
 /* BANDEAU HAUT — Pill centrée flottante sur la carte, sans fond pleine largeur             */
