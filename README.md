@@ -61,7 +61,7 @@ Cette commande télécharge les images Docker nécessaires et démarre les quatr
 > [!NOTE]
 > Le premier lancement peut prendre plusieurs minutes selon la connexion réseau.
 
-➡️ L'application est ensuite accessible sur un port local affiché dans le temrinal : **http://localhost:####/**
+➡️ L'application est ensuite accessible sur un port local affiché dans le terminal : **http://localhost:####/**
 
 ### 3. Arrêter l'application
 
@@ -193,7 +193,7 @@ npm install
 npm start
 ```
 
-Le front-end est alors accessible sur un port local affiché dans le temrinal **http://localhost:####** et se connecte aux services back-end démarrés via Docker Compose.
+Le front-end est alors accessible sur un port local affiché dans le terminal **http://localhost:####** et se connecte aux services back-end démarrés via Docker Compose.
 
 ### Reconstruire les conteneurs
 
