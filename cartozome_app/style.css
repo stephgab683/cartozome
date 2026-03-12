@@ -276,7 +276,7 @@ html, body {
 }
 
 /* Hover rose CLB sur le bouton Valider                                                     */
-#search-panel button:not(.geolocate-btn):not(.clear-btn):hover { background-color: #e71d73; }
+#search-panel button:not(.geolocate-btn):not(.clear-btn):not(.clear-btn):hover { background-color: #e71d73; }
 
 /* ========================================================================================= */
 /* BOUTON GÉOLOCALISATION                                                                    */
@@ -1025,13 +1025,12 @@ html, body {
 }
 
 .transport-btn.active {
-    background: #2c426c;
-    color: white;
+    background: #e71d73 !important; 
+    color: white !important;
 }
 
-.transport-btn:disabled,
-.transport-btn.disabled {
-    opacity: 0.4;
+.transport-btn:disabled {
+    opacity: 0.35;
     cursor: not-allowed;
     pointer-events: none;
 }
@@ -1338,8 +1337,3 @@ html, body {
 }
 
 .pollutant-checkbox{ color: #c00e0e;}
-
-.transport-btn.active {
-  background-color: #5aacbe;
-  color: white;
-}
