@@ -210,7 +210,7 @@ L.TileLayer.BetterWMS = L.TileLayer.WMS.extend({
       .setLatLng(latlng)
       .setContent(
         `<div style="font-family:'Jost',sans-serif;font-size:0.85rem;line-height:1.8;">
-          <b style="color:#1A4E72;">${label}</b><br>
+          <b style="color:#2c426c;">${label}</b><br>
           ${val.toFixed(2)} ${unit}
         </div>`
       )
@@ -779,7 +779,7 @@ async function getRoute(startCoords, endCoords, routeStart, routeEnd) {
     const simplified = turf.simplify(line, { tolerance: 0.0001, highQuality: false });
     const simplifiedCoords = simplified.geometry.coordinates;
     const simplifiedLatLngs = simplifiedCoords.map(c => L.latLng(c[1], c[0]));
-    const routeLine = L.polyline(simplifiedLatLngs, { color: "#1A4E72", weight: 4, opacity: 1 }).addTo(routingLayer);
+    const routeLine = L.polyline(simplifiedLatLngs, { color: "#5aacbe", weight: 4, opacity: 1 }).addTo(routingLayer);
     map.fitBounds(routeLine.getBounds(), { padding: [50, 50] });
     // Préparation des points simplifiés pour l'API d'expositions
     const simplifiedPoints = simplifiedCoords.map(c => ({ latitude: c[1], longitude: c[0] }));
@@ -895,6 +895,7 @@ const searchPanel = document.getElementById("search-panel");
 // Affiche le panel adresse, cache les autres
 function setAddressMode() {
   routingLayer.clearLayers();
+  document.getElementById('btn-info-route').classList.add('hidden');
   document.getElementById('point-start').value = '';
   document.getElementById('panel-address').classList.remove('hidden');
   document.getElementById('panel-compare').classList.add('hidden');
@@ -909,6 +910,7 @@ function setAddressMode() {
 // Affiche le panel comparaison, cache les autres
 function setCompareMode() {
   routingLayer.clearLayers();
+  document.getElementById('btn-info-route').classList.add('hidden')
   document.getElementById('compare-a').value = '';
   document.getElementById('compare-b').value = '';
   document.getElementById('panel-compare').classList.remove('hidden');
@@ -924,6 +926,7 @@ function setCompareMode() {
 // Affiche le panel itinéraire, cache les autres
 function setRouteMode() {
   routingLayer.clearLayers();
+  document.getElementById('btn-info-route').classList.remove('hidden');
   document.getElementById('route-start').value = '';
   document.getElementById('route-end').value = '';
   document.getElementById('panel-route').classList.remove('hidden');
@@ -1675,7 +1678,7 @@ map.on("click", async (e) => {
 
     // Construire le contenu HTML de la popup
     let content = `<div style="font-family:'Jost',sans-serif;font-size:0.85rem;line-height:1.4;">`;
-    content += `<b style="color:#1A4E72;">Coordonnées :</b> ${lat.toFixed(6)}, ${lng.toFixed(6)}<br>`;
+    content += `<b style="color:#2c426c;">Coordonnées :</b> ${lat.toFixed(6)}, ${lng.toFixed(6)}<br>`;
     
     for (const [key, value] of Object.entries(data)) {
       content += `<b>${key}</b> : ${value ?? "n/a"}<br>`;
@@ -2209,7 +2212,6 @@ function renderRouteResultsPanel(startAddress, endAddress, exposures) {
   });
 }
 
-
 function buildSegmentedRouteBar(layerName, values) {
   const legend = LAYER_LEGENDS[layerName];
   const thresholds = LAYER_THRESHOLDS[layerName];
@@ -2242,9 +2244,26 @@ function buildSegmentedRouteBar(layerName, values) {
     "></div>
   `).join("");
 
+  const pillStyle = `
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: white;
+    flex-shrink: 0;
+  `;
+
   return `
-    <div style="margin-top: 6px; position: relative; height: 10px;">
-      ${segmentsHTML}
+    <div style="margin-top: 6px; display: flex; align-items: center; gap: 6px;">
+      <span style="${pillStyle} background: #2c426c;">D</span>
+      <div style="position: relative; height: 10px; flex: 1; border-radius: 4px; overflow: hidden;">
+        ${segmentsHTML}
+      </div>
+      <span style="${pillStyle} background: #e71d73;">A</span>
     </div>
   `;
 }
