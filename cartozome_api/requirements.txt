@@ -5,4 +5,7 @@ requests
 pyproj
 pydantic
 httpx
-Shapely
+shapely
+osmnx
+scikit-learn
+geopandas

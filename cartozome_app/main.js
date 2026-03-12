@@ -4,6 +4,8 @@ import L from 'leaflet';                                                     // 
 // URLs GeoServer local (WMS pour les rasters, WFS pour le bruit aérien)
 const GEOSERVER_URL = "http://localhost:8081/geoserver/wms";
 const GEOSERVER_WFS = "http://localhost:8081/geoserver/wfs";
+let currentTransportMode = "pedestrian"; // Mode par défaut : marche
+
 
 // =============================================
 // CARTE LEAFLET
@@ -30,6 +32,19 @@ L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
     '&copy; <a href="https://carto.com/attributions" target="_blank">CARTO</a>',
   subdomains: 'abcd',
 }).addTo(map);
+
+// Sélection des boutons de transport
+document.querySelectorAll('.transport-btn').forEach(button => {
+  button.addEventListener('click', function() {
+    // Retire la classe 'active' de tous les boutons
+    document.querySelectorAll('.transport-btn').forEach(btn => btn.classList.remove('active'));
+    // Ajoute la classe 'active' au bouton cliqué
+    this.classList.add('active');
+    // Met à jour le mode de transport
+    currentTransportMode = this.dataset.mode;
+  });
+});
+
 
 
 // =============================================
@@ -685,91 +700,114 @@ async function reverseGeocode(lat, lon) {
   }
 }
 
-// Calcule un itinéraire piéton entre deux points via bdtopo-osrm
-// Retourne un tableau de coordonnées [lon, lat]
-// Modifiez la fonction getRoute pour retourner les données complètes
-// async function getRoute(start, end) {
-//   const url =
-//     `https://data.geopf.fr/navigation/itineraire?resource=bdtopo-osrm` +
-//     `&start=${start.join(',')}` +
-//     `&end=${end.join(',')}` +
-//     `&profile=pedestrian` +
-//     `&timeUnit=minute` +
-//     `&crs=EPSG:4326`;
-//   try {
-//     const res = await fetch(url);
-//     const data = await res.json();
-//     return data; // Retourne toutes les données de l'itinéraire
-//   } catch (err) {
-//     console.error("[ROUTING ERROR]", err);
-//     return null;
-//   }
-// }
-
-
 async function getRoute(startCoords, endCoords, routeStart, routeEnd) {
-  const url = `https://data.geopf.fr/navigation/itineraire?resource=bdtopo-osrm&start=${startCoords.join(',')}&end=${endCoords.join(',')}&profile=pedestrian&timeUnit=minute&crs=EPSG:4326`;
-  try {
-    const res = await fetch(url);
+  let url;
+  if (currentTransportMode === "cycling") {
+    // Appel au backend FastAPI pour le vélo
+    const res = await fetch("http://localhost:8000/itineraire/velo", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        start: { latitude: startCoords[1], longitude: startCoords[0] },
+        end: { latitude: endCoords[1], longitude: endCoords[0] }
+      }),
+    });
     if (!res.ok) throw new Error(`Erreur HTTP ${res.status} : ${res.statusText}`);
     const data = await res.json();
-    console.log("Réponse de l'API :", data);
 
-    if (!data.geometry || !data.geometry.coordinates || data.geometry.coordinates.length === 0) {
-      throw new Error("Aucun itinéraire trouvé pour ces coordonnées.");
-    }
+    // Tracer la route avec Leaflet
+    const routeLayer = L.geoJSON(data, {
+      style: { color: "green", weight: 4, opacity: 1 }
+    }).addTo(routingLayer);
 
-    // Simplification avec Turf.js
-    const line = turf.lineString(data.geometry.coordinates);
-    const simplified = turf.simplify(line, { tolerance: 0.0001, highQuality: false });
-    const simplifiedCoords = simplified.geometry.coordinates; // Coordonnées simplifiées [lng, lat]
+    // Ajuster la vue
+    map.fitBounds(routeLayer.getBounds(), { padding: [50, 50] });
 
-    // Affichage de la polyligne simplifiée
-    const simplifiedLatLngs = simplifiedCoords.map(c => L.latLng(c[1], c[0]));
-    const routeLine = L.polyline(simplifiedLatLngs, { color: "#1A4E72", weight: 4, opacity: 1 }).addTo(routingLayer);
-    map.fitBounds(routeLine.getBounds(), { padding: [50, 50] });
+    // Extraire les coordonnées de la route
+    const coordinates = [];
+    data.features.forEach(feature => {
+      if (feature.geometry.type === "LineString") {
+        coordinates.push(...feature.geometry.coordinates);
+      }
+    });
 
-    // Préparation des points simplifiés pour l'API d'expositions
-    const simplifiedPoints = simplifiedCoords.map(c => ({ latitude: c[1], longitude: c[0] }));
+    // Pour les expositions, on utilise les points de la route
+    const simplifiedPoints = coordinates.map(c => ({ latitude: c[1], longitude: c[0] }));
 
-    // Calcul des expositions avec les points simplifiés
+    // Calcul des expositions
     const exposuresResponse = await fetch("http://localhost:8000/indicateursItineraire", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ coords: simplifiedPoints }),
     });
-
-    if (!exposuresResponse.ok) throw new Error(`Erreur HTTP ${exposuresResponse.status} lors de la récupération des indicateurs.`);
+    if (!exposuresResponse.ok) throw new Error(`Erreur ${exposuresResponse.status} lors de la récupération des indicateurs.`);
     const exposures = await exposuresResponse.json();
-    if (!exposures || !Array.isArray(exposures)) throw new Error("Format de réponse invalide pour les indicateurs.");
 
-    // Calcul des durées (à partir des portions/steps originaux)
-    // On réutilise les durées des steps originaux, mais on les ajuste au nombre de points simplifiés
-    const durations = data.portions?.flatMap(portion => portion.steps.map(step => step.duration)) || [];
-    // Répartir les durées sur les segments simplifiés (approximation)
-    const totalDuration = durations.reduce((a, b) => a + b, 0);
-    const numSimplifiedSegments = simplifiedLatLngs.length - 1;
-    const avgDurationPerSegment = totalDuration / numSimplifiedSegments;
-    const simplifiedDurations = Array(numSimplifiedSegments).fill(avgDurationPerSegment);
+    // Convertir les coordonnées en LatLng pour Leaflet
+    const latLngs = coordinates.map(c => L.latLng(c[1], c[0]));
 
+    // Calculer une durée approximative (par exemple, 10 minutes par km)
+    const routeLength = turf.length(turf.lineString(coordinates), { units: 'kilometers' });
+    const totalDuration = routeLength * 10; // 10 minutes par km (approximation)
+    const numSegments = latLngs.length - 1;
+    const avgDurationPerSegment = totalDuration / numSegments;
+    const durations = Array(numSegments).fill(avgDurationPerSegment);
+
+    // Stocker les informations nécessaires pour le panneau de résultats
     window.routeExposures = {
-      points: simplifiedLatLngs, // Points simplifiés pour l'affichage et les calculs
-      durations: simplifiedDurations, // Durées réparties uniformément
-      data: exposures, // Expositions calculées sur les points simplifiés
-      latLngs: simplifiedLatLngs,
-      totalDuration,
+      points: latLngs,
+      durations: durations,
+      data: exposures,
+      latLngs: latLngs,
+      totalDuration: totalDuration,
     };
 
     openResultsPanel();
     renderRouteResultsPanel(routeStart, routeEnd, exposures);
-  } catch (err) {
-    console.error("[ROUTING ERROR]", err);
-    alert(`Impossible de calculer l'itinéraire : ${err.message}`);
-    return null;
+  } else {
+    // Appel à l'API gouvernementale pour marche/voiture
+    const profile = currentTransportMode;
+    const url = `https://data.geopf.fr/navigation/itineraire?resource=bdtopo-osrm&start=${startCoords.join(',')}&end=${endCoords.join(',')}&profile=${profile}&timeUnit=minute&crs=EPSG:4326`;
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`Erreur HTTP ${res.status} : ${res.statusText}`);
+    const data = await res.json();
+    if (!data.geometry || !data.geometry.coordinates || data.geometry.coordinates.length === 0) {
+      throw new Error("Aucun itinéraire trouvé pour ces coordonnées.");
+    }
+    // Simplification avec Turf.js
+    const line = turf.lineString(data.geometry.coordinates);
+    const simplified = turf.simplify(line, { tolerance: 0.0001, highQuality: false });
+    const simplifiedCoords = simplified.geometry.coordinates;
+    const simplifiedLatLngs = simplifiedCoords.map(c => L.latLng(c[1], c[0]));
+    const routeLine = L.polyline(simplifiedLatLngs, { color: "#1A4E72", weight: 4, opacity: 1 }).addTo(routingLayer);
+    map.fitBounds(routeLine.getBounds(), { padding: [50, 50] });
+    // Préparation des points simplifiés pour l'API d'expositions
+    const simplifiedPoints = simplifiedCoords.map(c => ({ latitude: c[1], longitude: c[0] }));
+    // Calcul des expositions
+    const exposuresResponse = await fetch("http://localhost:8000/indicateursItineraire", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ coords: simplifiedPoints }),
+    });
+    if (!exposuresResponse.ok) throw new Error(`Erreur HTTP ${exposuresResponse.status} lors de la récupération des indicateurs.`);
+    const exposures = await exposuresResponse.json();
+    // Calcul des durées
+    const durations = data.portions?.flatMap(portion => portion.steps.map(step => step.duration)) || [];
+    const totalDuration = durations.reduce((a, b) => a + b, 0);
+    const numSimplifiedSegments = simplifiedLatLngs.length - 1;
+    const avgDurationPerSegment = totalDuration / numSimplifiedSegments;
+    const simplifiedDurations = Array(numSimplifiedSegments).fill(avgDurationPerSegment);
+    window.routeExposures = {
+      points: simplifiedLatLngs,
+      durations: simplifiedDurations,
+      data: exposures,
+      latLngs: simplifiedLatLngs,
+      totalDuration,
+    };
+    openResultsPanel();
+    renderRouteResultsPanel(routeStart, routeEnd, exposures);
   }
 }
-
-
 
 
 

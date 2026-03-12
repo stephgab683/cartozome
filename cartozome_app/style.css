@@ -1314,3 +1314,8 @@ html, body {
 }
 
 .pollutant-checkbox{ color: #c00e0e;}
+
+.transport-btn.active {
+  background-color: #5aacbe;
+  color: white;
+}
