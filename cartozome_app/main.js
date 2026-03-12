@@ -813,6 +813,7 @@ async function getRoute(startCoords, endCoords, routeStart, routeEnd) {
 
 // Mise à jour de l'écouteur pour le bouton "calc-route-btn"
 document.getElementById("calc-route-btn").addEventListener("click", async () => {
+  resetResultsPanel();
   routingLayer.clearLayers();
 
   const routeStart = document.getElementById("route-start").value.trim();
@@ -873,9 +874,18 @@ function openResultsPanel() {
   resultsPanel.classList.remove("hidden");
 }
 
+// Réinitialise et cache le panel de résultats
+function resetResultsPanel() {
+  resultsPanel.classList.add("hidden");
+  const content = document.getElementById("results-content");
+  if (content) content.innerHTML = "";
+  const address = document.getElementById("results-address");
+  if (address) address.textContent = "";
+}
+
 // Ferme le panel au clic sur la croix
 document.getElementById("results-close").addEventListener("click", () => {
-  resultsPanel.classList.add("hidden");
+  resetResultsPanel();
 });
 
 // =============================================
@@ -994,6 +1004,7 @@ function attachGeolocate() {
 // Validation point unique : géocode l'adresse, place un marqueur, centre la vue.
 // TODO : interroger les couches actives pour ce point et afficher les valeurs d'exposition
 document.getElementById("calc-point-btn").addEventListener("click", async () => {
+  resetResultsPanel();
   routingLayer.clearLayers();
 
   const pointInput = document.getElementById("point-start").value.trim();
@@ -1086,6 +1097,11 @@ btnAddress.addEventListener("click", setAddressMode);
 btnCompare.addEventListener("click", setCompareMode);
 btnRoute.addEventListener("click", setRouteMode);
 
+// Reset le panel de résultats dès que l'utilisateur commence à modifier un champ
+["point-start", "compare-a", "compare-b", "route-start", "route-end"].forEach(id => {
+  const el = document.getElementById(id);
+  if (el) el.addEventListener("input", () => resetResultsPanel());
+});
 
 // =============================================
 // MÉTADONNÉES POUR LE PANEL DE RÉSULTATS
@@ -1997,6 +2013,7 @@ async function updateResultsForCompare(latA, lonA, addressA, latB, lonB, address
 }
 
 document.getElementById("calc-compare-btn").addEventListener("click", async () => {
+  resetResultsPanel();
   routingLayer.clearLayers();
 
   const inputA = document.getElementById("compare-a").value.trim();
@@ -2113,17 +2130,25 @@ function renderRouteResultsPanel(startAddress, endAddress, exposures) {
   const uvValues = data.map(exp => parseFloat(exp.UV)).filter(val => !isNaN(val));
   const uvAverage = uvValues.length > 0 ? calculateSimpleAverage(uvValues) : null;
 
-  let html = `
-    <div class="pollutant-checkboxes">
-      <label><input type="checkbox" data-pollutant="PM10" class="pollutant-checkbox"> PM10</label>
-      <label><input type="checkbox" data-pollutant="PM2.5" class="pollutant-checkbox"> PM2.5</label>
-      <label><input type="checkbox" data-pollutant="NO2" class="pollutant-checkbox"> NO₂</label>
-      <label><input type="checkbox" data-pollutant="O3" class="pollutant-checkbox"> O₃</label>
-      <label><input type="checkbox" data-pollutant="Ambroisie" class="pollutant-checkbox"> Ambroisie</label>
-      <label><input type="checkbox" data-pollutant="Bruit" class="pollutant-checkbox"> Bruit</label>
-      <label><input type="checkbox" data-pollutant="UV" class="pollutant-checkbox"> UV</label>
-    </div>
-  `;
+  // Correspondance layerName → clé polluant pour colorRouteByPollutant
+  const LAYER_TO_POLLUTANT = {
+    "cartozome:mod_aura_2024_pm10_moyan":           "PM10",
+    "cartozome:mod_aura_2024_pm25_moyan":           "PM2.5",
+    "cartozome:mod_aura_2024_no2_moyan":            "NO2",
+    "cartozome:mod_aura_2024_o3_nbjdep120":         "O3",
+    "cartozome:Ambroisie_2024_AURA":                "Ambroisie",
+    "cartozome:sous_indice_multibruit_orhane_2023": "Bruit",
+    "uvLayer":                                      "UV",
+  };
+
+  // Toggle switch injecté à droite du label dans chaque res-top
+  const makeToggle = (pollutantKey) => `
+    <label class="route-color-toggle" title="Colorier le tracé selon cet indicateur">
+      <input type="checkbox" class="pollutant-checkbox" data-pollutant="${pollutantKey}">
+      <span class="route-color-track"><span class="route-color-thumb"></span></span>
+    </label>`;
+
+  let html = "";
 
   for (const cat of RESULT_CATEGORIES) {
     html += `
@@ -2141,11 +2166,15 @@ function renderRouteResultsPanel(startAddress, endAddress, exposures) {
       
       const average = (layerName === "cartozome:mod_aura_2024_o3_nbjdep120") ? simpleAverages[layerName] : (isPollutant ? weightedAverages[layerName] : simpleAverages[layerName]);
 
+      const pollutantKey = LAYER_TO_POLLUTANT[layerName];
 
       html += `<div class="res-row">`;
       html += `
         <div class="res-top">
-          <span class="res-label">${meta.label}</span>
+          <div class="res-left-group">
+            <span class="res-label">${meta.label}</span>
+            ${makeToggle(pollutantKey)}
+          </div>
           ${average !== undefined && average !== null ? `<span class="res-average">Moy. : ${average.toFixed(1)} ${meta.unit}</span>` : '<span class="res-value no-data">Non disponible</span>'}
         </div>
       `;
@@ -2175,7 +2204,10 @@ function renderRouteResultsPanel(startAddress, endAddress, exposures) {
       <div class="cat-body">
         <div class="res-row">
           <div class="res-top">
-            <span class="res-label">Indice UV</span>
+            <div class="res-left-group">
+              <span class="res-label">Indice UV</span>
+              ${makeToggle("UV")}
+            </div>
             ${uvAverage !== undefined && uvAverage !== null ? `<span class="res-average">Moy. : ${uvAverage.toFixed(1)}</span>` : '<span class="res-value no-data">Non disponible</span>'}
           </div>
           ${uvValues.length > 0 ? buildSegmentedRouteBar("uvLayer", uvValues) : '<span class="res-value no-data">Non disponible</span>'}
@@ -2186,26 +2218,23 @@ function renderRouteResultsPanel(startAddress, endAddress, exposures) {
 
   content.innerHTML = html;
 
-  document.querySelectorAll(".pollutant-checkbox").forEach((checkbox) => {
-    checkbox.addEventListener("change", function () {
-      document.querySelectorAll(".pollutant-checkbox").forEach((otherCheckbox) => {
-        if (otherCheckbox !== this) {
-          otherCheckbox.checked = false;
-        }
+  // Branche les toggles — un seul actif à la fois
+  content.querySelectorAll(".pollutant-checkbox").forEach((toggle) => {
+    toggle.addEventListener("change", function () {
+      // Désactive tous les autres
+      content.querySelectorAll(".pollutant-checkbox").forEach((other) => {
+        if (other !== this) other.checked = false;
       });
 
       if (this.checked) {
-        const pollutant = this.getAttribute("data-pollutant");
-        colorRouteByPollutant(pollutant);
+        colorRouteByPollutant(this.getAttribute("data-pollutant"));
       } else {
+        // Remet le tracé en couleur par défaut
         if (window.routeExposures) {
           routingLayer.eachLayer((layer) => {
-            if (layer instanceof L.Polyline) {
-              routingLayer.removeLayer(layer);
-            }
+            if (layer instanceof L.Polyline) routingLayer.removeLayer(layer);
           });
-          const latLngs = window.routeExposures.latLngs;
-          L.polyline(latLngs, { color: "#1A4E72", weight: 4, opacity: 1 }).addTo(routingLayer);
+          L.polyline(window.routeExposures.latLngs, { color: "#5aacbe", weight: 4, opacity: 1 }).addTo(routingLayer);
         }
       }
     });
@@ -2321,4 +2350,3 @@ function colorRouteByPollutant(pollutant) {
     }).addTo(routingLayer);
   });
 }
-
