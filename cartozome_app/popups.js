@@ -32,7 +32,6 @@ window.addEventListener('load', () => {
 });
 
 
-
 // =============================================
 // POPUPS D'INFORMATION
 // Créées dynamiquement si absentes du DOM.
@@ -83,3 +82,19 @@ document.querySelectorAll('.info-btn').forEach(btn => {
     openInfoPopup(catId);
   });
 });
+
+
+// =============================================
+// POPUP INFO ITINÉRAIRE
+// Bouton ℹ affiché uniquement en mode itinéraire
+// dans le header du panel de résultats.
+// =============================================
+const btnInfoRoute = document.getElementById('btn-info-route');
+if (btnInfoRoute) {
+  btnInfoRoute.addEventListener('click', () => {
+    const src = document.getElementById('info-route');
+    if (!src) return;
+    popupContent.innerHTML = src.innerHTML;
+    infoPopup.classList.add('visible');
+  });
+}

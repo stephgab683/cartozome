@@ -1085,6 +1085,30 @@ html, body {
     background: #fff0f6;
 }
 
+/* =============================================
+    PANEL DE RÉSULTATS - BOUTON 'I' POUR L'ITINERAIRE
+    ============================================= */
+.info-route-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1.5px solid #2c426c;
+  background: white;
+  color: #2c426c;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: border-color 0.2s, color 0.2s, background 0.2s;
+}
+
+.info-route-btn:hover {
+  border-color: #e71d73;
+  color: #e71d73;
+  background: #fff0f6;
+}
+
 /* ========================================================================================= */
 /* IMPRESSION / EXPORT PDF                                                                   */
 /* ========================================================================================= */
