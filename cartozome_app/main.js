@@ -335,12 +335,12 @@ const LAYER_LEGENDS = {
   "cartozome:Ambroisie_2024_AURA": {
     unit: "Nombre de jour avec un RAEP >3", oms: null,
     entries: [
-      { color: '#b2e8e4', label: '0'    },
-      { color: '#7ecdc2', label: '5'    },
-      { color: '#f5e96a', label: '15'   },
-      { color: '#f4846a', label: '25'   },
-      { color: '#c0392b', label: '35'  },
-      { color: '#8e44ad', label: '45' },
+      { color: '#78b41c', label: '0'    },
+      { color: '#aec928', label: '5'    },
+      { color: '#f08b3c', label: '15'   },
+      { color: '#df1c22', label: '25'   },
+      { color: '#9b131b', label: '35'  },
+      { color: '#541111', label: '45' },
     ]
   },
 
