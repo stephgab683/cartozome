@@ -188,7 +188,7 @@ cartozome/
 
 ### Lancer le front-end en mode développement
 
-Pour travailler sur le front-end sans reconstruire les conteneurs à chaque modification, lancer le serveur de développement Vite séparément :
+Pour travailler sur le front-end sans reconstruire les conteneurs à chaque modification, lancer le serveur de développement Vite séparément. Placez vous dans le dossier cartozome_app puis lancez les commandes suivantes : 
 
 ```bash
 npm install
