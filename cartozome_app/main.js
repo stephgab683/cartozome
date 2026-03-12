@@ -1113,8 +1113,8 @@ const LAYER_META = {
   "cartozome:mod_aura_2024_pm10_moyan":           { label: "PM10",           unit: "µg/m³",   oms: 15,  thresholds: [0, 35]    },
   "cartozome:mod_aura_2024_pm25_moyan":           { label: "PM2.5",          unit: "µg/m³",   oms: 5,   thresholds: [0, 25]     },
   "cartozome:mod_aura_2024_no2_moyan":            { label: "NO₂",            unit: "µg/m³",   oms: 10,  thresholds: [0, 40]    },
-  "cartozome:mod_aura_2024_o3_nbjdep120":            { label: "O₃",             unit: "jours par an au-dessus du seuil", oms: null, thresholds: [0, 17500] },
-  "cartozome:Ambroisie_2024_AURA":                { label: "Ambroisie",      unit: "jours au-dessus du seuil",   oms: null, thresholds: [0, 500]     },
+  "cartozome:mod_aura_2024_o3_nbjdep120":            { label: "O₃",             unit: "jours/an au-delà du seuil", oms: null, thresholds: [0, 17500] },
+  "cartozome:Ambroisie_2024_AURA":                { label: "Ambroisie",      unit: "jours > seuil",   oms: null, thresholds: [0, 500]     },
   "cartozome:sous_indice_multibruit_orhane_2023": { label: "Indice multi-bruit", unit: " ", oms: null, thresholds: [0, 30]   },
 };
 
