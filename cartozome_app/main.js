@@ -336,11 +336,11 @@ const LAYER_LEGENDS = {
     unit: "Nombre de jour avec un RAEP >3", oms: null,
     entries: [
       { color: '#b2e8e4', label: '0'    },
-      { color: '#7ecdc2', label: '3'    },
-      { color: '#f5e96a', label: '30'   },
-      { color: '#f4846a', label: '40'   },
-      { color: '#c0392b', label: '250'  },
-      { color: '#8e44ad', label: '500' },
+      { color: '#7ecdc2', label: '5'    },
+      { color: '#f5e96a', label: '15'   },
+      { color: '#f4846a', label: '25'   },
+      { color: '#c0392b', label: '35'  },
+      { color: '#8e44ad', label: '45' },
     ]
   },
 
