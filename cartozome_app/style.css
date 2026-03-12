@@ -803,27 +803,28 @@ html, body {
 /* ========================================================================================= */
 /* POPUP DE CLIC COUCHE — Popup Leaflet affichée au clic sur une couche WMS active          */
 /* ========================================================================================= */
-
 /* Supprime le padding natif Leaflet autour du contenu                                      */
-.leaflet-popup-content { margin: 0 !important; }
+.leaflet-popup-tip-container { display: none !important; }
 
 /* Boîte blanche arrondie, ombre légère                                                     */
 .leaflet-popup-content-wrapper {
-    border-radius: 12px !important;
+    border-radius: 10px !important;
     box-shadow: 0 4px 20px rgba(0,0,0,0.15) !important;
-    padding: 0 !important;
+    padding: 12 !important;
+    border-left: 4px solid #2c426c !important;
 }
 
-.leaflet-popup-tip-container { margin-top: -1px; }
+.leaflet-popup-tip-container { display: none !important; } 
 
 /* Conteneur interne avec padding généreux                                                  */
-.layer-popup { padding: 14px 18px; min-width: 180px; }
+.layer-popup { padding: 10px 0 8px; min-width: 200px; } 
 
 /* Ligne flex : label à gauche, valeur à droite                                             */
 .layer-popup-row {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    padding: 5px 14px;
     gap: 16px;
 }
 
@@ -833,7 +834,7 @@ html, body {
 .layer-popup-value { font-weight: 700; color: #2c426c; font-size: 0.82rem; white-space: nowrap; line-height: 1.8; }
 
 /* Ligne de coordonnées GPS en haut de la popup                                            */
-.layer-popup-coords { font-size: 0.75rem; color: #aaa; margin-bottom: 8px; }
+.layer-popup-coords { font-size: 0.7rem; color: #bbb; padding: 0 14px 8px; }
 
 /* ========================================================================================= */
 /* CONTRÔLES LEAFLET — Surcharge des styles natifs pour harmoniser typographie et couleur  */
