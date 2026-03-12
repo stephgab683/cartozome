@@ -220,7 +220,7 @@ html, body {
 /* Conteneur positionné en absolu en haut à gauche — abaissé à 95px pour passer sous la pill */
 #search-controls {
     position: absolute;
-    top: 95px;
+    top: 20px;
     left: 20px;
     z-index: 1000;
     display: flex;
@@ -406,7 +406,7 @@ html, body {
 /* Ancré en haut à droite au même niveau que les boutons de recherche (top: 95px)          */
 #layers-control {
     position: fixed;
-    top: 95px;
+    top: 20px;
     right: 10px;
     z-index: 1000;
 }
@@ -803,27 +803,28 @@ html, body {
 /* ========================================================================================= */
 /* POPUP DE CLIC COUCHE — Popup Leaflet affichée au clic sur une couche WMS active          */
 /* ========================================================================================= */
-
 /* Supprime le padding natif Leaflet autour du contenu                                      */
-.leaflet-popup-content { margin: 0 !important; }
+.leaflet-popup-tip-container { display: none !important; }
 
 /* Boîte blanche arrondie, ombre légère                                                     */
 .leaflet-popup-content-wrapper {
-    border-radius: 12px !important;
+    border-radius: 10px !important;
     box-shadow: 0 4px 20px rgba(0,0,0,0.15) !important;
-    padding: 0 !important;
+    padding: 12 !important;
+    border-left: 4px solid #2c426c !important;
 }
 
-.leaflet-popup-tip-container { margin-top: -1px; }
+.leaflet-popup-tip-container { display: none !important; } 
 
 /* Conteneur interne avec padding généreux                                                  */
-.layer-popup { padding: 14px 18px; min-width: 180px; }
+.layer-popup { padding: 10px 0 8px; min-width: 200px; } 
 
 /* Ligne flex : label à gauche, valeur à droite                                             */
 .layer-popup-row {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    padding: 5px 14px;
     gap: 16px;
 }
 
@@ -833,7 +834,7 @@ html, body {
 .layer-popup-value { font-weight: 700; color: #2c426c; font-size: 0.82rem; white-space: nowrap; line-height: 1.8; }
 
 /* Ligne de coordonnées GPS en haut de la popup                                            */
-.layer-popup-coords { font-size: 0.75rem; color: #aaa; margin-bottom: 8px; }
+.layer-popup-coords { font-size: 0.7rem; color: #bbb; padding: 0 14px 8px; }
 
 /* ========================================================================================= */
 /* CONTRÔLES LEAFLET — Surcharge des styles natifs pour harmoniser typographie et couleur  */
@@ -946,14 +947,14 @@ html, body {
 /* Conteneur principal : colonne flex pour séparer le header fixe du contenu scrollable    */
 #results-panel {
     position: absolute;
-    top: 210px;
+    top: 135px;
     left: 20px;
     width: 350px;
     background: white;
     border-radius: 16px;
     box-shadow: 0 4px 20px rgba(0,0,0,0.15);
     z-index: 1000;
-    max-height: 52vh;
+    max-height: 60vh;
     overflow: hidden;
     display: flex;
     flex-direction: column;
@@ -1047,7 +1048,7 @@ html, body {
 }
 
 .transport-btn.active {
-    background: #5aacbe !important; 
+    background: #e71d73 !important; 
     color: white !important;
 }
 
@@ -1209,7 +1210,14 @@ html, body {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 6px;
+    margin-bottom: 12px;
+}
+
+/* Groupe label + toggle soudés ensemble à gauche */
+.res-left-group {
+    display: flex;
+    align-items: center;
+    gap: 6px;
 }
 
 .res-label { color: #555; font-size: 0.82rem; }
@@ -1223,6 +1231,13 @@ html, body {
 
 /* Valeur numérique */
 .res-value {
+    font-weight: 700;
+    color: #2c426c;
+    font-size: 0.82rem;
+}
+
+/* Moyenne itinéraire : même style que res-value */
+.res-average {
     font-weight: 700;
     color: #2c426c;
     font-size: 0.82rem;
@@ -1297,7 +1312,7 @@ html, body {
 .legend-bar-wrap {
     position: relative;
     height: 28px;
-    margin-top: 2px;
+    margin-top: 8px;
 }
 
 /* Dégradé vert → orange → rouge sur toute la largeur                                      */
@@ -1358,4 +1373,59 @@ html, body {
     white-space: nowrap;
 }
 
-.pollutant-checkbox{ color: #c00e0e;}
+/* =============================================
+   TOGGLE COLORISATION ITINÉRAIRE
+   Switch inline à droite du label du polluant.
+   ============================================= */
+.route-color-toggle {
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.route-color-toggle input[type="checkbox"] {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+.route-color-track {
+  position: relative;
+  width: 30px;
+  height: 16px;
+  background: #ddd;
+  border-radius: 10px;
+  transition: background 0.22s ease;
+  flex-shrink: 0;
+}
+
+.route-color-thumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 12px;
+  height: 12px;
+  background: white;
+  border-radius: 50%;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+  transition: transform 0.22s ease;
+}
+
+.route-color-toggle input:checked + .route-color-track {
+  background: #2c426c;
+}
+
+.route-color-toggle input:checked + .route-color-track .route-color-thumb {
+  transform: translateX(14px);
+}
+
+.route-color-toggle:hover .route-color-track {
+  background: #bbb;
+}
+
+.route-color-toggle input:checked:hover + .route-color-track {
+  background: #1a2f50;
+}
