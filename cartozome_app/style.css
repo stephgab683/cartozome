@@ -1429,3 +1429,9 @@ html, body {
 .route-color-toggle input:checked:hover + .route-color-track {
   background: #1a2f50;
 }
+
+math {
+  display: block;
+  text-align: center;
+  margin: 1em auto;
+}
