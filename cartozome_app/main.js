@@ -1628,6 +1628,8 @@ document.getElementById("btn-share").addEventListener("click", async () => {
 // =============================================
 map.on("click", async (e) => {
   const { lat, lng } = e.latlng;
+  routingLayer.clearLayers();
+  L.marker([lat, lng], { icon: iconPoint }).addTo(routingLayer);
 
   try {
     const res = await fetch("http://localhost:8000/indicateursPoint", {
@@ -1640,22 +1642,41 @@ map.on("click", async (e) => {
 
     const data = await res.json();
 
-    // Construire le contenu HTML de la popup
-    let content = `<div style="font-family:'Jost',sans-serif;font-size:0.85rem;line-height:1.4;">`;
-    content += `<b style="color:#2c426c;">Coordonnées :</b> ${lat.toFixed(6)}, ${lng.toFixed(6)}<br>`;
+    let content = `
+      <div style="font-family:'Jost',sans-serif;font-size:0.85rem;line-height:1.4;min-width:200px;">
+        <b style="color:#2c426c;">Coordonnées :</b> ${lat.toFixed(6)}, ${lng.toFixed(6)}<br><br>
+    `;
 
-    for (const [key, value] of Object.entries(data)) {
+    const indicators = [
+      { key: "PM10", label: "PM10", layer: "cartozome:mod_aura_2024_pm10_moyan", unit: "µg/m³" },
+      { key: "PM2.5", label: "PM2.5", layer: "cartozome:mod_aura_2024_pm25_moyan", unit: "µg/m³" },
+      { key: "NO2", label: "NO₂", layer: "cartozome:mod_aura_2024_no2_moyan", unit: "µg/m³" },
+      { key: "O3", label: "O₃", layer: "cartozome:mod_aura_2024_o3_nbjdep120", unit: "jours/an > seuil" },
+      { key: "Ambroisie", label: "Ambroisie", layer: "cartozome:Ambroisie_2024_AURA", unit: "jour/an > seuil" },
+      { key: "Bruit", label: "Bruit", layer: "cartozome:sous_indice_multibruit_orhane_2023", unit: "" },
+      { key: "UV", label: "UV", layer: "uvLayer", unit: "" }
+    ];
 
-      let displayValue = "n/a";
+    indicators.forEach(({ key, label, layer, unit }) => {
+      const rawValue = data[key];
+      // Conversion en nombre, avec gestion des erreurs
+      const value = rawValue !== null && rawValue !== undefined ? Number(rawValue) : null;
 
-      if (value !== null && value !== undefined && !isNaN(value)) {
-        const num = Number(value);
-        // Si entier, on affiche sans décimale ; sinon, 1 chiffre après la virgule
-        displayValue = Number.isInteger(num) ? num : num.toFixed(1);
-      }
+      if (value === null || isNaN(value)) return;
 
-      content += `<b>${key}</b> : ${displayValue}<br>`;
-    }
+      const color = getLayerValueColor(layer, value);
+      const colorDot = `<span style="display:inline-block;width:12px;height:12px;border-radius:50%;background-color:${color};margin-right:8px;vertical-align:middle;"></span>`;
+      // Affichage sans décimales pour les indices discrets (ex: UV, Bruit)
+      const displayValue = (layer === "uvLayer" || layer === "cartozome:sous_indice_multibruit_orhane_2023")
+        ? Math.round(value)
+        : value.toFixed(1);
+
+      content += `
+        <div style="margin-bottom:4px;">
+          <b>${label} :</b> ${colorDot}${displayValue} ${unit}
+        </div>
+      `;
+    });
 
     content += `</div>`;
 
@@ -1672,6 +1693,7 @@ map.on("click", async (e) => {
       .openOn(map);
   }
 });
+
 
 // ======================================== COMPARAISON ========================
 function buildCompareBars(layerName, valueA, valueB) {
