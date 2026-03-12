@@ -27,7 +27,6 @@ html, body {
 /* POPUP DE BIENVENUE                                                                        */
 /* ========================================================================================= */
 
-/* Fond noir semi-transparent qui couvre toute la page et centre la boîte blanche           */
 #welcome-overlay {
     display: none;
     position: fixed;
@@ -41,20 +40,18 @@ html, body {
     align-items: center;
 }
 
-/* Boîte blanche centrée avec bordure bleue gauche, ombre portée et coins arrondis          */
 #welcome-popup {
     background: #fff;
     border-radius: 12px;
     padding: 30px 40px;
     max-width: 500px;
     width: 90%;
-    text-align: center;
     position: relative;
     box-shadow: 0 6px 30px rgba(0,0,0,0.25);
     border-left: 4px solid #2c426c;
+    animation: slideIn 0.2s ease;
 }
 
-/* Croix de fermeture positionnée en absolu en haut à droite de la boîte                   */
 #welcome-close {
     position: absolute;
     top: 12px;
@@ -68,17 +65,42 @@ html, body {
 
 #welcome-close:hover { color: #e71d73; }
 
-#welcome-popup h2 {
-    margin: 0 0 15px 0;
-    font-size: 1.5rem;
-    color: #2c426c;
+#welcome-content {
+    max-height: 60vh;
+    overflow-y: auto;
+    padding-right: 6px;
+    margin-top: 10px;
 }
 
-#welcome-popup p {
-    font-size: 1rem;
-    line-height: 1.6;
-    color: #444;
+#welcome-content::-webkit-scrollbar       { width: 6px; }
+#welcome-content::-webkit-scrollbar-thumb { background-color: #2c426c; border-radius: 3px; }
+
+/* Titre principal centré */
+#welcome-content h2:first-child {
+    margin: 0 0 20px 0;
+    font-size: 1.5rem;
+    color: #2c426c;
+    text-align: center;
 }
+
+/* Titres de section */
+#welcome-content h2 {
+    margin: 16px 0 4px 0;
+    font-size: 1rem;
+    color: #2c426c;
+    text-align: left;
+}
+
+#welcome-content p,
+#welcome-content ul,
+#welcome-content li {
+    font-size: 0.85rem;
+    line-height: 1.8;
+    color: #444;
+    margin: 0;
+}
+
+#welcome-content ul { padding-left: 18px; }
 
 /* ========================================================================================= */
 /* BANDEAU HAUT — Pill centrée flottante sur la carte, sans fond pleine largeur             */
@@ -276,7 +298,7 @@ html, body {
 }
 
 /* Hover rose CLB sur le bouton Valider                                                     */
-#search-panel button:not(.geolocate-btn):not(.clear-btn):hover { background-color: #e71d73; }
+#search-panel button:not(.geolocate-btn):not(.clear-btn):not(.clear-btn):hover { background-color: #e71d73; }
 
 /* ========================================================================================= */
 /* BOUTON GÉOLOCALISATION                                                                    */
@@ -1025,13 +1047,12 @@ html, body {
 }
 
 .transport-btn.active {
-    background: #2c426c;
-    color: white;
+    background: #5aacbe !important; 
+    color: white !important;
 }
 
-.transport-btn:disabled,
-.transport-btn.disabled {
-    opacity: 0.4;
+.transport-btn:disabled {
+    opacity: 0.35;
     cursor: not-allowed;
     pointer-events: none;
 }
@@ -1083,6 +1104,30 @@ html, body {
     border-color: #e71d73;
     color: #e71d73;
     background: #fff0f6;
+}
+
+/* =============================================
+    PANEL DE RÉSULTATS - BOUTON 'I' POUR L'ITINERAIRE
+    ============================================= */
+.info-route-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1.5px solid #2c426c;
+  background: white;
+  color: #2c426c;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: border-color 0.2s, color 0.2s, background 0.2s;
+}
+
+.info-route-btn:hover {
+  border-color: #e71d73;
+  color: #e71d73;
+  background: #fff0f6;
 }
 
 /* ========================================================================================= */
@@ -1228,11 +1273,11 @@ html, body {
 }
 
 /* Fond très léger vert pour A, rose pour B */
-.compare-point-a { background: #dceff2; border-left: 3px solid #5aacbe; }
-.compare-point-b { background: #ffeded; border-left: 3px solid #e8928f; }
+.compare-point-a { background: #dceff2; border-left: 3px solid #2c426c; }
+.compare-point-b { background: #ffeded; border-left: 3px solid #e71d73; }
 
-.compare-dot-a { background: #5aacbe; color: white; }
-.compare-dot-b { background: #e8928f; color: white; }
+.compare-dot-a { background: #2c426c; color: white; }
+.compare-dot-b { background: #e71d73; color: white; }
 
 /* Adresse courte — prend l'espace disponible */
 .compare-point-label {
@@ -1314,8 +1359,3 @@ html, body {
 }
 
 .pollutant-checkbox{ color: #c00e0e;}
-
-.transport-btn.active {
-  background-color: #5aacbe;
-  color: white;
-}

@@ -12,11 +12,11 @@
   <!-- TEMPLATES DES ICÔNES DE MARQUEURS                                                         -->
   <!-- Définis ici comme <template> pour être clonés dans main.js via markerIcon(templateId).    -->
   <!-- Chaque template contient un SVG : rectangle arrondi + pointe basse + lettre ou point.     -->
-  <!-- tpl-marker-point    : pin bleu foncé (#1A4E72) + rond blanc — mode point unique           -->
-  <!-- tpl-marker-compare-a: pin bleu clair (#5aacbe) + lettre A — mode comparaison, point A           -->
-  <!-- tpl-marker-compare-b: pin rose (#e8928f) + lettre B — mode comparaison, point B          -->
-  <!-- tpl-marker-depart   : pin bleu clair (#5aacbe) + lettre D — mode itinéraire, point de départ    -->
-  <!-- tpl-marker-arrivee  : pin rose (#e8928f) + lettre A — mode itinéraire, point d'arrivée   -->
+  <!-- tpl-marker-point    : pin bleu foncé (#2c426c) + rond blanc — mode point unique           -->
+  <!-- tpl-marker-compare-a: pin bleu foncé (#2c426c) + lettre A — mode comparaison, point A           -->
+  <!-- tpl-marker-compare-b: pin rose (#e71d73) + lettre B — mode comparaison, point B          -->
+  <!-- tpl-marker-depart   : pin bleu foncé (#2c426c) + lettre D — mode itinéraire, point de départ    -->
+  <!-- tpl-marker-arrivee  : pin rose (#e71d73) + lettre A — mode itinéraire, point d'arrivée   -->
   <!-- ========================================================================================= -->
 
   <template id="tpl-marker-point">
@@ -26,8 +26,8 @@
           <feDropShadow dx="0" dy="3" stdDeviation="3" flood-color="rgba(0,0,0,0.4)"/>
         </filter>
       </defs>
-      <rect x="0" y="0" width="32" height="32" rx="16" fill="#1A4E72" filter="url(#shadow)"/>
-      <polygon points="10,30 22,30 16,40" fill="#1A4E72" filter="url(#shadow)"/>
+      <rect x="0" y="0" width="32" height="32" rx="16" fill="#2c426c" filter="url(#shadow)"/>
+      <polygon points="10,30 22,30 16,40" fill="#2c426c" filter="url(#shadow)"/>
       <circle cx="16" cy="16" r="6" fill="white"/>
     </svg>
   </template>
@@ -39,8 +39,8 @@
           <feDropShadow dx="0" dy="3" stdDeviation="3" flood-color="rgba(0,0,0,0.4)"/>
         </filter>
       </defs>
-      <rect x="0" y="0" width="32" height="32" rx="16" fill="#5aacbe" filter="url(#shadow)"/>
-      <polygon points="10,30 22,30 16,40" fill="#5aacbe" filter="url(#shadow)"/>
+      <rect x="0" y="0" width="32" height="32" rx="16" fill="#2c426c" filter="url(#shadow)"/>
+      <polygon points="10,30 22,30 16,40" fill="#2c426c" filter="url(#shadow)"/>
       <text x="16" y="21" text-anchor="middle" fill="white" font-family="Jost,sans-serif" font-size="14" font-weight="700">A</text>
     </svg>
   </template>
@@ -52,8 +52,8 @@
           <feDropShadow dx="0" dy="3" stdDeviation="3" flood-color="rgba(0,0,0,0.4)"/>
         </filter>
       </defs>
-      <rect x="0" y="0" width="32" height="32" rx="16" fill="#e8928f" filter="url(#shadow)"/>
-      <polygon points="10,30 22,30 16,40" fill="#e8928f" filter="url(#shadow)"/>
+      <rect x="0" y="0" width="32" height="32" rx="16" fill="#e71d73" filter="url(#shadow)"/>
+      <polygon points="10,30 22,30 16,40" fill="#e71d73" filter="url(#shadow)"/>
       <text x="16" y="21" text-anchor="middle" fill="white" font-family="Jost,sans-serif" font-size="14" font-weight="700">B</text>
     </svg>
   </template>
@@ -65,8 +65,8 @@
           <feDropShadow dx="0" dy="3" stdDeviation="3" flood-color="rgba(0,0,0,0.4)"/>
         </filter>
       </defs>
-      <rect x="0" y="0" width="32" height="32" rx="16" fill="#5aacbe" filter="url(#shadow)"/>
-      <polygon points="10,30 22,30 16,40" fill="#5aacbe" filter="url(#shadow)"/>
+      <rect x="0" y="0" width="32" height="32" rx="16" fill="#2c426c" filter="url(#shadow)"/>
+      <polygon points="10,30 22,30 16,40" fill="#2c426c" filter="url(#shadow)"/>
       <text x="16" y="21" text-anchor="middle" fill="white" font-family="Jost,sans-serif" font-size="14" font-weight="700">D</text>
     </svg>
   </template>
@@ -78,8 +78,8 @@
           <feDropShadow dx="0" dy="3" stdDeviation="3" flood-color="rgba(0,0,0,0.4)"/>
         </filter>
       </defs>
-      <rect x="0" y="0" width="32" height="32" rx="16" fill="#e8928f" filter="url(#shadow)"/>
-      <polygon points="10,30 22,30 16,40" fill="#e8928f" filter="url(#shadow)"/>
+      <rect x="0" y="0" width="32" height="32" rx="16" fill="#e71d73" filter="url(#shadow)"/>
+      <polygon points="10,30 22,30 16,40" fill="#e71d73" filter="url(#shadow)"/>
       <text x="16" y="21" text-anchor="middle" fill="white" font-family="Jost,sans-serif" font-size="14" font-weight="700">A</text>
     </svg>
   </template>
@@ -254,12 +254,11 @@
               <span title="Non disponible pour le moment">
                 <button class="transport-btn" data-mode="car" title="En voiture" >
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <rect x="4" y="3" width="16" height="14" rx="2"/>
-                    <path d="M4 11h16"/>
-                    <path d="M8 17l-2 4"/>
-                    <path d="M16 17l2 4"/>
-                    <circle cx="9" cy="7.5" r="1" fill="currentColor"/>
-                    <circle cx="15" cy="7.5" r="1" fill="currentColor"/>
+                    <path d="M6 17v2M18 17v2"/>
+                    <path d="M4 13l2-6h12l2 6v4H4z"/>
+                    <path d="M4 13h16"/>
+                    <circle cx="8" cy="16" r="1.5" fill="currentColor"/>
+                    <circle cx="16" cy="16" r="1.5" fill="currentColor"/>
                   </svg>
                 </button>
               </span>
@@ -291,6 +290,11 @@
               </svg>
               Télécharger en PDF
             </button>
+            <!-- Bonton Information pour itinéraire -->
+            <button class="info-route-btn hidden" id="btn-info-route" title="Informations sur l'itinéraire">
+              <span style="font-size:1.1rem;font-weight:700;font-family:'Jost',sans-serif;">i</span>
+            </button>
+            <!-- Bonton Fermer -->
             <button id="results-close">✖</button>
           </div>
         </div>
@@ -431,12 +435,26 @@
     <div id="welcome-overlay" style="display:none">
       <div id="welcome-popup">
         <button id="welcome-close">✖</button>
-        <h2>Bienvenue sur Cartozome</h2>
-        <p>
-          Cartozome est une carte interactive de sensibilisation aux exposomes environnementaux : l'ensemble des expositions à notre environnement qui peuvent influencer notre santé tout au long de la vie.<br>
-          Explorez vos expositions à différentes sources de pollution — bruit, rayonnements UV, polluants atmosphériques, pollens — en un point précis ou le long d'un itinéraire de votre choix.<br><br>
-          <i>Cette application a été développée par Laura Carrier, Fanny Fortin, Elias Makhlouf et Stéphanie Gabette, étudiants en Master GEONUM, à la demande du Centre de lutte contre le cancer Léon Bérard (Lyon).</i>
-        </p>
+        <div id="welcome-content">
+          <h2>Bienvenue sur Cartozome</h2>
+
+          <h2>Qu'est-ce que Cartozome ?</h2>
+          <p>Cartozome est une application cartographique développée par des étudiants des masters GEONUM et Sentinelles pour le Centre Léon Bérard (CLB), centre de référence en oncologie à Lyon. Elle vous permet d'évaluer votre exposition personnelle aux principaux facteurs environnementaux qui nous entourent au quotidien : pollution de l'air, bruit, pollen et rayonnement UV.</p>
+
+          <h2>Pourquoi cette application ?</h2>
+          <p>L'environnement dans lequel nous vivons, nous déplaçons et travaillons a des effets réels sur notre santé. Pourtant, jusqu'ici, aucun outil ne permettait à un habitant de la métropole lyonnaise d'évaluer simplement et de façon personnalisée son exposition environnementale — non pas à l'échelle d'une commune entière, mais à l'échelle de sa rue, de son trajet, de son adresse.</p>
+
+          <h2>Ce que vous pouvez faire avec Cartozome :</h2>
+          <ul>
+            <li><strong>Exploration</strong> — Naviguez entre les différents exposants grâce au menu situé à droite de la carte.</li>
+            <li><strong>Point fixe</strong> — Saisissez une adresse ou utilisez votre position GPS pour consulter les niveaux d'exposition environnementale à cet endroit précis.</li>
+            <li><strong>Comparer deux points</strong> — Entrez deux adresses (votre domicile et votre lieu de travail, deux logements potentiels…) pour les comparer côte à côte sur l'ensemble des indicateurs.</li>
+            <li><strong>Itinéraire piéton</strong> — Indiquez un point de départ et une arrivée pour calculer votre exposition moyenne tout au long de votre trajet, visualisée segment par segment sur la carte.</li>
+          </ul>
+
+          <h2>Exportez vos résultats !</h2>
+          <p>Les valeurs affichées sont comparées aux recommandations de l'Organisation Mondiale de la Santé (OMS), les références scientifiques les plus protectrices disponibles.</p>
+        </div>
       </div>
     </div>
   
@@ -453,21 +471,18 @@
           <img src="./img/air.png" alt="Logo Air">
           Pollution de l'air
         </h3>
-        <p>
-          On ne le voit pas, on ne le sent pas toujours — et pourtant, l'air que l'on respire chaque jour influence notre santé.
-          Nous sommes en permanence exposés à des polluants atmosphériques aux effets bien documentés.
-        </p>
-        <p><strong>Sur cette carte, quatre polluants sont suivis :</strong></p>
-        <p><strong>Le dioxyde d'azote (NO₂)</strong><br>
-        Produit principalement par les voitures thermiques et les chaudières, le NO₂ irrite les voies respiratoires et favorise l'asthme.
-        </p>
-        <p><strong>Les particules fines (PM2.5 et PM10)</strong><br>
-        Les PM2.5 peuvent atteindre la circulation sanguine. Elles sont associées à des maladies cardiovasculaires et respiratoires.
-        </p>
-        <p><strong>L'ozone troposphérique (O₃)</strong><br>
-        Le "mauvais ozone" formé au niveau du sol par temps chaud et ensoleillé.
-        </p>
-        <p>Les valeurs sont comparées aux recommandations de l'OMS (2021).</p>
+        <p><strong>D'où viennent ces données ?</strong><br>
+        Les cartes de pollution atmosphérique proviennent d'Atmo Auvergne-Rhône-Alpes, l'organisme public agréé par l'État pour surveiller la qualité de l'air dans la région.
+        Ces cartes représentent des concentrations moyennes sur l'année 2024. Elles ne reflètent pas les pics de pollution ponctuels, mais offrent en contrepartie une résolution spatiale très fine. Cela permet de voir des différences d'exposition entre deux rues voisines, ce qu'aucune donnée journalière communale ne permet de faire.</p>
+        <p><strong>Comment ces cartes sont-elles construites ?</strong><br>
+        Atmo AURA utilise une chaîne de modélisation à deux niveaux. À grande échelle, un modèle météorologique (WRF) et un modèle de chimie de l'atmosphère (CHIMERE) simulent la dispersion des polluants dans l'air. Ce résultat est ensuite affiné à l'échelle locale grâce au modèle SIRANE, qui prend en compte la géométrie des rues et la proximité des axes routiers. Le tout est calibré par les mesures réelles des stations fixes du réseau Atmo.</p>
+        <p><strong>Quels effets sur la santé ?</strong><br>
+        <strong>NO₂</strong> — Émis principalement par les véhicules thermiques et les chaudières. Il irrite les voies respiratoires, aggrave l'asthme et augmente le risque cardiovasculaire à long terme.<br>
+        <strong>PM2.5</strong> — Ces particules sont si petites qu'elles pénètrent profondément dans les poumons et peuvent atteindre la circulation sanguine. Elles sont associées aux maladies cardiovasculaires, aux cancers du poumon et à des effets neurologiques.<br>
+        <strong>PM10</strong> — Un peu plus grosses, elles irritent les voies respiratoires et aggravent l'asthme et les bronchites chroniques.<br>
+        <strong>O₃</strong> — Formé en présence de chaleur et de rayonnement solaire, il altère les fonctions respiratoires et augmente les risques d'accidents vasculaires cérébraux à long terme. Ici, l'indicateur affiché correspond au nombre de jours par an où la concentration dépasse 120 µg/m³ en moyenne sur 8 heures.</p>
+        <p><strong>Pourquoi les seuils OMS ?</strong><br>
+        Les valeurs affichées sont comparées aux lignes directrices de l'OMS (2021), qui sont fondées exclusivement sur des critères sanitaires — c'est-à-dire sur les niveaux en dessous desquels les études scientifiques ne montrent plus d'effets mesurables sur la santé.</p>
       </div>
 
       <div id="info-cat-pollen">
@@ -475,21 +490,16 @@
           <img src="./img/pollen.png" alt="Logo Pollen">
           Pollen
         </h3>
-        <p>
-          Transportés par le vent, les pollens provoquent des réactions allergiques — appelées pollinoses — qui touchent entre 20 et 30 % de la population européenne. Ces réactions se manifestent principalement sous forme de rhinites et de rhino-conjonctivites, et plus rarement d'asthme.
-        </p>
-        <p>
-          Si vous êtes allergique, connaître les niveaux de pollen sur votre trajet quotidien peut faire une vraie différence dans la gestion de vos symptômes.
-        </p>
-        <p><strong>Comment évalue-t-on le risque allergique d'un pollen ?</strong><br>
-          Tous les pollens ne se valent pas. Leur potentiel allergisant est classé en trois niveaux :
-        </p>
-        <ul>
-          <li><strong>Faible</strong> — Une très grande quantité de grains est nécessaire pour provoquer une réaction.</li>
-          <li><strong>Modéré</strong> — Une quantité importante est nécessaire pour affecter un faible nombre de personnes sensibles.</li>
-          <li><strong>Fort</strong> — Quelques grains suffisent à déclencher une réaction chez la majorité des personnes allergiques.</li>
-        </ul>
-        <p>Les données représentent les concentrations moyennes de pollen d'ambroisie sur l'année 2024.</p>
+        <p><strong>D'où vient cette donnée ?</strong><br>
+        La couche pollen provient d'Atmo Auvergne-Rhône-Alpes. Elle représente la présence de l'ambroisie (<em>Ambrosia artemisiifolia</em>) sur le territoire, sous la forme d'une carte raster annuelle 2024.</p>
+        <p><strong>Comment cette carte est-elle construite ?</strong><br>
+        La carte est issue de la modélisation et du suivi de terrain réalisés par Atmo AURA sur l'ensemble du territoire régional. Elle exprime le Risque Allergique épidémique (RAE), un indicateur fondé sur le potentiel allergisant de l'ambroisie tel que défini dans la littérature scientifique. La résolution est de 10 mètres par pixel, identique aux couches de qualité de l'air.</p>
+        <p><strong>Quels effets sur la santé ?</strong><br>
+        Les pollens aéroportants sont responsables de rhinites allergiques, de rhino-conjonctivites et de crises d'asthme chez les personnes sensibles. En Europe, environ 20 à 30 % de la population souffre d'allergie au pollen. L'ambroisie est particulièrement préoccupante : elle est très allergisante et la région Auvergne-Rhône-Alpes concentre les plus fortes densités de cette plante en France.</p>
+        <p><strong>Un biais important à connaître</strong><br>
+        La donnée affichée est une moyenne annuelle 2024. Or le risque pollinique est par nature très saisonnier : l'ambroisie fleurit principalement entre juillet et octobre. Si vous consultez l'application en dehors de cette période, la valeur affichée ne reflète pas votre exposition réelle au moment de la consultation. Gardez ce point à l'esprit dans l'interprétation des résultats.</p>
+        <p><strong>Pourquoi seulement l'ambroisie ?</strong><br>
+        Cartozome n'affiche pour l'instant que l'ambroisie, non par choix scientifique, mais par contrainte de disponibilité des données. Parmi les principaux taxons allergisants (graminées, bouleau, armoise, cyprès…), l'ambroisie est le seul pour lequel Atmo AURA met à disposition une carte raster géoréférencée exploitable directement.</p>
       </div>
 
       <div id="info-cat-bruit">
@@ -497,16 +507,12 @@
           <img src="./img/bruit.png" alt="Logo Bruit">
           Bruit
         </h3>
-        <p>
-          La pollution sonore liée aux transports représente à elle seule 65 % des nuisances sonores perçues, et on estime que 20 % des Européens sont exposés à des niveaux de bruit routier suffisamment élevés pour être préjudiciables à leur santé.
-        </p>
-        <p>
-          Les effets ne se limitent pas à une simple gêne : une exposition prolongée au bruit peut perturber le sommeil, augmenter le risque de maladies cardiovasculaires, affecter le développement cognitif des enfants et réduire les performances.
-        </p>
-        <p><strong>Comment mesure-t-on le bruit ?</strong><br>
-          Le bruit s'exprime en décibels (dB). Sur cette carte, deux indicateurs sont utilisés : l'exposition en journée et l'exposition la nuit.
-        </p>
-        <p>Les données représentent les niveaux de bruit moyens sur l'année 2022, issus de quatre sources : l'activité industrielle, le trafic routier, le trafic ferroviaire et le trafic aérien.</p>
+        <p><strong>D'où vient cette donnée ?</strong><br>
+        La couche bruit provient du Cerema (Centre d'études et d'expertise sur les risques, l'environnement, la mobilité et l'aménagement), via la plateforme nationale ORHANE. Il s'agit d'un indicateur précalculé couvrant l'ensemble de la région Auvergne-Rhône-Alpes, basé sur les données de 2023.</p>
+        <p><strong>Qu'est-ce que l'indice multi-bruit ?</strong><br>
+        Plutôt que d'afficher séparément le bruit de la route, du train et des avions, le Cerema a calculé un indicateur composite qui agrège ces trois sources en un seul score. Pour cela, chaque source est convertie en un niveau de gêne équivalent, en s'appuyant sur les courbes dose-réponse de l'OMS (2018) : ces courbes expriment le niveau de perturbation réelle ressentie par les personnes exposées. Les trois niveaux sont ensuite additionnés pour produire un score unique, classé en 7 niveaux, de "zone préservée" à "zone hautement dégradée". La résolution est de 10 mètres par pixel.</p>
+        <p><strong>Quels effets sur la santé ?</strong><br>
+        Le bruit urbain est la deuxième nuisance environnementale en milieu urbain, après la pollution de l'air. Ses effets sont bien documentés : troubles du sommeil, risques cardiovasculaires et métaboliques, troubles cognitifs (notamment chez les enfants), gêne et stress chronique. Environ 20 % de la population européenne serait exposée à des niveaux sonores préjudiciables pour la santé.</p>
       </div>
 
       <div id="info-cat-uv">
@@ -514,13 +520,18 @@
           <img src="./img/uv.png" alt="Logo UV">
           Rayonnement UV
         </h3>
-        <p>On pense souvent au soleil comme à un allié — et il l'est, en partie ! Une exposition modérée permet à notre corps de synthétiser la vitamine D. Mais le soleil a aussi son revers : une exposition excessive ou répétée peut avoir des conséquences durables sur notre santé.</p>
-        <p><strong>Comment mesure-t-on le risque UV ?</strong></p>
-        <p>Les scientifiques utilisent l'Indice UV Global, une échelle internationale recommandée par l'OMS et l'OMM. Il va de 1 (risque faible) à 11 et au-delà (risque extrême).</p>
-        <p><strong>Niveaux de risque :</strong></p>
-        <p>1-2 : Faible<br>3-5 : Modéré<br>6-7 : Fort<br>8-10 : Très fort<br>11+ : Extrême</p>
-        <p>Source : <a href="http://www.meteo.fr/temps/domtom/La_Reunion/meteoreunion2/UV/legendeUV.html" target="_blank">Météo-France</a></p>
-        <p>Sur cette carte, l'indice affiché est celui produit par Météo-France, mis à jour chaque jour.</p>
+        <p><strong>D'où vient cette donnée ?</strong><br>
+        L'indice UV affiché provient de l'API Open-Meteo, qui s'appuie sur les modèles météorologiques de Météo-France (AROME pour les prévisions à courte échéance, ARPEGE pour les horizons plus lointains). La donnée est récupérée automatiquement 4 fois par jour (5h50, 11h50, 15h50 et 19h50), puis mise à jour dans l'application. Contrairement aux couches de pollution ou de bruit, l'indice UV est donc une donnée quasi temps réel, recalculée plusieurs fois par jour.</p>
+        <p><strong>Comment se lit l'indice UV ?</strong><br>
+        L'indice UV est une échelle internationale standardisée par l'OMS, qui va de 0 à 11 et au-delà. À partir de l'indice 3, l'OMS recommande de se protéger : crème solaire, lunettes, chapeau et vêtements couvrants.</p>
+        <p><strong>Quels effets sur la santé ?</strong><br>
+        À faible dose, le rayonnement UV est bénéfique (synthèse de vitamine D). À forte dose ou de manière répétée, il provoque des cancers cutanés, un photo-vieillissement et des lésions oculaires. Selon la Ligue contre le Cancer, 80 % des cancers de la peau sont liés à une exposition excessive au soleil. Le Centre Léon Bérard, commanditaire de cette application, mène des recherches spécifiques sur les liens entre expositions environnementales et cancers — la vigilance face au rayonnement UV s'inscrit directement dans cette démarche de prévention.</p>
+      </div>
+
+      <!-- Info pop-up bouton "i" itinéraire -->
+      <div id="info-route">
+        <h3 class="popup-title">Informations sur l'itinéraire</h3>
+        <p>Contenu à venir.</p>
       </div>
 
     </div>
