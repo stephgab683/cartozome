@@ -220,7 +220,7 @@ html, body {
 /* Conteneur positionné en absolu en haut à gauche — abaissé à 95px pour passer sous la pill */
 #search-controls {
     position: absolute;
-    top: 20px;
+    top: 95px;
     left: 20px;
     z-index: 1000;
     display: flex;
@@ -406,7 +406,7 @@ html, body {
 /* Ancré en haut à droite au même niveau que les boutons de recherche (top: 95px)          */
 #layers-control {
     position: fixed;
-    top: 20px;
+    top: 95px;
     right: 10px;
     z-index: 1000;
 }
@@ -947,14 +947,14 @@ html, body {
 /* Conteneur principal : colonne flex pour séparer le header fixe du contenu scrollable    */
 #results-panel {
     position: absolute;
-    top: 135px;
+    top: 210px;
     left: 20px;
     width: 350px;
     background: white;
     border-radius: 16px;
     box-shadow: 0 4px 20px rgba(0,0,0,0.15);
     z-index: 1000;
-    max-height: 60vh;
+    max-height: 52vh;
     overflow: hidden;
     display: flex;
     flex-direction: column;
