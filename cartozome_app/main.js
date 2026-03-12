@@ -688,23 +688,90 @@ async function reverseGeocode(lat, lon) {
 // Calcule un itinéraire piéton entre deux points via bdtopo-osrm
 // Retourne un tableau de coordonnées [lon, lat]
 // Modifiez la fonction getRoute pour retourner les données complètes
-async function getRoute(start, end) {
-  const url =
-    `https://data.geopf.fr/navigation/itineraire?resource=bdtopo-osrm` +
-    `&start=${start.join(',')}` +
-    `&end=${end.join(',')}` +
-    `&profile=pedestrian` +
-    `&timeUnit=minute` +
-    `&crs=EPSG:4326`;
+// async function getRoute(start, end) {
+//   const url =
+//     `https://data.geopf.fr/navigation/itineraire?resource=bdtopo-osrm` +
+//     `&start=${start.join(',')}` +
+//     `&end=${end.join(',')}` +
+//     `&profile=pedestrian` +
+//     `&timeUnit=minute` +
+//     `&crs=EPSG:4326`;
+//   try {
+//     const res = await fetch(url);
+//     const data = await res.json();
+//     return data; // Retourne toutes les données de l'itinéraire
+//   } catch (err) {
+//     console.error("[ROUTING ERROR]", err);
+//     return null;
+//   }
+// }
+
+
+async function getRoute(startCoords, endCoords, routeStart, routeEnd) {
+  const url = `https://data.geopf.fr/navigation/itineraire?resource=bdtopo-osrm&start=${startCoords.join(',')}&end=${endCoords.join(',')}&profile=pedestrian&timeUnit=minute&crs=EPSG:4326`;
   try {
     const res = await fetch(url);
+    if (!res.ok) throw new Error(`Erreur HTTP ${res.status} : ${res.statusText}`);
     const data = await res.json();
-    return data; // Retourne toutes les données de l'itinéraire
+    console.log("Réponse de l'API :", data);
+
+    if (!data.geometry || !data.geometry.coordinates || data.geometry.coordinates.length === 0) {
+      throw new Error("Aucun itinéraire trouvé pour ces coordonnées.");
+    }
+
+    // Simplification avec Turf.js
+    const line = turf.lineString(data.geometry.coordinates);
+    const simplified = turf.simplify(line, { tolerance: 0.0001, highQuality: false });
+    const simplifiedCoords = simplified.geometry.coordinates; // Coordonnées simplifiées [lng, lat]
+
+    // Affichage de la polyligne simplifiée
+    const simplifiedLatLngs = simplifiedCoords.map(c => L.latLng(c[1], c[0]));
+    const routeLine = L.polyline(simplifiedLatLngs, { color: "#1A4E72", weight: 4, opacity: 1 }).addTo(routingLayer);
+    map.fitBounds(routeLine.getBounds(), { padding: [50, 50] });
+
+    // Préparation des points simplifiés pour l'API d'expositions
+    const simplifiedPoints = simplifiedCoords.map(c => ({ latitude: c[1], longitude: c[0] }));
+
+    // Calcul des expositions avec les points simplifiés
+    const exposuresResponse = await fetch("http://localhost:8000/indicateursItineraire", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ coords: simplifiedPoints }),
+    });
+
+    if (!exposuresResponse.ok) throw new Error(`Erreur HTTP ${exposuresResponse.status} lors de la récupération des indicateurs.`);
+    const exposures = await exposuresResponse.json();
+    if (!exposures || !Array.isArray(exposures)) throw new Error("Format de réponse invalide pour les indicateurs.");
+
+    // Calcul des durées (à partir des portions/steps originaux)
+    // On réutilise les durées des steps originaux, mais on les ajuste au nombre de points simplifiés
+    const durations = data.portions?.flatMap(portion => portion.steps.map(step => step.duration)) || [];
+    // Répartir les durées sur les segments simplifiés (approximation)
+    const totalDuration = durations.reduce((a, b) => a + b, 0);
+    const numSimplifiedSegments = simplifiedLatLngs.length - 1;
+    const avgDurationPerSegment = totalDuration / numSimplifiedSegments;
+    const simplifiedDurations = Array(numSimplifiedSegments).fill(avgDurationPerSegment);
+
+    window.routeExposures = {
+      points: simplifiedLatLngs, // Points simplifiés pour l'affichage et les calculs
+      durations: simplifiedDurations, // Durées réparties uniformément
+      data: exposures, // Expositions calculées sur les points simplifiés
+      latLngs: simplifiedLatLngs,
+      totalDuration,
+    };
+
+    openResultsPanel();
+    renderRouteResultsPanel(routeStart, routeEnd, exposures);
   } catch (err) {
     console.error("[ROUTING ERROR]", err);
+    alert(`Impossible de calculer l'itinéraire : ${err.message}`);
     return null;
   }
 }
+
+
+
+
 
 // Mise à jour de l'écouteur pour le bouton "calc-route-btn"
 document.getElementById("calc-route-btn").addEventListener("click", async () => {
@@ -738,46 +805,16 @@ document.getElementById("calc-route-btn").addEventListener("click", async () => 
   const endLatLng = L.latLng(endCoords[1], endCoords[0]);
   L.marker(endLatLng, { icon: iconArrivee }).addTo(routingLayer).bindPopup("Arrivée");
 
-  const routeData = await getRoute(startCoords, endCoords);
+  // Passez aussi routeStart et routeEnd à getRoute
+  const routeData = await getRoute(startCoords, endCoords, routeStart, routeEnd);
   if (!routeData) {
     alert("Impossible de calculer l'itinéraire");
     return;
   }
 
-  const latLngs = routeData.geometry.coordinates.map(c => L.latLng(c[1], c[0]));
-  const routeLine = L.polyline(latLngs, { color: "#1A4E72", weight: 4, opacity: 1 }).addTo(routingLayer);
-  map.fitBounds(routeLine.getBounds(), { padding: [50, 50] });
-
-  const durations = routeData.portions.flatMap(portion =>
-    portion.steps.map(step => step.duration)
-  );
-
-  const allPoints = latLngs;
-
-  const exposures = await fetch("http://localhost:8000/indicateursItineraire", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      coords: allPoints.map(p => ({ latitude: p.lat, longitude: p.lng })),
-    }),
-  }).then(r => r.json());
-
-  if (!exposures || !Array.isArray(exposures) || exposures.length === 0) {
-    alert("Erreur lors de la récupération des indicateurs.");
-    return;
-  }
-
-  window.routeExposures = {
-    points: allPoints,
-    durations: durations,
-    data: exposures,
-    latLngs: latLngs,
-    totalDuration: durations.reduce((a, b) => a + b, 0),
-  };
-
-  openResultsPanel();
-  renderRouteResultsPanel(routeStart, routeEnd, exposures);
+  // ... reste du code
 });
+
 
 
 
