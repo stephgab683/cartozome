@@ -53,7 +53,7 @@ cd cartozome
 ### 2. Lancer l'application
 
 ```bash
-docker compose up -d
+docker compose up -d --build
 ```
 
 Cette commande télécharge les images Docker nécessaires et démarre les quatre services (back-end Python, GeoServer, Cron UV, Caddy).
