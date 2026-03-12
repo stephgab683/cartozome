@@ -9,6 +9,7 @@
 ![Leaflet](https://img.shields.io/badge/Leaflet-front--end-199900?logo=leaflet&logoColor=white)
 ![GeoServer](https://img.shields.io/badge/GeoServer-WMS%2FWCS-4CAF50?logoColor=white)
 ![Vite](https://img.shields.io/badge/Vite-bundler-646CFF?logo=vite&logoColor=white)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ---
 
@@ -206,8 +207,16 @@ docker compose up -d --build
 
 ---
 
+## ⚖️ Licence
+ 
+Ce projet est distribué sous licence **MIT** — voir le fichier [`LICENSE`](LICENSE) pour le détail.
+ 
+En résumé : vous êtes libre de réutiliser, modifier et distribuer ce code, y compris à des fins commerciales, à condition de conserver la mention de copyright originale.
+ 
+---
+ 
 ## 📚 Références
-
+ 
 | Ressource | Lien |
 |-----------|------|
 | Dépôt GitHub | [github.com/stephgab683/cartozome](https://github.com/stephgab683/cartozome) |
