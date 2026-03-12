@@ -78,7 +78,7 @@ L'application repose sur quatre conteneurs orchestrés par Docker Compose :
 | Service | Rôle | Port exposé |
 |---------|------|-------------|
 | `backend` | API FastAPI — extraction des valeurs d'exposition | 8000 (interne) |
-| `geoserver` | Publication des couches WMS/WCS environnementales | 8081 (interne) |
+| `geoserver` | Publication des couches WMS environnementales | 8081 (interne) |
 | `cron_uv` | Récupération périodique des indices UV (Open-Meteo) | — |
 | `caddy` | Reverse proxy, routage, HTTPS | 80 / 443 |
 
@@ -100,12 +100,12 @@ L'interface d'administration GeoServer est accessible à l'adresse :
 
 | Nom de couche | Source | Type |
 |---------------|--------|------|
-| `mod_aura_2024_no2_moyan` | Atmo AURA | WMS/WCS |
-| `mod_aura_2024_pm25_moyan` | Atmo AURA | WMS/WCS |
-| `mod_aura_2024_pm10_moyan` | Atmo AURA | WMS/WCS |
-| `mod_aura_2024_o3_nbjdep120` | Atmo AURA | WMS/WCS |
-| `Ambroisie_2024_AURA` | Atmo AURA | WMS/WCS |
-| `sous_indice_multibruit_orhane_2023` | Cerema/ORHANE | WMS/WCS |
+| `mod_aura_2024_no2_moyan` | Atmo AURA | WMS |
+| `mod_aura_2024_pm25_moyan` | Atmo AURA | WMS |
+| `mod_aura_2024_pm10_moyan` | Atmo AURA | WMS |
+| `mod_aura_2024_o3_nbjdep120` | Atmo AURA | WMS |
+| `Ambroisie_2024_AURA` | Atmo AURA | WMS |
+| `sous_indice_multibruit_orhane_2023` | Cerema/ORHANE | WMS |
 | `communes_metropole` | IGN Admin Express | WFS |
 
 ---
