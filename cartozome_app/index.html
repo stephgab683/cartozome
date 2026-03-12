@@ -12,11 +12,11 @@
   <!-- TEMPLATES DES ICÔNES DE MARQUEURS                                                         -->
   <!-- Définis ici comme <template> pour être clonés dans main.js via markerIcon(templateId).    -->
   <!-- Chaque template contient un SVG : rectangle arrondi + pointe basse + lettre ou point.     -->
-  <!-- tpl-marker-point    : pin bleu foncé (#1A4E72) + rond blanc — mode point unique           -->
-  <!-- tpl-marker-compare-a: pin bleu clair (#5aacbe) + lettre A — mode comparaison, point A           -->
-  <!-- tpl-marker-compare-b: pin rose (#e8928f) + lettre B — mode comparaison, point B          -->
-  <!-- tpl-marker-depart   : pin bleu clair (#5aacbe) + lettre D — mode itinéraire, point de départ    -->
-  <!-- tpl-marker-arrivee  : pin rose (#e8928f) + lettre A — mode itinéraire, point d'arrivée   -->
+  <!-- tpl-marker-point    : pin bleu foncé (#2c426c) + rond blanc — mode point unique           -->
+  <!-- tpl-marker-compare-a: pin bleu foncé (#2c426c) + lettre A — mode comparaison, point A           -->
+  <!-- tpl-marker-compare-b: pin rose (#e71d73) + lettre B — mode comparaison, point B          -->
+  <!-- tpl-marker-depart   : pin bleu foncé (#2c426c) + lettre D — mode itinéraire, point de départ    -->
+  <!-- tpl-marker-arrivee  : pin rose (#e71d73) + lettre A — mode itinéraire, point d'arrivée   -->
   <!-- ========================================================================================= -->
 
   <template id="tpl-marker-point">
@@ -26,8 +26,8 @@
           <feDropShadow dx="0" dy="3" stdDeviation="3" flood-color="rgba(0,0,0,0.4)"/>
         </filter>
       </defs>
-      <rect x="0" y="0" width="32" height="32" rx="16" fill="#1A4E72" filter="url(#shadow)"/>
-      <polygon points="10,30 22,30 16,40" fill="#1A4E72" filter="url(#shadow)"/>
+      <rect x="0" y="0" width="32" height="32" rx="16" fill="#2c426c" filter="url(#shadow)"/>
+      <polygon points="10,30 22,30 16,40" fill="#2c426c" filter="url(#shadow)"/>
       <circle cx="16" cy="16" r="6" fill="white"/>
     </svg>
   </template>
@@ -39,8 +39,8 @@
           <feDropShadow dx="0" dy="3" stdDeviation="3" flood-color="rgba(0,0,0,0.4)"/>
         </filter>
       </defs>
-      <rect x="0" y="0" width="32" height="32" rx="16" fill="#5aacbe" filter="url(#shadow)"/>
-      <polygon points="10,30 22,30 16,40" fill="#5aacbe" filter="url(#shadow)"/>
+      <rect x="0" y="0" width="32" height="32" rx="16" fill="#2c426c" filter="url(#shadow)"/>
+      <polygon points="10,30 22,30 16,40" fill="#2c426c" filter="url(#shadow)"/>
       <text x="16" y="21" text-anchor="middle" fill="white" font-family="Jost,sans-serif" font-size="14" font-weight="700">A</text>
     </svg>
   </template>
@@ -52,8 +52,8 @@
           <feDropShadow dx="0" dy="3" stdDeviation="3" flood-color="rgba(0,0,0,0.4)"/>
         </filter>
       </defs>
-      <rect x="0" y="0" width="32" height="32" rx="16" fill="#e8928f" filter="url(#shadow)"/>
-      <polygon points="10,30 22,30 16,40" fill="#e8928f" filter="url(#shadow)"/>
+      <rect x="0" y="0" width="32" height="32" rx="16" fill="#e71d73" filter="url(#shadow)"/>
+      <polygon points="10,30 22,30 16,40" fill="#e71d73" filter="url(#shadow)"/>
       <text x="16" y="21" text-anchor="middle" fill="white" font-family="Jost,sans-serif" font-size="14" font-weight="700">B</text>
     </svg>
   </template>
@@ -65,8 +65,8 @@
           <feDropShadow dx="0" dy="3" stdDeviation="3" flood-color="rgba(0,0,0,0.4)"/>
         </filter>
       </defs>
-      <rect x="0" y="0" width="32" height="32" rx="16" fill="#5aacbe" filter="url(#shadow)"/>
-      <polygon points="10,30 22,30 16,40" fill="#5aacbe" filter="url(#shadow)"/>
+      <rect x="0" y="0" width="32" height="32" rx="16" fill="#2c426c" filter="url(#shadow)"/>
+      <polygon points="10,30 22,30 16,40" fill="#2c426c" filter="url(#shadow)"/>
       <text x="16" y="21" text-anchor="middle" fill="white" font-family="Jost,sans-serif" font-size="14" font-weight="700">D</text>
     </svg>
   </template>
@@ -78,8 +78,8 @@
           <feDropShadow dx="0" dy="3" stdDeviation="3" flood-color="rgba(0,0,0,0.4)"/>
         </filter>
       </defs>
-      <rect x="0" y="0" width="32" height="32" rx="16" fill="#e8928f" filter="url(#shadow)"/>
-      <polygon points="10,30 22,30 16,40" fill="#e8928f" filter="url(#shadow)"/>
+      <rect x="0" y="0" width="32" height="32" rx="16" fill="#e71d73" filter="url(#shadow)"/>
+      <polygon points="10,30 22,30 16,40" fill="#e71d73" filter="url(#shadow)"/>
       <text x="16" y="21" text-anchor="middle" fill="white" font-family="Jost,sans-serif" font-size="14" font-weight="700">A</text>
     </svg>
   </template>

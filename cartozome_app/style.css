@@ -1025,7 +1025,7 @@ html, body {
 }
 
 .transport-btn.active {
-    background: #e71d73 !important; 
+    background: #5aacbe !important; 
     color: white !important;
 }
 
@@ -1251,11 +1251,11 @@ html, body {
 }
 
 /* Fond très léger vert pour A, rose pour B */
-.compare-point-a { background: #dceff2; border-left: 3px solid #5aacbe; }
-.compare-point-b { background: #ffeded; border-left: 3px solid #e8928f; }
+.compare-point-a { background: #dceff2; border-left: 3px solid #2c426c; }
+.compare-point-b { background: #ffeded; border-left: 3px solid #e71d73; }
 
-.compare-dot-a { background: #5aacbe; color: white; }
-.compare-dot-b { background: #e8928f; color: white; }
+.compare-dot-a { background: #2c426c; color: white; }
+.compare-dot-b { background: #e71d73; color: white; }
 
 /* Adresse courte — prend l'espace disponible */
 .compare-point-label {

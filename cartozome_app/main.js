@@ -210,7 +210,7 @@ L.TileLayer.BetterWMS = L.TileLayer.WMS.extend({
       .setLatLng(latlng)
       .setContent(
         `<div style="font-family:'Jost',sans-serif;font-size:0.85rem;line-height:1.8;">
-          <b style="color:#1A4E72;">${label}</b><br>
+          <b style="color:#2c426c;">${label}</b><br>
           ${val.toFixed(2)} ${unit}
         </div>`
       )
@@ -779,7 +779,7 @@ async function getRoute(startCoords, endCoords, routeStart, routeEnd) {
     const simplified = turf.simplify(line, { tolerance: 0.0001, highQuality: false });
     const simplifiedCoords = simplified.geometry.coordinates;
     const simplifiedLatLngs = simplifiedCoords.map(c => L.latLng(c[1], c[0]));
-    const routeLine = L.polyline(simplifiedLatLngs, { color: "#1A4E72", weight: 4, opacity: 1 }).addTo(routingLayer);
+    const routeLine = L.polyline(simplifiedLatLngs, { color: "#5aacbe", weight: 4, opacity: 1 }).addTo(routingLayer);
     map.fitBounds(routeLine.getBounds(), { padding: [50, 50] });
     // Préparation des points simplifiés pour l'API d'expositions
     const simplifiedPoints = simplifiedCoords.map(c => ({ latitude: c[1], longitude: c[0] }));
@@ -1683,7 +1683,7 @@ map.on("click", async (e) => {
 
     // Construire le contenu HTML de la popup
     let content = `<div style="font-family:'Jost',sans-serif;font-size:0.85rem;line-height:1.4;">`;
-    content += `<b style="color:#1A4E72;">Coordonnées :</b> ${lat.toFixed(6)}, ${lng.toFixed(6)}<br>`;
+    content += `<b style="color:#2c426c;">Coordonnées :</b> ${lat.toFixed(6)}, ${lng.toFixed(6)}<br>`;
     
     for (const [key, value] of Object.entries(data)) {
       content += `<b>${key}</b> : ${value ?? "n/a"}<br>`;
@@ -2262,11 +2262,11 @@ function buildSegmentedRouteBar(layerName, values) {
 
   return `
     <div style="margin-top: 6px; display: flex; align-items: center; gap: 6px;">
-      <span style="${pillStyle} background: #5aacbe;">D</span>
+      <span style="${pillStyle} background: #2c426c;">D</span>
       <div style="position: relative; height: 10px; flex: 1; border-radius: 4px; overflow: hidden;">
         ${segmentsHTML}
       </div>
-      <span style="${pillStyle} background: #e8928f;">A</span>
+      <span style="${pillStyle} background: #e71d73;">A</span>
     </div>
   `;
 }
