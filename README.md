@@ -77,8 +77,9 @@ L'application repose sur quatre conteneurs orchestrés par Docker Compose :
 
 | Service | Rôle | Port exposé |
 |---------|------|-------------|
+| `cartozome_app` | Application web (HTML, CSS, JS) — interface utilisateur | 8080 (interne) |
 | `backend` | API FastAPI — extraction des valeurs d'exposition | 8000 (interne) |
-| `geoserver` | Publication des couches WMS environnementales | 8081 (interne) |
+| `cartozome_geoserver` | Publication des couches WMS environnementales | 8081 (interne) |
 | `cron_uv` | Récupération périodique des indices UV (Open-Meteo) | — |
 | `caddy` | Reverse proxy, routage, HTTPS | 80 / 443 |
 
