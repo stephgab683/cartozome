@@ -811,7 +811,7 @@ html, body {
 .leaflet-popup-content-wrapper {
     border-radius: 10px !important;
     box-shadow: 0 4px 20px rgba(0,0,0,0.15) !important;
-    padding: 12 !important;
+    padding: 12px !important;
     border-left: 4px solid #2c426c !important;
 }
 

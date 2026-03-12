@@ -347,13 +347,13 @@ const LAYER_LEGENDS = {
   "cartozome:sous_indice_multibruit_orhane_2023": {
     unit: " ", oms: null, centerLabels: true,
     entries: [
-      { color: '#78c679', label: 'Zone préservée ou Absence de données' },
-      { color: '#addd8e', label: 'Zone peu altérée'                     },
-      { color: '#fed976', label: 'Zone moyennement altérée'             },
-      { color: '#fd8d3c', label: 'Zone altérée'                         },
-      { color: '#e31a1c', label: 'Zone dégradée'                        },
-      { color: '#800026', label: 'Zone très dégradée'                   },
-      { color: '#54278f', label: 'Zone hautement dégradée'              },
+      { color: '#4afd85', label: 'Zone préservée ou Absence de données' },
+      { color: '#ccfd9a', label: 'Zone peu altérée'                     },
+      { color: '#fdfd49', label: 'Zone moyennement altérée'             },
+      { color: '#fcc048', label: 'Zone altérée'                         },
+      { color: '#fb4848', label: 'Zone dégradée'                        },
+      { color: '#df4afc', label: 'Zone très dégradée'                   },
+      { color: '#b0488d', label: 'Zone hautement dégradée'              },
     ]
   },
 
@@ -1202,8 +1202,7 @@ const LAYER_THRESHOLDS = {
   "cartozome:mod_aura_2024_o3_nbjdep120":
     [0,7,10,12,15,17,22,25,50, Infinity],
 
-  "cartozome:Ambroisie_2024_AURA":
-    [0,3,30,50,250,500,Infinity],
+  "cartozome:Ambroisie_2024_AURA": [0, 5, 15, 25, 35, 45, Infinity],
 
   "cartozome:sous_indice_multibruit_orhane_2023":
     [1,2,3,4,5,6,7,8],   // valeurs discrètes 1–7
@@ -1388,40 +1387,30 @@ tickHTML = `
 // =============================================
 
 function renderResultsPanel(address, layerValues, uvValue){
-
   const content = document.getElementById("results-content");
   document.getElementById("results-address").textContent = address;
-
   let html="";
 
   for(const cat of RESULT_CATEGORIES){
-
     html += `
     <div class="cat-card">
-
       <div class="cat-header">
         ${cat.icon} ${cat.label}
       </div>
-
       <div class="cat-body">
     `;
 
     for(const layerName of cat.layers){
-
       const meta = LAYER_META[layerName];
       const value = layerValues[layerName];
-
       html+=`<div class="res-row">`;
-
       html+=`
       <div class="res-top">
         <span class="res-label">${meta.label}</span>
       `;
 
       if(value===null || isNaN(value)){
-
         html+=`<span class="res-value no-data">Non disponible</span>`;
-
       }else{
 
         html+=`
@@ -1429,102 +1418,69 @@ function renderResultsPanel(address, layerValues, uvValue){
           ${value.toFixed(1)} ${meta.unit}
         </span>
         `;
-
       }
 
       html+=`</div>`;
-
       if(value!==null && !isNaN(value)){
-
         html+=buildResultBar(layerName,value);
-
       }
-
       html+=`</div>`;
-
     }
 
     html+=`
       </div>
     </div>
     `;
-
   }
 
 
   // ================= UV =================
-
   html+=`
-
   <div class="cat-card">
-
     <div class="cat-header">
       <img src="./img/uv.png"
       style="width:16px;height:16px;vertical-align:middle">
       UV
     </div>
-
     <div class="cat-body">
-
       <div class="res-row">
-
         <div class="res-top">
-
           <span class="res-label">
           Indice UV
           </span>
-
   `;
 
   if(uvValue===null || isNaN(uvValue)){
-
     html+=`
     <span class="res-value no-data">
     Non disponible
     </span>
     `;
-
   }else{
-
     html+=`
     <span class="res-value">
     ${uvValue}
     </span>
     `;
-
   }
 
   html+=`
-
         </div>
-
         ${uvValue!==null ? buildResultBar("uvLayer",uvValue) : ""}
-
       </div>
-
     </div>
-
   </div>
-
   `;
-
-
   content.innerHTML=html;
-
 }
-
-
 
 // =============================================
 // APPEL API POINT
 // =============================================
 
 async function updateResultsForPoint(lat,lon,address){
-
   let data={};
-
   try{
-
     const res=await fetch(
       "http://localhost:8000/indicateursPoint",
       {
@@ -1542,13 +1498,9 @@ async function updateResultsForPoint(lat,lon,address){
 //    data=await res.json();
 data = await res.json();
 console.log("[indicateursPoint]", data);
-
   }catch(err){
-
     console.error("API indicateurs erreur",err);
-
   }
-
 
   const layerValues={
     "cartozome:mod_aura_2024_pm10_moyan": parseFloat(data.PM10) || null,
@@ -1557,22 +1509,18 @@ console.log("[indicateursPoint]", data);
     "cartozome:mod_aura_2024_o3_nbjdep120": data.O3 !== undefined && data.O3 !== null ? parseFloat(data.O3) : null,
     "cartozome:Ambroisie_2024_AURA": parseFloat(data.Ambroisie) || null,
     "cartozome:sous_indice_multibruit_orhane_2023": parseFloat(data.Bruit) || null
-
   };
-
 
   const uvValue =
     data.UV !== undefined && data.UV !== null
     ? parseFloat(data.UV)
     : null;
 
-
   renderResultsPanel(
     address,
     layerValues,
     uvValue
   );
-
 }
 
 // =============================================
@@ -1695,10 +1643,20 @@ map.on("click", async (e) => {
     // Construire le contenu HTML de la popup
     let content = `<div style="font-family:'Jost',sans-serif;font-size:0.85rem;line-height:1.4;">`;
     content += `<b style="color:#2c426c;">Coordonnées :</b> ${lat.toFixed(6)}, ${lng.toFixed(6)}<br>`;
-    
+
     for (const [key, value] of Object.entries(data)) {
-      content += `<b>${key}</b> : ${value ?? "n/a"}<br>`;
+
+      let displayValue = "n/a";
+
+      if (value !== null && value !== undefined && !isNaN(value)) {
+        const num = Number(value);
+        // Si entier, on affiche sans décimale ; sinon, 1 chiffre après la virgule
+        displayValue = Number.isInteger(num) ? num : num.toFixed(1);
+      }
+
+      content += `<b>${key}</b> : ${displayValue}<br>`;
     }
+
     content += `</div>`;
 
     L.popup({ maxWidth: 300 })
