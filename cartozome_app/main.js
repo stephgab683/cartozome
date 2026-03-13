@@ -2,6 +2,7 @@ import 'leaflet/dist/leaflet.css';                                           // 
 import L from 'leaflet';                                                     // Import de la bibliothèque Leaflet pour la gestion des cartes
 
 // URLs GeoServer local (WMS pour les rasters, WFS pour le bruit aérien)
+const BASE_URL = "http://localhost:8000";
 const GEOSERVER_URL = "http://localhost:8081/geoserver/wms";
 const GEOSERVER_WFS = "http://localhost:8081/geoserver/wfs";
 let currentTransportMode = "pedestrian"; // Mode par défaut : marche
@@ -704,7 +705,7 @@ async function getRoute(startCoords, endCoords, routeStart, routeEnd) {
   let url;
   if (currentTransportMode === "cycling") {
     // Appel au backend FastAPI pour le vélo
-    const res = await fetch("http://localhost:8000/itineraire/velo", {
+    const res = await fetch(`${BASE_URL}/itineraire/velo`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -735,7 +736,7 @@ async function getRoute(startCoords, endCoords, routeStart, routeEnd) {
     const simplifiedPoints = coordinates.map(c => ({ latitude: c[1], longitude: c[0] }));
 
     // Calcul des expositions
-    const exposuresResponse = await fetch("http://localhost:8000/indicateursItineraire", {
+    const exposuresResponse = await fetch(`${BASE_URL}/indicateursItineraire`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ coords: simplifiedPoints }),
@@ -784,7 +785,7 @@ async function getRoute(startCoords, endCoords, routeStart, routeEnd) {
     // Préparation des points simplifiés pour l'API d'expositions
     const simplifiedPoints = simplifiedCoords.map(c => ({ latitude: c[1], longitude: c[0] }));
     // Calcul des expositions
-    const exposuresResponse = await fetch("http://localhost:8000/indicateursItineraire", {
+    const exposuresResponse = await fetch(`${BASE_URL}/indicateursItineraire`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ coords: simplifiedPoints }),
@@ -808,8 +809,6 @@ async function getRoute(startCoords, endCoords, routeStart, routeEnd) {
     renderRouteResultsPanel(routeStart, routeEnd, exposures);
   }
 }
-
-
 
 // Mise à jour de l'écouteur pour le bouton "calc-route-btn"
 document.getElementById("calc-route-btn").addEventListener("click", async () => {
@@ -847,12 +846,6 @@ document.getElementById("calc-route-btn").addEventListener("click", async () => 
   // Passez aussi routeStart et routeEnd à getRoute
   await getRoute(startCoords, endCoords, routeStart, routeEnd);
 });
-
-
-
-
-
-
 
 // =============================================
 // PANEL DE RÉSULTATS
@@ -1482,7 +1475,7 @@ async function updateResultsForPoint(lat,lon,address){
   let data={};
   try{
     const res=await fetch(
-      "http://localhost:8000/indicateursPoint",
+      `${BASE_URL}/indicateursPoint`,
       {
         method:"POST",
         headers:{
@@ -1632,7 +1625,7 @@ map.on("click", async (e) => {
   L.marker([lat, lng], { icon: iconPoint }).addTo(routingLayer);
 
   try {
-    const res = await fetch("http://localhost:8000/indicateursPoint", {
+    const res = await fetch(`${BASE_URL}/indicateursPoint`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ latitude: lat, longitude: lng })
@@ -1951,14 +1944,14 @@ async function updateResultsForCompare(latA, lonA, addressA, latB, lonB, address
   let dataB = {};
 
   try {
-    const resA = await fetch("http://localhost:8000/indicateursPoint", {
+    const resA = await fetch(`${BASE_URL}/indicateursPoint`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ latitude: latA, longitude: lonA }),
     });
     dataA = await resA.json();
 
-    const resB = await fetch("http://localhost:8000/indicateursPoint", {
+    const resB = await fetch(`${BASE_URL}/indicateursPoint`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ latitude: latB, longitude: lonB }),
