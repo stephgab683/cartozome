@@ -126,12 +126,9 @@
       <!-- ========================================================================================= -->
       <div id="search-controls">
 
-        <!-- Bouton toggle "Où je suis" → active le mode point unique, ouvre panel-address -->
-        <button class="floating-btn search-btn" id="btn-address">Où je suis</button>
-        <!-- Bouton toggle "Comparer" → active le mode comparaison, ouvre panel-compare -->
-        <button class="floating-btn search-btn" id="btn-compare">Comparer</button>
-        <!-- Bouton toggle "Mon chemin" → active le mode itinéraire, ouvre panel-route -->
-        <button class="floating-btn search-btn" id="btn-route">Mon chemin</button>
+        <button class="floating-btn search-btn" id="btn-address">Rechercher un lieu</button>
+        <button class="floating-btn search-btn" id="btn-compare">Comparer deux lieux</button>
+        <button class="floating-btn search-btn" id="btn-route">Calculer un trajet</button>
 
         <div id="search-panel" class="hidden">
 
@@ -508,14 +505,16 @@
           <h2>Ce que vous pouvez faire avec Cartozome :</h2>
           <ul>
             <li><strong>Exploration</strong> — Naviguez entre les différents exposants grâce au menu situé à droite de la carte.</li>
-            <li><strong>Point fixe</strong> — Saisissez une adresse ou utilisez votre position GPS pour consulter les niveaux d'exposition environnementale à cet endroit précis.</li>
-            <li><strong>Comparer deux points</strong> — Entrez deux adresses (votre domicile et votre lieu de travail, deux logements potentiels…) pour les comparer côte à côte sur l'ensemble des indicateurs.</li>
-            <li><strong>Itinéraire piéton</strong> — Indiquez un point de départ et une arrivée pour calculer votre exposition moyenne tout au long de votre trajet, visualisée segment par segment sur la carte.</li>
+            <li><strong>Rechercher un lieu</strong> — Saisissez une adresse ou utilisez votre position GPS pour consulter les niveaux d'exposition environnementale à cet endroit précis.</li>
+            <li><strong>Comparer deux lieux</strong> — Entrez deux adresses (votre domicile et votre lieu de travail, deux logements potentiels…) pour les comparer côte à côte sur l'ensemble des indicateurs.</li>
+            <li><strong>Calculer un itinéraire</strong> — Indiquez un point de départ et une arrivée pour calculer votre exposition moyenne tout au long de votre trajet, visualisée segment par segment sur la carte.</li>
           </ul>
 
           <!-- Section "Exportez vos résultats" — popup bienvenue -->
           <h2>Exportez vos résultats !</h2>
-          <p>Les valeurs affichées sont comparées aux recommandations de l'Organisation Mondiale de la Santé (OMS), les références scientifiques les plus protectrices disponibles.</p>
+          <p>Les valeurs affichées sont comparées aux recommandations de l'Organisation Mondiale de la Santé (OMS), les références scientifiques les plus protectrices disponibles.</p><br>
+
+          <p><em><b>Application réalisée par Elias Makhlouf, Stéphanie Gabette, Laura Carrier, Fanny Fortin du master GéoNUM</b></em></p>
         </div>
       </div>
     </div>
@@ -596,11 +595,74 @@
 
       <!-- Contenu popup info itinéraire (#info-route) — ouvert par bouton ℹ (#btn-info-route) dans le panel résultats -->
       <div id="info-route">
-        <h3 class="popup-title">Informations sur l'itinéraire</h3>
-        <p>Contenu à venir.</p>
-      </div>
+        <h2 class="popup-title">Informations sur l'itinéraire</h2>
 
-    </div>
+        <h3>Comment lire cette donnée ?</h3>
+        <p>Chaque bande colorée représente l’exposition le long d’un trajet, du point de départ (D) au point d’arrivée (A). Ces bandes illustrent la variation spatiale des indicateurs environnementaux. En activant le bouton correspondant à chaque indicateur, il est possible de visualiser la répartition spatiale de l’exposition sur la carte.</p>
+
+        <h3>Comment sont calculés les tronçons colorés ?</h3>
+        <p>L’itinéraire est modélisé comme une suite de points géolocalisés. La valeur d’exposition associée à un tronçon reliant deux points consécutifs A et B est déterminée comme la moyenne des valeurs mesurées en A et B :</p>
+
+        <math>
+          <mrow>
+            <mi>Valeur du tronçon</mi>
+            <mo>=</mo>
+            <mfrac>
+              <mrow>
+                <mi>Valeur du point A</mi>
+                <mo>+</mo>
+                <mi>Valeur du point B</mi>
+              </mrow>
+              <mn>2</mn>
+            </mfrac>
+          </mrow>
+        </math>
+        <p>La moyenne entre deux points est utilisée afin d’estimer la valeur d’exposition sur le tronçon qui les relie, en supposant que l’intensité de l’indicateur varie progressivement entre ces deux positions. Cette valeur permet ensuite à chaque tronçon d'être coloré selon les couleurs de la legénde correpondant à l'indicateur.</p>
+
+        <h3>Comment sont calculées les moyennes visibles dans le panneau d’affichage ?</h3>
+        <p><strong>Pour les polluants atmosphériques</strong> (PM10, PM2.5, NO₂), une moyenne pondérée est utilisée afin de tenir compte du temps passé sur chaque tronçon : plus l’exposition dure longtemps, plus elle influence la valeur moyenne de l’exposition le long du trajet. Elle est calculée selon la formule suivante : </p>
+        <math>
+          <mrow>
+            <mi>Moyenne pondérée</mi>
+            <mo>=</mo>
+          <mfrac>
+              <mrow>
+                <mo>&#x2211;</mo>
+                <mspace width="0.3em"/>
+                <mrow>
+                  <mi>(Valeur du tronçon i</mi>
+                  <mspace width="0.3em"/>
+                  <mo>&#x00D7;</mo>
+                  <mspace width="0.3em"/>
+                  <mi>Temps passé sur le tronçon i)</mi>
+                </mrow>
+              </mrow>
+              <mrow>
+                <mo>&#x2211;</mo>
+                <mspace width="0.3em"/>
+                <mi>Temps passé sur le tronçon i</mi>
+              </mrow>
+            </mfrac>
+          </mrow>
+        </math>
+
+        <p><strong>Pour les autres indicateurs</strong> (bruit, UV, ambroisie, O₃), une moyenne arithmétique est calculée à partir des valeurs de chaque tronçon de l’itinéraire selon la formule :</p>
+        <math>
+          <mrow>
+            <mi>Moyenne</mi>
+            <mo>=</mo>
+            <mfrac>
+              <mrow>
+                <mo>&#x2211;</mo>
+                <mspace width="0.3em"/>
+                <mi>Valeur de chaque tronçon</mi>
+              </mrow>
+              <mi>Nombre de tronçons</mi>
+            </mfrac>
+          </mrow>
+        </math>
+        <p>Les unités sont spécifiques à chaque indicateur : nombre de jours/an avec un RAEP&gt;3 pour les pollens, valeur d'indice pour le bruit et pour les UV</p>
+
 
     <!-- main.js   : carte Leaflet, couches WMS/WFS/GeoJSON, recherche, géocodage, routing, panel de résultats -->
     <!-- popups.js : popup de bienvenue + popups d'information (boutons ℹ) -->

@@ -1,10 +1,10 @@
 import 'leaflet/dist/leaflet.css';                                           // Import du CSS de Leaflet pour le style des cartes
 import L from 'leaflet';                                                     // Import de la bibliothèque Leaflet pour la gestion des cartes
 
-// URLs GeoServer local (WMS pour les rasters, WFS pour le bruit aérien)
+// Variable d'environnement
+const BASE_URL = "http://localhost:8000";
 const GEOSERVER_URL = "http://localhost:8081/geoserver/wms";
 const GEOSERVER_WFS = "http://localhost:8081/geoserver/wfs";
-let currentTransportMode = "pedestrian"; // Mode par défaut : marche
 
 
 // =============================================
@@ -44,7 +44,6 @@ document.querySelectorAll('.transport-btn').forEach(button => {
     currentTransportMode = this.dataset.mode;
   });
 });
-
 
 
 // =============================================
@@ -237,7 +236,7 @@ const LAYER_LABELS = {
   "cartozome:mod_aura_2024_pm10_moyan":  "PM10",
   "cartozome:mod_aura_2024_pm25_moyan":  "PM2,5",
   "cartozome:mod_aura_2024_no2_moyan":   "NO2",
-  "cartozome:mod_aura_2024_o3_nbjdep120":  "O3 SOMO35",
+  "cartozome:mod_aura_2024_o3_nbjdep120":  "O3",
   "cartozome:Ambroisie_2024_AURA":       "Ambroisie",
   // Multi-taxons
   // Graminées
@@ -261,7 +260,7 @@ const LAYER_UNITS = {
   // Bouleau
   // Aulne
   // Armoise
-  "cartozome:sous_indice_multibruit_orhane_2023":"dB(A)",
+  "cartozome:sous_indice_multibruit_orhane_2023":" ",
 
 };
 
@@ -335,25 +334,25 @@ const LAYER_LEGENDS = {
   "cartozome:Ambroisie_2024_AURA": {
     unit: "Nombre de jour avec un RAEP >3", oms: null,
     entries: [
-      { color: '#b2e8e4', label: '0'    },
-      { color: '#7ecdc2', label: '3'    },
-      { color: '#f5e96a', label: '30'   },
-      { color: '#f4846a', label: '40'   },
-      { color: '#c0392b', label: '250'  },
-      { color: '#8e44ad', label: '500' },
+      { color: '#78b41c', label: '0'    },
+      { color: '#aec928', label: '5'    },
+      { color: '#f08b3c', label: '15'   },
+      { color: '#df1c22', label: '25'   },
+      { color: '#9b131b', label: '35'  },
+      { color: '#541111', label: '45' },
     ]
   },
 
   "cartozome:sous_indice_multibruit_orhane_2023": {
-    unit: "dB(A)", oms: null, centerLabels: true,
+    unit: " ", oms: null, centerLabels: true,
     entries: [
-      { color: '#78c679', label: 'Zone préservée ou Absence de données' },
-      { color: '#addd8e', label: 'Zone peu altérée'                     },
-      { color: '#fed976', label: 'Zone moyennement altérée'             },
-      { color: '#fd8d3c', label: 'Zone altérée'                         },
-      { color: '#e31a1c', label: 'Zone dégradée'                        },
-      { color: '#800026', label: 'Zone très dégradée'                   },
-      { color: '#54278f', label: 'Zone hautement dégradée'              },
+      { color: '#4afd85', label: 'Zone préservée ou Absence de données' },
+      { color: '#ccfd9a', label: 'Zone peu altérée'                     },
+      { color: '#fdfd49', label: 'Zone moyennement altérée'             },
+      { color: '#fcc048', label: 'Zone altérée'                         },
+      { color: '#fb4848', label: 'Zone dégradée'                        },
+      { color: '#df4afc', label: 'Zone très dégradée'                   },
+      { color: '#b0488d', label: 'Zone hautement dégradée'              },
     ]
   },
 
@@ -700,11 +699,13 @@ async function reverseGeocode(lat, lon) {
   }
 }
 
+let currentTransportMode = "pedestrian"; // Mode par défaut : marche
+
 async function getRoute(startCoords, endCoords, routeStart, routeEnd) {
   let url;
   if (currentTransportMode === "cycling") {
     // Appel au backend FastAPI pour le vélo
-    const res = await fetch("http://localhost:8000/itineraire/velo", {
+    const res = await fetch(`${BASE_URL}/itineraire/velo`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -735,7 +736,7 @@ async function getRoute(startCoords, endCoords, routeStart, routeEnd) {
     const simplifiedPoints = coordinates.map(c => ({ latitude: c[1], longitude: c[0] }));
 
     // Calcul des expositions
-    const exposuresResponse = await fetch("http://localhost:8000/indicateursItineraire", {
+    const exposuresResponse = await fetch(`${BASE_URL}/indicateursItineraire`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ coords: simplifiedPoints }),
@@ -784,7 +785,7 @@ async function getRoute(startCoords, endCoords, routeStart, routeEnd) {
     // Préparation des points simplifiés pour l'API d'expositions
     const simplifiedPoints = simplifiedCoords.map(c => ({ latitude: c[1], longitude: c[0] }));
     // Calcul des expositions
-    const exposuresResponse = await fetch("http://localhost:8000/indicateursItineraire", {
+    const exposuresResponse = await fetch(`${BASE_URL}/indicateursItineraire`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ coords: simplifiedPoints }),
@@ -808,8 +809,6 @@ async function getRoute(startCoords, endCoords, routeStart, routeEnd) {
     renderRouteResultsPanel(routeStart, routeEnd, exposures);
   }
 }
-
-
 
 // Mise à jour de l'écouteur pour le bouton "calc-route-btn"
 document.getElementById("calc-route-btn").addEventListener("click", async () => {
@@ -845,19 +844,8 @@ document.getElementById("calc-route-btn").addEventListener("click", async () => 
   L.marker(endLatLng, { icon: iconArrivee }).addTo(routingLayer).bindPopup("Arrivée");
 
   // Passez aussi routeStart et routeEnd à getRoute
-  const routeData = await getRoute(startCoords, endCoords, routeStart, routeEnd);
-  if (!routeData) {
-    alert("Impossible de calculer l'itinéraire");
-    return;
-  }
-
-  // ... reste du code
+  await getRoute(startCoords, endCoords, routeStart, routeEnd);
 });
-
-
-
-
-
 
 // =============================================
 // PANEL DE RÉSULTATS
@@ -1118,9 +1106,9 @@ const LAYER_META = {
   "cartozome:mod_aura_2024_pm10_moyan":           { label: "PM10",           unit: "µg/m³",   oms: 15,  thresholds: [0, 35]    },
   "cartozome:mod_aura_2024_pm25_moyan":           { label: "PM2.5",          unit: "µg/m³",   oms: 5,   thresholds: [0, 25]     },
   "cartozome:mod_aura_2024_no2_moyan":            { label: "NO₂",            unit: "µg/m³",   oms: 10,  thresholds: [0, 40]    },
-  "cartozome:mod_aura_2024_o3_nbjdep120":            { label: "O₃",             unit: "µg/m³·j", oms: null, thresholds: [0, 17500] },
-  "cartozome:Ambroisie_2024_AURA":                { label: "Ambroisie",      unit: "gr/m³",   oms: null, thresholds: [0, 500]     },
-  "cartozome:sous_indice_multibruit_orhane_2023": { label: "Indice multi-bruit", unit: "dB(A)", oms: null, thresholds: [0, 30]   },
+  "cartozome:mod_aura_2024_o3_nbjdep120":         { label: "O₃",             unit: "jours/an > du seuil", oms: null, thresholds: [0, 17500] },
+  "cartozome:Ambroisie_2024_AURA":                { label: "Ambroisie",      unit: "jours > seuil",   oms: null, thresholds: [0, 500]     },
+  "cartozome:sous_indice_multibruit_orhane_2023": { label: "Indice multi-bruit", unit: " ", oms: null, thresholds: [0, 30]   },
 };
 
 // Structure des catégories affichées dans le panel
@@ -1207,8 +1195,7 @@ const LAYER_THRESHOLDS = {
   "cartozome:mod_aura_2024_o3_nbjdep120":
     [0,7,10,12,15,17,22,25,50, Infinity],
 
-  "cartozome:Ambroisie_2024_AURA":
-    [0,3,30,50,250,500,Infinity],
+  "cartozome:Ambroisie_2024_AURA": [0, 5, 15, 25, 35, 45, Infinity],
 
   "cartozome:sous_indice_multibruit_orhane_2023":
     [1,2,3,4,5,6,7,8],   // valeurs discrètes 1–7
@@ -1393,40 +1380,30 @@ tickHTML = `
 // =============================================
 
 function renderResultsPanel(address, layerValues, uvValue){
-
   const content = document.getElementById("results-content");
   document.getElementById("results-address").textContent = address;
-
   let html="";
 
   for(const cat of RESULT_CATEGORIES){
-
     html += `
     <div class="cat-card">
-
       <div class="cat-header">
         ${cat.icon} ${cat.label}
       </div>
-
       <div class="cat-body">
     `;
 
     for(const layerName of cat.layers){
-
       const meta = LAYER_META[layerName];
       const value = layerValues[layerName];
-
       html+=`<div class="res-row">`;
-
       html+=`
       <div class="res-top">
         <span class="res-label">${meta.label}</span>
       `;
 
       if(value===null || isNaN(value)){
-
         html+=`<span class="res-value no-data">Non disponible</span>`;
-
       }else{
 
         html+=`
@@ -1434,104 +1411,71 @@ function renderResultsPanel(address, layerValues, uvValue){
           ${value.toFixed(1)} ${meta.unit}
         </span>
         `;
-
       }
 
       html+=`</div>`;
-
       if(value!==null && !isNaN(value)){
-
         html+=buildResultBar(layerName,value);
-
       }
-
       html+=`</div>`;
-
     }
 
     html+=`
       </div>
     </div>
     `;
-
   }
 
 
   // ================= UV =================
-
   html+=`
-
   <div class="cat-card">
-
     <div class="cat-header">
       <img src="./img/uv.png"
       style="width:16px;height:16px;vertical-align:middle">
       UV
     </div>
-
     <div class="cat-body">
-
       <div class="res-row">
-
         <div class="res-top">
-
           <span class="res-label">
           Indice UV
           </span>
-
   `;
 
   if(uvValue===null || isNaN(uvValue)){
-
     html+=`
     <span class="res-value no-data">
     Non disponible
     </span>
     `;
-
   }else{
-
     html+=`
     <span class="res-value">
     ${uvValue}
     </span>
     `;
-
   }
 
   html+=`
-
         </div>
-
         ${uvValue!==null ? buildResultBar("uvLayer",uvValue) : ""}
-
       </div>
-
     </div>
-
   </div>
-
   `;
-
-
   content.innerHTML=html;
-
 }
-
-
 
 // =============================================
 // APPEL API POINT
 // =============================================
 
 async function updateResultsForPoint(lat,lon,address){
-
   let data={};
-
   try{
-
     const res=await fetch(
-      "http://localhost:8000/indicateursPoint",
+      `${BASE_URL}/indicateursPoint`,
       {
         method:"POST",
         headers:{
@@ -1547,13 +1491,9 @@ async function updateResultsForPoint(lat,lon,address){
 //    data=await res.json();
 data = await res.json();
 console.log("[indicateursPoint]", data);
-
   }catch(err){
-
     console.error("API indicateurs erreur",err);
-
   }
-
 
   const layerValues={
     "cartozome:mod_aura_2024_pm10_moyan": parseFloat(data.PM10) || null,
@@ -1562,22 +1502,18 @@ console.log("[indicateursPoint]", data);
     "cartozome:mod_aura_2024_o3_nbjdep120": data.O3 !== undefined && data.O3 !== null ? parseFloat(data.O3) : null,
     "cartozome:Ambroisie_2024_AURA": parseFloat(data.Ambroisie) || null,
     "cartozome:sous_indice_multibruit_orhane_2023": parseFloat(data.Bruit) || null
-
   };
-
 
   const uvValue =
     data.UV !== undefined && data.UV !== null
     ? parseFloat(data.UV)
     : null;
 
-
   renderResultsPanel(
     address,
     layerValues,
     uvValue
   );
-
 }
 
 // =============================================
@@ -1685,9 +1621,11 @@ document.getElementById("btn-share").addEventListener("click", async () => {
 // =============================================
 map.on("click", async (e) => {
   const { lat, lng } = e.latlng;
+  routingLayer.clearLayers();
+  L.marker([lat, lng], { icon: iconPoint }).addTo(routingLayer);
 
   try {
-    const res = await fetch("http://localhost:8000/indicateursPoint", {
+    const res = await fetch(`${BASE_URL}/indicateursPoint`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ latitude: lat, longitude: lng })
@@ -1697,13 +1635,42 @@ map.on("click", async (e) => {
 
     const data = await res.json();
 
-    // Construire le contenu HTML de la popup
-    let content = `<div style="font-family:'Jost',sans-serif;font-size:0.85rem;line-height:1.4;">`;
-    content += `<b style="color:#2c426c;">Coordonnées :</b> ${lat.toFixed(6)}, ${lng.toFixed(6)}<br>`;
-    
-    for (const [key, value] of Object.entries(data)) {
-      content += `<b>${key}</b> : ${value ?? "n/a"}<br>`;
-    }
+    let content = `
+      <div style="font-family:'Jost',sans-serif;font-size:0.85rem;line-height:1.4;min-width:200px;">
+        <b style="color:#2c426c;">Coordonnées :</b> ${lat.toFixed(6)}, ${lng.toFixed(6)}<br><br>
+    `;
+
+    const indicators = [
+      { key: "PM10", label: "PM10", layer: "cartozome:mod_aura_2024_pm10_moyan", unit: "µg/m³" },
+      { key: "PM2.5", label: "PM2.5", layer: "cartozome:mod_aura_2024_pm25_moyan", unit: "µg/m³" },
+      { key: "NO2", label: "NO₂", layer: "cartozome:mod_aura_2024_no2_moyan", unit: "µg/m³" },
+      { key: "O3", label: "O₃", layer: "cartozome:mod_aura_2024_o3_nbjdep120", unit: "jours/an > seuil" },
+      { key: "Ambroisie", label: "Ambroisie", layer: "cartozome:Ambroisie_2024_AURA", unit: "jour/an > seuil" },
+      { key: "Bruit", label: "Bruit", layer: "cartozome:sous_indice_multibruit_orhane_2023", unit: "" },
+      { key: "UV", label: "UV", layer: "uvLayer", unit: "" }
+    ];
+
+    indicators.forEach(({ key, label, layer, unit }) => {
+      const rawValue = data[key];
+      // Conversion en nombre, avec gestion des erreurs
+      const value = rawValue !== null && rawValue !== undefined ? Number(rawValue) : null;
+
+      if (value === null || isNaN(value)) return;
+
+      const color = getLayerValueColor(layer, value);
+      const colorDot = `<span style="display:inline-block;width:12px;height:12px;border-radius:50%;background-color:${color};margin-right:8px;vertical-align:middle;"></span>`;
+      // Affichage sans décimales pour les indices discrets (ex: UV, Bruit)
+      const displayValue = (layer === "uvLayer" || layer === "cartozome:sous_indice_multibruit_orhane_2023")
+        ? Math.round(value)
+        : value.toFixed(1);
+
+      content += `
+        <div style="margin-bottom:4px;">
+          <b>${label} :</b> ${colorDot}${displayValue} ${unit}
+        </div>
+      `;
+    });
+
     content += `</div>`;
 
     L.popup({ maxWidth: 300 })
@@ -1719,6 +1686,7 @@ map.on("click", async (e) => {
       .openOn(map);
   }
 });
+
 
 // ======================================== COMPARAISON ========================
 function buildCompareBars(layerName, valueA, valueB) {
@@ -1976,14 +1944,14 @@ async function updateResultsForCompare(latA, lonA, addressA, latB, lonB, address
   let dataB = {};
 
   try {
-    const resA = await fetch("http://localhost:8000/indicateursPoint", {
+    const resA = await fetch(`${BASE_URL}/indicateursPoint`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ latitude: latA, longitude: lonA }),
     });
     dataA = await resA.json();
 
-    const resB = await fetch("http://localhost:8000/indicateursPoint", {
+    const resB = await fetch(`${BASE_URL}/indicateursPoint`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ latitude: latB, longitude: lonB }),
@@ -2116,7 +2084,7 @@ function renderRouteResultsPanel(startAddress, endAddress, exposures) {
   const simpleAverages = {};
 
   // Calcul des moyennes pondérées pour les polluants
-  ["cartozome:mod_aura_2024_pm10_moyan", "cartozome:mod_aura_2024_pm25_moyan", "cartozome:mod_aura_2024_no2_moyan", "cartozome:mod_aura_2024_o3_nbjdep120"].forEach(layerName => {
+  ["cartozome:mod_aura_2024_pm10_moyan", "cartozome:mod_aura_2024_pm25_moyan", "cartozome:mod_aura_2024_no2_moyan"].forEach(layerName => {
     const values = routeValues[layerName].filter(val => !isNaN(val));
     if (values.length > 0) {
       weightedAverages[layerName] = calculateWeightedAverage(values, durations.slice(0, values.length - 1), totalDuration);
@@ -2124,7 +2092,7 @@ function renderRouteResultsPanel(startAddress, endAddress, exposures) {
   });
 
   // Calcul des moyennes simples pour les autres indicateurs
-  ["cartozome:Ambroisie_2024_AURA", "cartozome:sous_indice_multibruit_orhane_2023"].forEach(layerName => {
+  ["cartozome:Ambroisie_2024_AURA", "cartozome:sous_indice_multibruit_orhane_2023","cartozome:mod_aura_2024_o3_nbjdep120" ].forEach(layerName => {
     const values = routeValues[layerName].filter(val => !isNaN(val));
     if (values.length > 0) {
       simpleAverages[layerName] = calculateSimpleAverage(values);
@@ -2167,8 +2135,10 @@ function renderRouteResultsPanel(startAddress, endAddress, exposures) {
     for (const layerName of cat.layers) {
       const meta = LAYER_META[layerName];
       const values = routeValues[layerName];
-      const isPollutant = ["cartozome:mod_aura_2024_pm10_moyan", "cartozome:mod_aura_2024_pm25_moyan", "cartozome:mod_aura_2024_no2_moyan", "cartozome:mod_aura_2024_o3_nbjdep120"].includes(layerName);
-      const average = isPollutant ? weightedAverages[layerName] : simpleAverages[layerName];
+      const isPollutant = ["cartozome:mod_aura_2024_pm10_moyan", "cartozome:mod_aura_2024_pm25_moyan", "cartozome:mod_aura_2024_no2_moyan"].includes(layerName);
+      
+      const average = (layerName === "cartozome:mod_aura_2024_o3_nbjdep120") ? simpleAverages[layerName] : (isPollutant ? weightedAverages[layerName] : simpleAverages[layerName]);
+
       const pollutantKey = LAYER_TO_POLLUTANT[layerName];
 
       html += `<div class="res-row">`;
@@ -2178,7 +2148,7 @@ function renderRouteResultsPanel(startAddress, endAddress, exposures) {
             <span class="res-label">${meta.label}</span>
             ${makeToggle(pollutantKey)}
           </div>
-          ${average !== undefined && average !== null ? `<span class="res-average">Moyenne : ${average.toFixed(1)} ${meta.unit}</span>` : '<span class="res-value no-data">Non disponible</span>'}
+          ${average !== undefined && average !== null ? `<span class="res-average">Moy. : ${average.toFixed(1)} ${meta.unit}</span>` : '<span class="res-value no-data">Non disponible</span>'}
         </div>
       `;
 
@@ -2211,7 +2181,7 @@ function renderRouteResultsPanel(startAddress, endAddress, exposures) {
               <span class="res-label">Indice UV</span>
               ${makeToggle("UV")}
             </div>
-            ${uvAverage !== undefined && uvAverage !== null ? `<span class="res-average">Moyenne : ${uvAverage.toFixed(1)}</span>` : '<span class="res-value no-data">Non disponible</span>'}
+            ${uvAverage !== undefined && uvAverage !== null ? `<span class="res-average">Moy. : ${uvAverage.toFixed(1)}</span>` : '<span class="res-value no-data">Non disponible</span>'}
           </div>
           ${uvValues.length > 0 ? buildSegmentedRouteBar("uvLayer", uvValues) : '<span class="res-value no-data">Non disponible</span>'}
         </div>
