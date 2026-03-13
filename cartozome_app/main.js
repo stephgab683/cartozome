@@ -1651,25 +1651,24 @@ map.on("click", async (e) => {
     ];
 
     indicators.forEach(({ key, label, layer, unit }) => {
-      const rawValue = data[key];
-      // Conversion en nombre, avec gestion des erreurs
-      const value = rawValue !== null && rawValue !== undefined ? Number(rawValue) : null;
+    const rawValue = data[key];
+    const value = rawValue !== null && rawValue !== undefined ? Number(rawValue) : null;
+    if (value === null || isNaN(value)) return;
 
-      if (value === null || isNaN(value)) return;
+    // couleur : UV utilise getColor, les autres utilisent getLayerValueColor
+    const color = layer === "uvLayer" ? getColor(value) : getLayerValueColor(layer, value);
 
-      const color = getLayerValueColor(layer, value);
-      const colorDot = `<span style="display:inline-block;width:12px;height:12px;border-radius:50%;background-color:${color};margin-right:8px;vertical-align:middle;"></span>`;
-      // Affichage sans décimales pour les indices discrets (ex: UV, Bruit)
-      const displayValue = (layer === "uvLayer" || layer === "cartozome:sous_indice_multibruit_orhane_2023")
-        ? Math.round(value)
-        : value.toFixed(1);
+    const colorDot = `<span style="display:inline-block;width:12px;height:12px;border-radius:50%;background-color:${color};margin-right:8px;vertical-align:middle;"></span>`;
+    const displayValue = (layer === "cartozome:sous_indice_multibruit_orhane_2023")
+      ? Math.round(value)
+      : value.toFixed(1);
 
-      content += `
-        <div style="margin-bottom:4px;">
-          <b>${label} :</b> ${colorDot}${displayValue} ${unit}
-        </div>
-      `;
-    });
+    content += `
+      <div style="margin-bottom:4px;">
+        <b>${label} :</b> ${colorDot}${displayValue} ${unit}
+      </div>
+    `;
+  });
 
     content += `</div>`;
 
