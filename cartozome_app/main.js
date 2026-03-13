@@ -1,11 +1,10 @@
 import 'leaflet/dist/leaflet.css';                                           // Import du CSS de Leaflet pour le style des cartes
 import L from 'leaflet';                                                     // Import de la bibliothèque Leaflet pour la gestion des cartes
 
-// URLs GeoServer local (WMS pour les rasters, WFS pour le bruit aérien)
+// Variable d'environnement
 const BASE_URL = "http://localhost:8000";
 const GEOSERVER_URL = "http://localhost:8081/geoserver/wms";
 const GEOSERVER_WFS = "http://localhost:8081/geoserver/wfs";
-let currentTransportMode = "pedestrian"; // Mode par défaut : marche
 
 
 // =============================================
@@ -45,7 +44,6 @@ document.querySelectorAll('.transport-btn').forEach(button => {
     currentTransportMode = this.dataset.mode;
   });
 });
-
 
 
 // =============================================
@@ -700,6 +698,8 @@ async function reverseGeocode(lat, lon) {
     return null;
   }
 }
+
+let currentTransportMode = "pedestrian"; // Mode par défaut : marche
 
 async function getRoute(startCoords, endCoords, routeStart, routeEnd) {
   let url;
