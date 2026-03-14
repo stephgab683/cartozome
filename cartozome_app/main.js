@@ -701,114 +701,132 @@ async function reverseGeocode(lat, lon) {
 
 let currentTransportMode = "pedestrian"; // Mode par défaut : marche
 
+
+
+
+
 async function getRoute(startCoords, endCoords, routeStart, routeEnd) {
-  let url;
-  if (currentTransportMode === "cycling") {
-    // Appel au backend FastAPI pour le vélo
-    const res = await fetch(`${BASE_URL}/itineraire/velo`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        start: { latitude: startCoords[1], longitude: startCoords[0] },
-        end: { latitude: endCoords[1], longitude: endCoords[0] }
-      }),
-    });
-    if (!res.ok) throw new Error(`Erreur HTTP ${res.status} : ${res.statusText}`);
-    const data = await res.json();
+  // Affiche la modale de chargement
+  document.getElementById("loading-modal").classList.remove("hidden");
 
-    // Tracer la route avec Leaflet
-    const routeLayer = L.geoJSON(data, {
-      style: { color: "green", weight: 4, opacity: 1 }
-    }).addTo(routingLayer);
+  try {
+    let url;
+    if (currentTransportMode === "cycling") {
+      // Appel au backend FastAPI pour le vélo
+      const res = await fetch(`${BASE_URL}/itineraire/velo`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          start: { latitude: startCoords[1], longitude: startCoords[0] },
+          end: { latitude: endCoords[1], longitude: endCoords[0] }
+        }),
+      });
+      if (!res.ok) throw new Error(`Erreur HTTP ${res.status} : ${res.statusText}`);
+      const data = await res.json();
 
-    // Ajuster la vue
-    map.fitBounds(routeLayer.getBounds(), { padding: [50, 50] });
+      // Tracer la route avec Leaflet
+      const routeLayer = L.geoJSON(data, {
+        style: { color: "green", weight: 4, opacity: 1 }
+      }).addTo(routingLayer);
 
-    // Extraire les coordonnées de la route
-    const coordinates = [];
-    data.features.forEach(feature => {
-      if (feature.geometry.type === "LineString") {
-        coordinates.push(...feature.geometry.coordinates);
+      // Ajuster la vue
+      map.fitBounds(routeLayer.getBounds(), { padding: [50, 50] });
+
+      // Extraire les coordonnées de la route
+      const coordinates = [];
+      data.features.forEach(feature => {
+        if (feature.geometry.type === "LineString") {
+          coordinates.push(...feature.geometry.coordinates);
+        }
+      });
+
+      // Pour les expositions, on utilise les points de la route
+      const simplifiedPoints = coordinates.map(c => ({ latitude: c[1], longitude: c[0] }));
+
+      // Calcul des expositions
+      const exposuresResponse = await fetch(`${BASE_URL}/indicateursItineraire`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ coords: simplifiedPoints }),
+      });
+      if (!exposuresResponse.ok) throw new Error(`Erreur ${exposuresResponse.status} lors de la récupération des indicateurs.`);
+      const exposures = await exposuresResponse.json();
+
+      // Convertir les coordonnées en LatLng pour Leaflet
+      const latLngs = coordinates.map(c => L.latLng(c[1], c[0]));
+
+      // Calculer une durée approximative (par exemple, 10 minutes par km)
+      const routeLength = turf.length(turf.lineString(coordinates), { units: 'kilometers' });
+      const totalDuration = routeLength * 10; // 10 minutes par km (approximation)
+      const numSegments = latLngs.length - 1;
+      const avgDurationPerSegment = totalDuration / numSegments;
+      const durations = Array(numSegments).fill(avgDurationPerSegment);
+
+      // Stocker les informations nécessaires pour le panneau de résultats
+      window.routeExposures = {
+        points: latLngs,
+        durations: durations,
+        data: exposures,
+        latLngs: latLngs,
+        totalDuration: totalDuration,
+      };
+
+      openResultsPanel();
+      renderRouteResultsPanel(routeStart, routeEnd, exposures);
+    } else {
+      // Appel à l'API gouvernementale pour marche/voiture
+      const profile = currentTransportMode;
+      const url = `https://data.geopf.fr/navigation/itineraire?resource=bdtopo-osrm&start=${startCoords.join(',')}&end=${endCoords.join(',')}&profile=${profile}&timeUnit=minute&crs=EPSG:4326`;
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`Erreur HTTP ${res.status} : ${res.statusText}`);
+      const data = await res.json();
+      if (!data.geometry || !data.geometry.coordinates || data.geometry.coordinates.length === 0) {
+        throw new Error("Aucun itinéraire trouvé pour ces coordonnées.");
       }
-    });
-
-    // Pour les expositions, on utilise les points de la route
-    const simplifiedPoints = coordinates.map(c => ({ latitude: c[1], longitude: c[0] }));
-
-    // Calcul des expositions
-    const exposuresResponse = await fetch(`${BASE_URL}/indicateursItineraire`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ coords: simplifiedPoints }),
-    });
-    if (!exposuresResponse.ok) throw new Error(`Erreur ${exposuresResponse.status} lors de la récupération des indicateurs.`);
-    const exposures = await exposuresResponse.json();
-
-    // Convertir les coordonnées en LatLng pour Leaflet
-    const latLngs = coordinates.map(c => L.latLng(c[1], c[0]));
-
-    // Calculer une durée approximative (par exemple, 10 minutes par km)
-    const routeLength = turf.length(turf.lineString(coordinates), { units: 'kilometers' });
-    const totalDuration = routeLength * 10; // 10 minutes par km (approximation)
-    const numSegments = latLngs.length - 1;
-    const avgDurationPerSegment = totalDuration / numSegments;
-    const durations = Array(numSegments).fill(avgDurationPerSegment);
-
-    // Stocker les informations nécessaires pour le panneau de résultats
-    window.routeExposures = {
-      points: latLngs,
-      durations: durations,
-      data: exposures,
-      latLngs: latLngs,
-      totalDuration: totalDuration,
-    };
-
-    openResultsPanel();
-    renderRouteResultsPanel(routeStart, routeEnd, exposures);
-  } else {
-    // Appel à l'API gouvernementale pour marche/voiture
-    const profile = currentTransportMode;
-    const url = `https://data.geopf.fr/navigation/itineraire?resource=bdtopo-osrm&start=${startCoords.join(',')}&end=${endCoords.join(',')}&profile=${profile}&timeUnit=minute&crs=EPSG:4326`;
-    const res = await fetch(url);
-    if (!res.ok) throw new Error(`Erreur HTTP ${res.status} : ${res.statusText}`);
-    const data = await res.json();
-    if (!data.geometry || !data.geometry.coordinates || data.geometry.coordinates.length === 0) {
-      throw new Error("Aucun itinéraire trouvé pour ces coordonnées.");
+      // Simplification avec Turf.js
+      const line = turf.lineString(data.geometry.coordinates);
+      const simplified = turf.simplify(line, { tolerance: 0.0001, highQuality: false });
+      const simplifiedCoords = simplified.geometry.coordinates;
+      const simplifiedLatLngs = simplifiedCoords.map(c => L.latLng(c[1], c[0]));
+      const routeLine = L.polyline(simplifiedLatLngs, { color: "#5aacbe", weight: 4, opacity: 1 }).addTo(routingLayer);
+      map.fitBounds(routeLine.getBounds(), { padding: [50, 50] });
+      // Préparation des points simplifiés pour l'API d'expositions
+      const simplifiedPoints = simplifiedCoords.map(c => ({ latitude: c[1], longitude: c[0] }));
+      // Calcul des expositions
+      const exposuresResponse = await fetch(`${BASE_URL}/indicateursItineraire`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ coords: simplifiedPoints }),
+      });
+      if (!exposuresResponse.ok) throw new Error(`Erreur HTTP ${exposuresResponse.status} lors de la récupération des indicateurs.`);
+      const exposures = await exposuresResponse.json();
+      // Calcul des durées
+      const durations = data.portions?.flatMap(portion => portion.steps.map(step => step.duration)) || [];
+      const totalDuration = durations.reduce((a, b) => a + b, 0);
+      const numSimplifiedSegments = simplifiedLatLngs.length - 1;
+      const avgDurationPerSegment = totalDuration / numSimplifiedSegments;
+      const simplifiedDurations = Array(numSimplifiedSegments).fill(avgDurationPerSegment);
+      window.routeExposures = {
+        points: simplifiedLatLngs,
+        durations: simplifiedDurations,
+        data: exposures,
+        latLngs: simplifiedLatLngs,
+        totalDuration,
+      };
+      openResultsPanel();
+      renderRouteResultsPanel(routeStart, routeEnd, exposures);
     }
-    // Simplification avec Turf.js
-    const line = turf.lineString(data.geometry.coordinates);
-    const simplified = turf.simplify(line, { tolerance: 0.0001, highQuality: false });
-    const simplifiedCoords = simplified.geometry.coordinates;
-    const simplifiedLatLngs = simplifiedCoords.map(c => L.latLng(c[1], c[0]));
-    const routeLine = L.polyline(simplifiedLatLngs, { color: "#5aacbe", weight: 4, opacity: 1 }).addTo(routingLayer);
-    map.fitBounds(routeLine.getBounds(), { padding: [50, 50] });
-    // Préparation des points simplifiés pour l'API d'expositions
-    const simplifiedPoints = simplifiedCoords.map(c => ({ latitude: c[1], longitude: c[0] }));
-    // Calcul des expositions
-    const exposuresResponse = await fetch(`${BASE_URL}/indicateursItineraire`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ coords: simplifiedPoints }),
-    });
-    if (!exposuresResponse.ok) throw new Error(`Erreur HTTP ${exposuresResponse.status} lors de la récupération des indicateurs.`);
-    const exposures = await exposuresResponse.json();
-    // Calcul des durées
-    const durations = data.portions?.flatMap(portion => portion.steps.map(step => step.duration)) || [];
-    const totalDuration = durations.reduce((a, b) => a + b, 0);
-    const numSimplifiedSegments = simplifiedLatLngs.length - 1;
-    const avgDurationPerSegment = totalDuration / numSimplifiedSegments;
-    const simplifiedDurations = Array(numSimplifiedSegments).fill(avgDurationPerSegment);
-    window.routeExposures = {
-      points: simplifiedLatLngs,
-      durations: simplifiedDurations,
-      data: exposures,
-      latLngs: simplifiedLatLngs,
-      totalDuration,
-    };
-    openResultsPanel();
-    renderRouteResultsPanel(routeStart, routeEnd, exposures);
+  } catch (err) {
+    console.error("Erreur lors du calcul de l'itinéraire :", err);
+    alert("Erreur lors du calcul de l'itinéraire : " + err.message);
+  } finally {
+    // Masque la modale de chargement, même en cas d'erreur
+    document.getElementById("loading-modal").classList.add("hidden");
   }
 }
+
+
+
 
 // Mise à jour de l'écouteur pour le bouton "calc-route-btn"
 document.getElementById("calc-route-btn").addEventListener("click", async () => {
@@ -1939,10 +1957,13 @@ function renderCompareResultsPanel(addressA, addressB, layerValuesA, layerValues
 }
 
 async function updateResultsForCompare(latA, lonA, addressA, latB, lonB, addressB) {
-  let dataA = {};
-  let dataB = {};
+  // Affiche la modale de chargement
+  document.getElementById("loading-modal").classList.remove("hidden");
 
   try {
+    let dataA = {};
+    let dataB = {};
+
     const resA = await fetch(`${BASE_URL}/indicateursPoint`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -1956,33 +1977,38 @@ async function updateResultsForCompare(latA, lonA, addressA, latB, lonB, address
       body: JSON.stringify({ latitude: latB, longitude: lonB }),
     });
     dataB = await resB.json();
+
+    const layerValuesA = {
+      "cartozome:mod_aura_2024_pm10_moyan": parseFloat(dataA.PM10) || null,
+      "cartozome:mod_aura_2024_pm25_moyan": parseFloat(dataA["PM2.5"]) || null,
+      "cartozome:mod_aura_2024_no2_moyan": parseFloat(dataA.NO2) || null,
+      "cartozome:mod_aura_2024_o3_nbjdep120": parseFloat(dataA.O3) || null,
+      "cartozome:Ambroisie_2024_AURA": parseFloat(dataA.Ambroisie) || null,
+      "cartozome:sous_indice_multibruit_orhane_2023": parseFloat(dataA.Bruit) || null,
+    };
+
+    const layerValuesB = {
+      "cartozome:mod_aura_2024_pm10_moyan": parseFloat(dataB.PM10) || null,
+      "cartozome:mod_aura_2024_pm25_moyan": parseFloat(dataB["PM2.5"]) || null,
+      "cartozome:mod_aura_2024_no2_moyan": parseFloat(dataB.NO2) || null,
+      "cartozome:mod_aura_2024_o3_nbjdep120": parseFloat(dataB.O3) || null,
+      "cartozome:Ambroisie_2024_AURA": parseFloat(dataB.Ambroisie) || null,
+      "cartozome:sous_indice_multibruit_orhane_2023": parseFloat(dataB.Bruit) || null,
+    };
+
+    const uvValueA = dataA.UV !== undefined && dataA.UV !== null ? parseFloat(dataA.UV) : null;
+    const uvValueB = dataB.UV !== undefined && dataB.UV !== null ? parseFloat(dataB.UV) : null;
+
+    renderCompareResultsPanel(addressA, addressB, layerValuesA, layerValuesB, uvValueA, uvValueB);
   } catch (err) {
-    console.error("API indicateurs erreur", err);
+    console.error("Erreur lors de la comparaison :", err);
+    alert("Erreur lors de la comparaison : " + err.message);
+  } finally {
+    // Masque la modale de chargement, même en cas d'erreur
+    document.getElementById("loading-modal").classList.add("hidden");
   }
-
-  const layerValuesA = {
-    "cartozome:mod_aura_2024_pm10_moyan": parseFloat(dataA.PM10) || null,
-    "cartozome:mod_aura_2024_pm25_moyan": parseFloat(dataA["PM2.5"]) || null,
-    "cartozome:mod_aura_2024_no2_moyan": parseFloat(dataA.NO2) || null,
-    "cartozome:mod_aura_2024_o3_nbjdep120": parseFloat(dataA.O3) || null,
-    "cartozome:Ambroisie_2024_AURA": parseFloat(dataA.Ambroisie) || null,
-    "cartozome:sous_indice_multibruit_orhane_2023": parseFloat(dataA.Bruit) || null,
-  };
-
-  const layerValuesB = {
-    "cartozome:mod_aura_2024_pm10_moyan": parseFloat(dataB.PM10) || null,
-    "cartozome:mod_aura_2024_pm25_moyan": parseFloat(dataB["PM2.5"]) || null,
-    "cartozome:mod_aura_2024_no2_moyan": parseFloat(dataB.NO2) || null,
-    "cartozome:mod_aura_2024_o3_nbjdep120": parseFloat(dataB.O3) || null,
-    "cartozome:Ambroisie_2024_AURA": parseFloat(dataB.Ambroisie) || null,
-    "cartozome:sous_indice_multibruit_orhane_2023": parseFloat(dataB.Bruit) || null,
-  };
-
-  const uvValueA = dataA.UV !== undefined && dataA.UV !== null ? parseFloat(dataA.UV) : null;
-  const uvValueB = dataB.UV !== undefined && dataB.UV !== null ? parseFloat(dataB.UV) : null;
-
-  renderCompareResultsPanel(addressA, addressB, layerValuesA, layerValuesB, uvValueA, uvValueB);
 }
+
 
 document.getElementById("calc-compare-btn").addEventListener("click", async () => {
   resetResultsPanel();

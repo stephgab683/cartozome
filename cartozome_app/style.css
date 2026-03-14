@@ -1436,3 +1436,63 @@ math {
   text-align: center;
   margin: 1em auto;
 }
+
+
+
+/* ========================================================================================= */
+/* MODALE DE CHARGEMENT                                                                     */
+/* ========================================================================================= */
+
+.loading-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+}
+
+.loading-modal-content {
+    background: white;
+    border-radius: 16px;
+    padding: 30px 40px;
+    max-width: 300px;
+    width: 90%;
+    text-align: center;
+    box-shadow: 0 6px 30px rgba(0, 0, 0, 0.25);
+    border-left: 4px solid #2c426c;
+    font-family: 'Jost', sans-serif;
+    animation: slideIn 0.2s ease;
+}
+
+.loading-spinner {
+    width: 48px;
+    height: 48px;
+    border: 4px solid rgba(44, 66, 108, 0.1);
+    border-radius: 50%;
+    border-top: 4px solid #2c426c;
+    margin: 0 auto 16px;
+    animation: spin 1s linear infinite;
+}
+
+.loading-text {
+    font-size: 0.95rem;
+    color: #2c426c;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.hidden {
+    display: none;
+}
+
