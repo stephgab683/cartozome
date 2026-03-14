@@ -1,4 +1,4 @@
-# 🗺️ Cartozome
+# Cartozome
 
 > Application web de cartographie des expositions environnementales individuelles
 > (qualité de l'air, bruit, UV, pollen) sur la métropole de Lyon.
@@ -25,7 +25,7 @@
 
 ---
 
-## 📋 Prérequis
+## Prérequis
 
 Avant de déployer l'application, s'assurer que les outils suivants sont installés sur la machine hôte :
 
@@ -42,7 +42,7 @@ Avant de déployer l'application, s'assurer que les outils suivants sont install
 
 ---
 
-## 🚀 Démarrage rapide
+## Démarrage rapide
 
 ### 1. Cloner le dépôt
 
@@ -72,7 +72,7 @@ docker compose down
 
 ---
 
-## 🏗️ Architecture des services
+## Architecture des services
 
 L'application repose sur quatre conteneurs orchestrés par Docker Compose :
 
@@ -86,7 +86,7 @@ L'application repose sur quatre conteneurs orchestrés par Docker Compose :
 
 ---
 
-## 🌍 Configuration des couches GeoServer
+## Configuration des couches GeoServer
 
 Les couches environnementales (qualité de l'air, pollen, bruit) sont publiées dans GeoServer à partir des flux WMS Atmo AURA et du flux ORHANE/Cerema.
 
@@ -112,7 +112,7 @@ L'interface d'administration GeoServer est accessible à l'adresse :
 
 ---
 
-## 🔄 Mise à jour des données
+## Mise à jour des données
 
 ### Qualité de l'air et pollen (Atmo AURA)
 
@@ -134,12 +134,12 @@ docker compose logs cron_uv
 
 ---
 
-## 🛠️ Développement
+## Développement
 
 ### Structure du dépôt
 
 <details>
-<summary>📁 Voir l'arborescence complète</summary>
+<summary> Voir l'arborescence complète</summary>
 
 ```text
 cartozome/
@@ -207,7 +207,7 @@ docker compose up -d --build
 
 ---
 
-## ⚖️ Licence
+## Licence
  
 Ce projet est distribué sous licence **MIT** — voir le fichier [`LICENSE`](LICENSE) pour le détail.
  
@@ -215,7 +215,7 @@ En résumé : vous êtes libre de réutiliser, modifier et distribuer ce code, y
  
 ---
  
-## 📚 Références
+## Références
  
 | Ressource | Lien |
 |-----------|------|
