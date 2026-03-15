@@ -85,7 +85,12 @@
   </template>
 
   <body>
-
+    <!-- ========================================================================================= -->
+    <!-- POPUP DE CHARGEMENT (#loading-modal)                                                      -->
+    <!-- Overlay affiché pendant le calcul de l'itinéraire (mode "Mon chemin").                    -->
+    <!-- Rendu visible/caché dans main.js via classList.remove/add('hidden').                      -->
+    <!-- Structure : spinner CSS animé (.loading-spinner) + texte "Calcul en cours..."             -->
+    <!-- ========================================================================================= -->
     <div id="loading-modal" class="loading-modal hidden">
         <div class="loading-modal-content">
             <div class="loading-spinner"></div>

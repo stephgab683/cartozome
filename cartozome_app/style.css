@@ -1,10 +1,12 @@
 /* ========================================================================================= */
-/* POLICES — Import de la police Jost depuis Google Fonts, utilisée sur toute l'interface   */
+/* POLICES — Import Jost depuis Google Fonts, utilisée sur toute l'interface.               */
+/*    → Changer la police globale : modifier l'url ici ET font-family dans html, body       */
 /* ========================================================================================= */
 @import url('https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,100..900;1,100..900&display=swap');
 
 /* ========================================================================================= */
-/* BASE — Reset marges/paddings + mise en page colonne pour empiler le bandeau et la carte  */
+/* BASE — Reset marges/paddings + mise en page colonne (bandeau au-dessus, carte en-dessous)*/
+/*    → Changer la police globale : font-family dans html, body                             */
 /* ========================================================================================= */
 html, body {
     margin: 0;
@@ -16,15 +18,20 @@ html, body {
 }
 
 /* ========================================================================================= */
-/* UTILITAIRES — .hidden masque un élément ; utilisé par le JS pour afficher/cacher         */
-/* les panels de recherche, de résultats et les contenus de couches                         */
+/* UTILITAIRES — .hidden masque un élément sans le supprimer du DOM.                        */
+/*    Ajouté/retiré par le JS pour afficher/cacher panels, popups et contenus de couches.   */
 /* ========================================================================================= */
 .hidden {
     display: none !important;
 }
 
 /* ========================================================================================= */
-/* POPUP DE BIENVENUE                                                                        */
+/* POPUP DE BIENVENUE — Affichée au chargement via popups.js, fermée via #welcome-close.   */
+/*    → Changer la taille de la boîte       : max-width dans #welcome-popup                 */
+/*    → Changer le trait coloré gauche      : border-left dans #welcome-popup               */
+/*    → Changer taille/couleur de la croix  : font-size / color dans #welcome-close         */
+/*    → Changer la hauteur scrollable       : max-height dans #welcome-content              */
+/*    → Changer la scrollbar (couleur)      : background-color dans ::-webkit-scrollbar-thumb*/
 /* ========================================================================================= */
 
 #welcome-overlay {
@@ -103,7 +110,12 @@ html, body {
 #welcome-content ul { padding-left: 18px; }
 
 /* ========================================================================================= */
-/* BANDEAU HAUT — Pill centrée flottante sur la carte, sans fond pleine largeur             */
+/* BANDEAU HAUT — Pill centrée flottante sur la carte, sans fond pleine largeur.            */
+/*    → Déplacer la pill verticalement      : top dans #top-banner                          */
+/*    → Changer la hauteur de la pill       : height dans #center-pill                      */
+/*    → Changer la taille du logo Cartozome : width/height dans #pill-logo img              */
+/*    → Changer la taille du titre texte    : font-size dans #pill-title                    */
+/*    → Changer la taille du logo CLB       : height dans #pill-clb img                     */
 /* ========================================================================================= */
 #top-banner {
     position: absolute;
@@ -166,8 +178,8 @@ html, body {
 #pill-clb img { height: 34px; object-fit: contain; }
 
 /* ========================================================================================= */
-/* CONTENEUR PRINCIPAL — Prend tout l'espace restant, hauteur 100vh.                        */
-/* Position relative pour ancrer en absolu la carte, les panels et les boutons flottants.   */
+/* CONTENEUR PRINCIPAL — Prend tout l'espace sous le bandeau, hauteur 100vh.               */
+/*    Position relative = référence pour ancrer en absolu la carte, panels et boutons.      */
 /* ========================================================================================= */
 #main-container {
     position: relative;
@@ -176,8 +188,9 @@ html, body {
 }
 
 /* ========================================================================================= */
-/* CARTE LEAFLET — Occupe tout le conteneur en absolu (inset: 0).                           */
-/* z-index: 0 pour passer sous tous les panels et boutons flottants.                        */
+/* CARTE LEAFLET — Occupe tout le conteneur en absolu (inset: 0).                          */
+/*    z-index: 0 → passe sous tous les panels et boutons flottants (z-index 1000).          */
+/*    Ne pas modifier le z-index sans ajuster ceux des panels au-dessus.                    */
 /* ========================================================================================= */
 #map {
     position: absolute;
@@ -188,8 +201,11 @@ html, body {
 }
 
 /* ========================================================================================= */
-/* BOUTONS FLOTTANTS — Style de base partagé par le bouton couches et les boutons           */
-/* de mode de recherche (Où je suis / Comparer / Mon chemin). Taille 44×44px, arrondi.     */
+/* BOUTONS FLOTTANTS — Style de base partagé par le bouton couches (#layers-toggle)        */
+/*    et les 3 boutons de mode de recherche. Les .search-btn surchargent width/height.      */
+/*    → Changer la taille des boutons carrés    : width / height dans .floating-btn         */
+/*    → Changer la couleur hover bouton couches : background dans #layers-toggle:hover      */
+/*    → Changer la couleur de l'icône SVG hover : stroke dans #layers-toggle:hover svg      */
 /* ========================================================================================= */
 .floating-btn {
     width: 44px;
@@ -215,7 +231,12 @@ html, body {
 }
 
 /* ========================================================================================= */
-/* RECHERCHE                                                                                 */
+/* RECHERCHE — 3 boutons toggle + panel de saisie. top: 95px pour passer sous la pill.     */
+/*    → Déplacer les boutons                : top / left dans #search-controls              */
+/*    → Changer largeur/hauteur des boutons : width / height dans .search-btn               */
+/*    → Changer le rayon des boutons        : border-radius dans .search-btn                */
+/*    → Changer la largeur du panel         : width dans #search-panel                      */
+/*    → Changer la distance boutons→panel   : top dans #search-panel                        */
 /* ========================================================================================= */
 
 /* Conteneur positionné en absolu en haut à gauche — abaissé à 95px pour passer sous la pill */
@@ -302,7 +323,9 @@ html, body {
 #search-panel button:not(.geolocate-btn):not(.clear-btn):not(.clear-btn):hover { background-color: #e71d73; }
 
 /* ========================================================================================= */
-/* BOUTON GÉOLOCALISATION                                                                    */
+/* BOUTON GPS / GÉOLOCALISATION — Cercle dans .search-row à droite du champ de saisie.     */
+/*    → Changer la taille du cercle         : width / height dans .geolocate-btn            */
+/*    → Changer la couleur de la bordure    : border dans .geolocate-btn                    */
 /* ========================================================================================= */
 
 /* Aligne le champ de saisie et le bouton GPS sur la même ligne                             */
@@ -336,12 +359,11 @@ html, body {
 
 .geolocate-btn:hover { border-color: #e71d73; color: #e71d73; background: #fff0f6; }
 
-/* =============================================
-    BOUTON EFFACER
-    Même gabarit que le bouton géolocalisation,
-    positionné juste à sa droite dans search-row.
-    Vide le champ de saisie au clic.
-    ============================================= */
+/* ========================================================================================= */
+/* BOUTON EFFACER — Même gabarit que .geolocate-btn, positionné juste à sa droite.         */
+/*    Vide le champ ciblé par data-target au clic (géré dans main.js).                     */
+/*    → Changer la taille : width / height (garder identique au bouton GPS pour cohérence) */
+/* ========================================================================================= */
 .clear-btn {
     width: 36px !important;
     height: 36px !important;
@@ -365,8 +387,10 @@ html, body {
 }
 
 /* ========================================================================================= */
-/* AUTOCOMPLÉTION — Liste déroulante absolue affichée sous le champ de saisie pendant la    */
-/* frappe. Suggestions filtrées sur les bounds de la métropole de Lyon côté JS.             */
+/* AUTOCOMPLÉTION — Liste déroulante créée dynamiquement sous le champ actif pendant la    */
+/*    frappe. Suggestions filtrées sur les bounds de la métropole de Lyon côté JS.          */
+/*    → Changer l'arrondi de la liste       : border-radius dans .autocomplete-list         */
+/*    → Changer la couleur hover            : color dans .autocomplete-list li:hover        */
 /* ========================================================================================= */
 
 /* Conteneur ancré sous le champ via position absolute + top: calc(100% + 4px)             */
@@ -401,7 +425,12 @@ html, body {
 .autocomplete-list li:hover { background: #fff0f6; color: #e71d73; }
 
 /* ========================================================================================= */
-/* SÉLECTEUR DE COUCHES                                                                     */
+/* SÉLECTEUR DE COUCHES — Panneau flottant ancré en haut à droite.                         */
+/*    top: 95px = aligné avec #search-controls. Scrollable si contenu > 70vh.              */
+/*    → Déplacer le panneau                 : top / right dans #layers-control              */
+/*    → Changer la largeur du panneau       : width dans #layers-panel                     */
+/*    → Changer la hauteur max scrollable   : max-height dans #layers-panel                 */
+/*    → Changer la scrollbar (couleur)      : background-color dans ::-webkit-scrollbar-thumb*/
 /* ========================================================================================= */
 
 /* Ancré en haut à droite au même niveau que les boutons de recherche (top: 95px)          */
@@ -444,7 +473,11 @@ html, body {
 }
 
 /* ========================================================================================= */
-/* GROUPES DE COUCHES — Accordéon, un seul groupe ouvert à la fois (géré dans main.js)     */
+/* GROUPES DE COUCHES — Accordéon, un seul groupe ouvert à la fois (géré dans main.js).   */
+/*    Structure : en-tête bleu (bouton toggle + bouton ℹ) + zone de contenu masquable.     */
+/*    → Changer la couleur de l'en-tête    : background-color dans .layer-group-header     */
+/*    → Changer la couleur hover toggle    : background-color dans .layer-group-toggle:hover*/
+/*    → Changer la taille de l'icône cat.  : width/height dans .layer-group-toggle .cat-icon*/
 /* ========================================================================================= */
 
 /* Conteneur d'un groupe avec bordure fine et coins arrondis                                */
@@ -517,7 +550,12 @@ html, body {
 .layer-group-content.hidden { display: none; }
 
 /* ========================================================================================= */
-/* ITEMS DE COUCHE                                                                          */
+/* ITEMS DE COUCHE — Chaque couche = label flex (toggle switch + nom).                     */
+/*    Checkbox native remplacée par un pill personnalisé via appearance:none + ::before.    */
+/*    → Changer la largeur du toggle switch  : width dans input[type="checkbox"]            */
+/*    → Changer la couleur du toggle activé  : background-color dans :checked              */
+/*    → Changer l'opacité des couches grises : opacity dans .layer-disabled                */
+/*    → Changer couleur bandeau Jour/Nuit    : background-color dans .sublabel (#5dade2)    */
 /* ========================================================================================= */
 
 /* Chaque couche est un label flex avec un toggle switch à gauche et un nom à droite       */
@@ -588,8 +626,11 @@ html, body {
 }
 
 /* ========================================================================================= */
-/* LÉGENDE DES COUCHES                                                                      */
-/* ========================================================================================= */
+/* LÉGENDE DES COUCHES — Injectée dynamiquement dans le .layer-group-content actif.        */
+/*    Deux modes : barre segmentée (Air, Pollen, Bruit) ou liste pastilles (Bruit col).    */
+/*    → Changer la hauteur de la barre segmentée : height dans .lgd-seg-bar                */
+/*    → Changer la couleur du trait OMS           : background dans .lgd-oms-line          */
+/*    → Changer le fond de la légende             : background dans .layer-legend           */
 /* ========================================================================================= */
 
 /* Conteneur injecté dynamiquement dans le layer-group-content actif                       */
@@ -722,8 +763,13 @@ html, body {
 .leaflet-control-attribution a:hover { color: #e71d73 !important; text-decoration: underline !important; }
 
 /* ========================================================================================= */
-/* POPUP D'INFORMATION — Même structure que la popup de bienvenue. Créée dynamiquement par  */
-/* popups.js. Rendue visible via la classe .visible. Contenu injecté depuis #info-contents. */
+/* POPUP D'INFORMATION — Même structure que la popup de bienvenue. Créée par popups.js.    */
+/*    Rendue visible via .visible au clic sur un bouton ℹ. Contenu injecté depuis          */
+/*    les divs #info-cat-XXX de #info-contents (HTML).                                     */
+/*    → Changer la taille de la boîte      : max-width dans #popup-inner                   */
+/*    → Changer la hauteur scrollable      : max-height dans #popup-content                 */
+/*    → Changer la scrollbar               : ::-webkit-scrollbar-thumb dans #popup-content  */
+/*    → Changer taille/couleur de la croix : font-size / color dans #popup-close            */
 /* ========================================================================================= */
 
 /* Fond semi-transparent, masqué par défaut, affiché via .visible                          */
@@ -802,7 +848,10 @@ html, body {
 #popup-content li { font-size: 0.85rem; line-height: 1.8; color: #444; }
 
 /* ========================================================================================= */
-/* POPUP DE CLIC COUCHE — Popup Leaflet affichée au clic sur une couche WMS active          */
+/* POPUP DE CLIC COUCHE — Popup Leaflet affichée au clic sur une couche WMS active.        */
+/*    Remplace le style natif de Leaflet. La flèche de la bulle est supprimée.              */
+/*    → Changer la couleur du trait gauche  : border-left dans .leaflet-popup-content-wrapper*/
+/*    → Changer la largeur min              : min-width dans .layer-popup                   */
 /* ========================================================================================= */
 /* Supprime le padding natif Leaflet autour du contenu                                      */
 .leaflet-popup-tip-container { display: none !important; }
@@ -838,7 +887,8 @@ html, body {
 .layer-popup-coords { font-size: 0.7rem; color: #bbb; padding: 0 14px 8px; }
 
 /* ========================================================================================= */
-/* CONTRÔLES LEAFLET — Surcharge des styles natifs pour harmoniser typographie et couleur  */
+/* CONTRÔLES LEAFLET — Surcharges des styles natifs pour harmoniser avec la charte.        */
+/*    Police Jost + couleur #2c426c sur tous les contrôles. Bordures/ombres supprimées.    */
 /* ========================================================================================= */
 
 /* Surcharge globale : police Jost et couleur bleue sur tous les contrôles Leaflet         */
@@ -854,7 +904,10 @@ html, body {
 .leaflet-control { border: none !important; box-shadow: none !important; }
 
 /* ========================================================================================= */
-/* BOUTONS ZOOM                                                                             */
+/* BOUTONS ZOOM — Repositionnés du coin supérieur gauche (défaut Leaflet) vers bas droite. */
+/*    → Changer la position  : bottom / right dans .leaflet-top.leaflet-left               */
+/*    → Changer la taille    : width / height dans .leaflet-control-zoom a                 */
+/*    → Changer la couleur   : color dans .leaflet-control-zoom a                          */
 /* ========================================================================================= */
 
 /* Déplace le groupe +/- du coin supérieur gauche (défaut Leaflet) vers le bas à droite    */
@@ -890,7 +943,7 @@ html, body {
 .leaflet-control-zoom-in { border-bottom: none !important; }
 
 /* ========================================================================================= */
-/* ÉCHELLE — Barre d'échelle en bas à gauche, même style card arrondi que les boutons zoom */
+/* ÉCHELLE — Barre d'échelle en bas à gauche, même style card arrondi que les boutons zoom.*/
 /* ========================================================================================= */
 .leaflet-control-scale {
     background: rgba(255,255,255,0.9) !important;
@@ -912,7 +965,8 @@ html, body {
 }
 
 /* ========================================================================================= */
-/* CRÉDITS OPENSTREETMAP — Bandeau attribution en bas à droite, même style card arrondi    */
+/* CRÉDITS OPENSTREETMAP — Bandeau attribution en bas à droite, repositionné à 5px.        */
+/*    → Changer la position : bottom / right dans .leaflet-bottom.leaflet-right            */
 /* ========================================================================================= */
 .leaflet-control-attribution {
     background: rgba(255,255,255,0.9) !important;
@@ -937,12 +991,12 @@ html, body {
 .leaflet-control-attribution a:hover { text-decoration: underline !important; }
 
 /* ========================================================================================= */
-/* ============================== PANEL RESULTATS ========================================== */
-/* ========================================================================================= */
-
-/* ========================================================================================= */
-/* PANEL DE RÉSULTATS — S'affiche sous le panel de recherche après validation.              */
-/* Le top est recalculé dynamiquement par main.js (getBoundingClientRect).                  */
+/* PANEL DE RÉSULTATS — S'affiche sous le panel de recherche après validation.             */
+/*    Le top est recalculé dynamiquement par main.js (getBoundingClientRect).               */
+/*    → Changer la largeur             : width dans #results-panel                          */
+/*    → Changer la hauteur max         : max-height dans #results-panel                     */
+/*    → Changer la scrollbar (couleur) : background-color dans ::-webkit-scrollbar-thumb   */
+/*    → Changer couleur hover de la ✖  : color dans #results-close:hover                   */
 /* ========================================================================================= */
 
 /* Conteneur principal : colonne flex pour séparer le header fixe du contenu scrollable    */
@@ -1012,7 +1066,9 @@ html, body {
 }
 
 /* ========================================================================================= */
-/* SÉLECTEUR DE MODE DE TRANSPORT — Affiché dans le panel itinéraire                       */
+/* SÉLECTEUR DE MODE DE TRANSPORT — Pill conteneur avec 4 boutons icône dans #panel-route. */
+/*    → Changer la couleur du bouton actif   : background dans .transport-btn.active        */
+/*    → Changer l'opacité du bouton disabled : opacity dans .transport-btn:disabled         */
 /* ========================================================================================= */
 #transport-selector {
     display: flex;
@@ -1059,9 +1115,12 @@ html, body {
     pointer-events: none;
 }
 
-/* =============================================
-    PANEL DE RÉSULTATS - BOUTON 'TELECHARGE EN PDF'
-    ============================================= */
+/* ========================================================================================= */
+/* EN-TÊTE RÉSULTATS — ZONE ACTIONS (#results-address, #results-header-actions, .share-btn)*/
+/*    2ème déclaration de #results-header : affine l'alignement centré + gap.               */
+/*    C'est cette déclaration qui prend le dessus sur la première (cascade CSS).            */
+/*    → Changer le style du bouton PDF      : .share-btn (couleur, bordure, arrondi)        */
+/* ========================================================================================= */
 #results-address {
     display: none;
 }
@@ -1108,9 +1167,11 @@ html, body {
     background: #fff0f6;
 }
 
-/* =============================================
-    PANEL DE RÉSULTATS - BOUTON 'I' POUR L'ITINERAIRE
-    ============================================= */
+/* ========================================================================================= */
+/* BOUTON INFO ITINÉRAIRE — Cercle dans l'en-tête des résultats, visible en mode itinéraire*/
+/*    Ouvre la popup #info-route via popups.js. Masqué par défaut (.hidden dans le HTML).   */
+/*    → Changer la taille du cercle  : width / height dans .info-route-btn                  */
+/* ========================================================================================= */
 .info-route-btn {
   width: 34px;
   height: 34px;
@@ -1133,7 +1194,8 @@ html, body {
 }
 
 /* ========================================================================================= */
-/* IMPRESSION / EXPORT PDF                                                                   */
+/* IMPRESSION / EXPORT PDF — Déclenché par html2canvas+jsPDF (#btn-share).                 */
+/*    Masque tout sauf #results-panel, le place pleine largeur et cache les boutons action. */
 /* ========================================================================================= */
 @media print {
 
@@ -1163,7 +1225,12 @@ html, body {
   }
 
 /* ========================================================================================= */
-/* PANEL DE RÉSULTATS — CONTENU                                                             */
+/* PANEL DE RÉSULTATS — CONTENU (.cat-card, .res-row, badges)                              */
+/*    HTML injecté dans #results-content par renderResultsPanel() dans main.js.             */
+/*    → Changer la couleur en-tête catégorie : background dans .cat-header                 */
+/*    → Changer la couleur badge Bon         : .badge-low (fond + texte)                   */
+/*    → Changer la couleur badge Modéré      : .badge-mid                                  */
+/*    → Changer la couleur badge Élevé       : .badge-high                                 */
 /* ========================================================================================= */
 /* Titre gris majuscule affiché en haut du panel (adresse saisie ou "Point A / Point B")   */
 .panel-address-title {
@@ -1254,9 +1321,13 @@ html, body {
 .badge-mid  { background: #fff8e1; color: #f39c12; }
 .badge-high { background: #fdecea; color: #e74c3c; }
 
-/* =============================================
-   COMPARAISON — blocs Point A / Point B
-   ============================================= */
+/* ========================================================================================= */
+/* COMPARAISON — Blocs Point A / Point B injectés en mode comparaison.                     */
+/*    Point A : teinte bleue (#dceff2 + bordure #2c426c).                                   */
+/*    Point B : teinte rose (#ffeded + bordure #e71d73).                                    */
+/*    → Changer couleurs A : .compare-point-a et .compare-dot-a                            */
+/*    → Changer couleurs B : .compare-point-b et .compare-dot-b                            */
+/* ========================================================================================= */
 
 /* Bloc englobant un point dans la comparaison */
 .compare-point-block {
@@ -1306,7 +1377,10 @@ html, body {
 }
 
 /* ========================================================================================= */
-/* BARRE DE LÉGENDE — Affichée sous chaque sous-catégorie quand une valeur est disponible  */
+/* BARRE DE LÉGENDE — Dégradé vert→orange→rouge sous chaque polluant quand valeur dispo.   */
+/*    Trait blanc = seuil OMS. Point bleu = valeur mesurée. Positions en % via inline style.*/
+/*    → Changer les couleurs du dégradé     : background dans .legend-bar                  */
+/*    → Changer la couleur du point valeur  : background dans .marker-val                  */
 /* ========================================================================================= */
 
 /* Conteneur relatif qui sert de référence de positionnement pour tous les éléments enfants */
@@ -1374,10 +1448,13 @@ html, body {
     white-space: nowrap;
 }
 
-/* =============================================
-   TOGGLE COLORISATION ITINÉRAIRE
-   Switch inline à droite du label du polluant.
-   ============================================= */
+/* ========================================================================================= */
+/* TOGGLE COLORISATION ITINÉRAIRE — Switch inline à droite du label du polluant.           */
+/*    Activé = colorise les segments de l'itinéraire sur la carte selon l'exposition.       */
+/*    Même principe que le toggle switch des couches mais en plus petit (30×16px).          */
+/*    → Changer la couleur activée  : background dans input:checked + .route-color-track    */
+/*    → Changer la taille           : width / height dans .route-color-track                */
+/* ========================================================================================= */
 .route-color-toggle {
   display: inline-flex;
   align-items: center;
@@ -1437,12 +1514,15 @@ math {
   margin: 1em auto;
 }
 
-
-
 /* ========================================================================================= */
-/* MODALE DE CHARGEMENT                                                                     */
+/* POPUP DE CHARGEMENT — Overlay affiché pendant le calcul de l'itinéraire.                */
+/*    Rendu visible/caché dans main.js via classList.remove/add('hidden').                   */
+/*    → Changer la couleur de la roue       : border-top dans .loading-spinner              */
+/*    → Changer la taille de la roue        : width / height dans .loading-spinner          */
+/*    → Changer la vitesse d'animation      : durée dans animation: spin Xs                 */
+/*    → Changer la taille de la boîte       : max-width dans .loading-modal-content         */
+/*    → Changer le texte affiché            : modifier .loading-text dans index.html        */
 /* ========================================================================================= */
-
 .loading-modal {
     position: fixed;
     top: 0;
@@ -1495,4 +1575,3 @@ math {
 .hidden {
     display: none;
 }
-
