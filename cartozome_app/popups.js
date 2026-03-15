@@ -2,7 +2,7 @@
 // PILL DE PRESENTATION
 // =============================================
 
-document.getElementById('pill-title').addEventListener('click', () => {
+document.getElementById('pill-info').addEventListener('click', () => {
   document.getElementById('welcome-overlay').style.display = 'flex';
   document.getElementById('welcome-content').scrollTop = 0;
 });
