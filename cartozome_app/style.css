@@ -34,6 +34,7 @@ html, body {
 /*    → Changer la scrollbar (couleur)      : background-color dans ::-webkit-scrollbar-thumb*/
 /* ========================================================================================= */
 
+/* Fond semi-transparent plein écran — masqué par défaut, affiché via style.display='flex' */
 #welcome-overlay {
     display: none;
     position: fixed;
@@ -47,6 +48,7 @@ html, body {
     align-items: center;
 }
 
+/* Boîte blanche centrée — trait bleu gauche, animation d'apparition slideIn               */
 #welcome-popup {
     background: #fff;
     border-radius: 12px;
@@ -59,6 +61,7 @@ html, body {
     animation: slideIn 0.2s ease;
 }
 
+/* Bouton ✖ — positionné en absolu en haut à droite de la boîte                           */
 #welcome-close {
     position: absolute;
     top: 12px;
@@ -70,8 +73,10 @@ html, body {
     color: #888;
 }
 
+/* Hover rose CLB sur la croix */
 #welcome-close:hover { color: #e71d73; }
 
+/* Zone de texte scrollable — hauteur max pour ne pas dépasser l'écran                     */
 #welcome-content {
     max-height: 60vh;
     overflow-y: auto;
@@ -79,10 +84,11 @@ html, body {
     margin-top: 10px;
 }
 
+/* Scrollbar fine bleue dans la zone de texte */
 #welcome-content::-webkit-scrollbar       { width: 6px; }
 #welcome-content::-webkit-scrollbar-thumb { background-color: #2c426c; border-radius: 3px; }
 
-/* Titre principal centré */
+/* Titre principal "Bienvenue sur Cartozome" — centré, plus grand que les h2 de section   */
 #welcome-content h2:first-child {
     margin: 0 0 20px 0;
     font-size: 1.5rem;
@@ -90,7 +96,7 @@ html, body {
     text-align: center;
 }
 
-/* Titres de section */
+/* Titres de section (Qu'est-ce que / Pourquoi / Ce que vous pouvez faire…)               */
 #welcome-content h2 {
     margin: 16px 0 4px 0;
     font-size: 1rem;
@@ -98,6 +104,7 @@ html, body {
     text-align: left;
 }
 
+/* Texte courant et listes de la popup bienvenue */
 #welcome-content p,
 #welcome-content ul,
 #welcome-content li {
@@ -107,6 +114,7 @@ html, body {
     margin: 0;
 }
 
+/* Indentation de la liste */
 #welcome-content ul { padding-left: 18px; }
 
 /* ========================================================================================= */
@@ -117,6 +125,7 @@ html, body {
 /*    → Changer la taille du titre texte    : font-size dans #pill-title                    */
 /*    → Changer la taille du logo CLB       : height dans #pill-clb img                     */
 /* ========================================================================================= */
+/* Ancré en absolu centré horizontalement — z-index 1000 pour flotter sur la carte         */
 #top-banner {
     position: absolute;
     top: 14px;
@@ -126,6 +135,7 @@ html, body {
     pointer-events: none;
 }
 
+/* Conteneur pill blanc — forme très arrondie, ombre portée, clics réactivés               */
 #center-pill {
     background: rgba(255,255,255,0.97);
     border-radius: 40px;
@@ -138,13 +148,16 @@ html, body {
     white-space: nowrap;
 }
 
+/* Zone logo Cartozome à gauche */
 #pill-logo {
     margin-left: 12px;
     flex-shrink: 0;
 }
 
+/* Taille du logo Cartozome */
 #pill-logo img { width: 36px; height: 36px; object-fit: contain; }
 
+/* Titre "CARTOZOME" — clic ouvre la popup de bienvenue (géré dans popups.js)              */
 #pill-title {
     font-size: 1.3rem;
     font-weight: 900;
@@ -154,8 +167,10 @@ html, body {
     cursor: pointer;
 }
 
+/* Hover rose CLB sur le titre */
 #pill-title:hover { color: #e71d73; }
 
+/* Trait séparateur vertical entre le titre et le logo CLB */
 .pill-sep {
     width: 1px;
     height: 24px;
@@ -163,6 +178,7 @@ html, body {
     flex-shrink: 0;
 }
 
+/* Zone logo CLB à droite — clic ouvre le site du CLB (géré dans popups.js)                */
 #pill-clb {
     height: 100%;
     display: flex;
@@ -173,8 +189,10 @@ html, body {
     transition: background 0.15s;
 }
 
+/* Hover fond rose léger sur le logo CLB */
 #pill-clb:hover { background: #fff0f6; }
 
+/* Taille du logo CLB */
 #pill-clb img { height: 34px; object-fit: contain; }
 
 /* ========================================================================================= */
@@ -220,12 +238,15 @@ html, body {
     line-height: 1.3;
 }
 
+/* Hover générique — gris très léger */
 .floating-btn:hover { background: #f5f5f5; }
 
+/* Hover spécifique au bouton couches — fond rose */
 #layers-toggle:hover {
     background: #fff0f6 !important;
 }
 
+/* Icône SVG du bouton couches passe en rose au hover */
 #layers-toggle:hover svg {
     stroke: #e71d73 !important;
 }
@@ -299,6 +320,7 @@ html, body {
     transition: border-color 0.2s;
 }
 
+/* Bordure bleue au focus sur les champs de saisie */
 #search-panel input:focus { border-color: #2c426c; }
 
 /* Bouton Valider — pleine largeur, fond bleu, majuscule. :not(.geolocate-btn) pour ne pas */
@@ -357,6 +379,7 @@ html, body {
     transition: border-color 0.2s, color 0.2s, background 0.2s;
 }
 
+/* Hover rose CLB sur le bouton GPS */
 .geolocate-btn:hover { border-color: #e71d73; color: #e71d73; background: #fff0f6; }
 
 /* ========================================================================================= */
@@ -380,6 +403,7 @@ html, body {
     transition: border-color 0.2s, color 0.2s, background 0.2s;
 }
 
+/* Hover rose CLB sur le bouton effacer */
 .clear-btn:hover {
     border-color: #e71d73;
     color: #e71d73;
@@ -419,6 +443,7 @@ html, body {
     font-family: 'Jost', sans-serif;
 }
 
+/* Supprime le séparateur sur le dernier item */
 .autocomplete-list li:last-child { border-bottom: none; }
 
 /* Hover rose CLB sur les suggestions                                                       */
@@ -456,10 +481,12 @@ html, body {
     scrollbar-gutter: stable;
 }
 
+/* Largeur de la scrollbar du panneau de couches */
 #layers-panel::-webkit-scrollbar {
     width: 10px;
 }
 
+/* Thumb bleu avec espace blanc autour (effet pill) */
 #layers-panel::-webkit-scrollbar-thumb {
     background-color: #2c426c;
     border-radius: 10px;
@@ -467,6 +494,7 @@ html, body {
     background-clip: padding-box;
 }
 
+/* Piste transparente avec marge verticale */
 #layers-panel::-webkit-scrollbar-track {
     background: transparent;
     margin: 10px;
@@ -518,6 +546,7 @@ html, body {
 /* Hover rose CLB sur le toggle                                                             */
 .layer-group-toggle:hover { background-color: #e71d73; }
 
+/* Icône catégorie (air.png, pollen.png…) dans l'en-tête du groupe */
 .layer-group-toggle .cat-icon { width: 20px; height: 20px; object-fit: contain; }
 
 /* Chevron animé : pointe vers le bas (ouvert) ou vers la droite (-90°, fermé)             */
@@ -527,6 +556,7 @@ html, body {
     transition: transform 0.2s;
 }
 
+/* État fermé : chevron pivoté à -90° (pointe vers la droite) */
 .layer-group-toggle.closed .chevron { transform: rotate(-90deg); }
 
 /* Bouton ℹ séparé du toggle par une bordure gauche, ouvre la popup d'information          */
@@ -572,6 +602,7 @@ html, body {
     transition: color 0.15s;
 }
 
+/* Supprime le séparateur sur le dernier item de la liste */
 .layer-group-content label:last-of-type { border-bottom: none; }
 
 /* Hover rose CLB sur les labels de couche                                                  */
@@ -642,28 +673,34 @@ html, body {
 
 /* ── Barre segmentée (Air, Ambroisie, Bruit) ── */
 
+/* Conteneur relatif — réserve l'espace pour l'étiquette OMS au-dessus et les labels en-dessous */
 .lgd-bar-outer {
     position: relative;
     padding-top: 28px;
     padding-bottom: 14px;
 }
 
+/* Variante sans seuil OMS — pas d'espace réservé au-dessus */
 .lgd-bar-outer--no-oms {
     padding-top: 6px;
 }
 
+/* Variante centrée (UV) — pas de padding haut */
 .lgd-bar-outer--center {
     padding-top: 0;
 }
 
+/* Barre en flex — chaque segment reçoit sa couleur en inline style par main.js */
 .lgd-seg-bar {
     display: flex;
     gap: 2px;
     height: 12px;
 }
 
+/* Segment individuel de la barre colorée */
 .lgd-seg { height: 100%; }
 
+/* Ligne de labels positionnée en absolu en bas de .lgd-bar-outer */
 .lgd-border-labels {
     position: absolute;
     bottom: 0;
@@ -672,6 +709,7 @@ html, body {
     height: 14px;
 }
 
+/* Label de valeur seuil — centré via translateX(-50%), left posé en inline style (%) */
 .lgd-border-label {
     position: absolute;
     transform: translateX(-50%);
@@ -681,11 +719,13 @@ html, body {
     white-space: nowrap;
 }
 
+/* Premier label (valeur min) — calé à gauche sans décalage */
 .lgd-border-label:first-child {
     transform: none;
     left: 0 !important;
 }
 
+/* Trait vertical indiquant la position du seuil OMS — left posé en inline style (%) */
 .lgd-oms-line {
     position: absolute;
     top: 40px;
@@ -697,6 +737,7 @@ html, body {
     pointer-events: none;
 }
 
+/* Étiquette "OMS XX µg/m³" au-dessus du trait — décalée à gauche de 75% */
 .lgd-oms-above {
     position: absolute;
     top: 10px;
@@ -706,6 +747,7 @@ html, body {
     transform: translateX(-75%);
 }
 
+/* Texte de l'étiquette OMS */
 .lgd-seg-oms {
     font-size: 0.65rem;
     font-weight: 700;
@@ -716,19 +758,23 @@ html, body {
     line-height: 1.3;
 }
 
-/* Liste verticale (Bruit)                                                                  */
+/* ── Liste verticale pastille + label (Bruit) ── */
+
+/* Conteneur flex colonne */
 .lgd-col-list {
     display: flex;
     flex-direction: column;
     gap: 4px;
 }
 
+/* Ligne : pastille colorée + texte du niveau */
 .lgd-col-row {
     display: flex;
     align-items: center;
     gap: 8px;
 }
 
+/* Pastille carrée arrondie — couleur définie en inline style par main.js */
 .lgd-col-swatch {
     width: 14px;
     height: 14px;
@@ -737,12 +783,14 @@ html, body {
     border: 1px solid rgba(0,0,0,0.08);
 }
 
+/* Libellé du niveau (ex. "Zone préservée", "Zone dégradée…") */
 .lgd-col-label {
     font-size: 0.75rem;
     color: #444;
     font-family: 'Jost', sans-serif;
 }
 
+/* Unité affichée en italique gris au-dessus de la liste (ex. "µg/m³") */
 .lgd-col-unit {
     font-size: 0.68rem;
     color: #999;
@@ -751,6 +799,7 @@ html, body {
     margin-bottom: 4px;
 }
 
+/* Texte affiché quand aucune donnée de légende n'est disponible */
 .legend-placeholder {
     font-size: 0.75rem;
     color: #aaa;
@@ -785,6 +834,7 @@ html, body {
     align-items: center;
 }
 
+/* Classe ajoutée par popups.js pour afficher la popup */
 #info-popup.visible { display: flex; }
 
 /* Boîte blanche avec bordure bleue gauche et animation d'apparition                       */
@@ -808,6 +858,7 @@ html, body {
     margin-top: 10px;
 }
 
+/* Scrollbar fine bleue dans le contenu de la popup */
 #popup-content::-webkit-scrollbar       { width: 6px; }
 #popup-content::-webkit-scrollbar-thumb { background-color: #2c426c; border-radius: 3px; }
 
@@ -829,8 +880,10 @@ html, body {
     color: #888;
 }
 
+/* Hover rose CLB sur la croix de la popup */
 #popup-close:hover { color: #e71d73; }
 
+/* Titre h3 avec icône catégorie (img 20px) à gauche */
 #popup-content h3 {
     display: flex;
     align-items: center;
@@ -841,8 +894,10 @@ html, body {
     font-weight: 700;
 }
 
+/* Taille de l'icône dans le h3 */
 #popup-content h3 img { width: 20px; height: 20px; object-fit: contain; }
 
+/* Texte courant dans les popups d'information */
 #popup-content p,
 #popup-content ul,
 #popup-content li { font-size: 0.85rem; line-height: 1.8; color: #444; }
@@ -979,15 +1034,17 @@ html, body {
     color: #2c426c !important;
 }
 
+/* Liens d'attribution — pas de soulignement par défaut */
 .leaflet-control-attribution a {
     color: #2c426c !important;
     text-decoration: none !important;
     font-weight: 600 !important;
 }
 
-/* Repositionne le bandeau pour coller aux bords inférieurs droit de la carte              */
+/* Repositionne le bandeau aux bords inférieurs droits de la carte */
 .leaflet-bottom.leaflet-right { bottom: 5px !important; right: 5px !important; }
 
+/* Hover rose CLB sur les liens d'attribution OSM */
 .leaflet-control-attribution a:hover { text-decoration: underline !important; }
 
 /* ========================================================================================= */
@@ -1036,6 +1093,7 @@ html, body {
     flex-shrink: 0;
 }
 
+/* Hover rose CLB sur la croix */
 #results-close:hover { color: #e71d73; }
 
 /* Zone scrollable qui reçoit le HTML injecté par renderResultsPanel()                     */
@@ -1049,10 +1107,12 @@ html, body {
     scrollbar-gutter: stable;
 }
 
+/* Largeur de la scrollbar dans la zone de résultats */
 #results-content::-webkit-scrollbar {
     width: 10px;
 }
 
+/* Thumb bleu avec espace blanc autour (effet pill) */
 #results-content::-webkit-scrollbar-thumb {
     background-color: #2c426c;
     border-radius: 10px;
@@ -1060,6 +1120,7 @@ html, body {
     background-clip: padding-box;
 }
 
+/* Piste transparente avec marge verticale */
 #results-content::-webkit-scrollbar-track {
     background: transparent;
     margin: 10px;
@@ -1079,11 +1140,13 @@ html, body {
     padding: 4px;
 }
 
+/* Chaque span prend 1 part égale — répartition uniforme des 4 boutons */
 #transport-selector span {
     flex: 1;
     display: inline-flex;
 }
 
+/* Bouton de transport — transparent par défaut, fond rose quand .active */
 .transport-btn {
     flex: 1;
     width: 100%;
@@ -1099,16 +1162,19 @@ html, body {
     transition: background 0.15s, color 0.15s;
 }
 
+/* Hover rose sur les boutons inactifs */
 .transport-btn:hover:not(.active) {
     background: #fff0f6;
     color: #e71d73;
 }
 
+/* Mode sélectionné — fond rose CLB, icône blanche */
 .transport-btn.active {
     background: #e71d73 !important; 
     color: white !important;
 }
 
+/* Mode désactivé (transports en commun) — 35% d'opacité, non cliquable */
 .transport-btn:disabled {
     opacity: 0.35;
     cursor: not-allowed;
@@ -1121,10 +1187,12 @@ html, body {
 /*    C'est cette déclaration qui prend le dessus sur la première (cascade CSS).            */
 /*    → Changer le style du bouton PDF      : .share-btn (couleur, bordure, arrondi)        */
 /* ========================================================================================= */
+/* Adresse textuelle — masquée par défaut, affichée selon le mode dans main.js */
 #results-address {
     display: none;
 }
 
+/* 2ème déclaration — centre les éléments + gap. Prend le dessus sur la 1ère */
 #results-header {
     display: flex;
     align-items: center;
@@ -1135,6 +1203,7 @@ html, body {
     gap: 8px;
 }
 
+/* Conteneur des boutons actions (PDF + ℹ + fermer) — prend tout l'espace disponible */
 #results-header-actions {
     display: flex;
     align-items: center;
@@ -1142,6 +1211,7 @@ html, body {
     flex: 1;
 }
 
+/* Bouton "Télécharger en PDF" — pill avec bordure bleue */
 .share-btn {
     flex: 1;
     padding: 8px 14px;
@@ -1161,6 +1231,7 @@ html, body {
     transition: border-color 0.2s, color 0.2s, background 0.2s;
 }
 
+/* Hover rose CLB sur le bouton PDF */
 .share-btn:hover {
     border-color: #e71d73;
     color: #e71d73;
@@ -1187,6 +1258,7 @@ html, body {
   transition: border-color 0.2s, color 0.2s, background 0.2s;
 }
 
+/* Hover rose CLB sur le bouton info itinéraire */
 .info-route-btn:hover {
   border-color: #e71d73;
   color: #e71d73;
@@ -1263,6 +1335,7 @@ html, body {
     letter-spacing: 0.05em;
 }
 
+/* Corps de la carte — padding vertical léger pour espacer les lignes */
 .cat-body { padding: 4px 0; }
 
 /* Bloc d'une sous-catégorie (PM10, NO₂, etc.) séparé du suivant par un trait fin          */
@@ -1271,6 +1344,7 @@ html, body {
     border-bottom: 1px solid #f5f5f5;
 }
 
+/* Supprime le séparateur sur le dernier polluant de la carte */
 .res-row:last-child { border-bottom: none; }
 
 /* Ligne flex : nom du polluant à gauche, valeur + badge à droite                          */
@@ -1288,6 +1362,7 @@ html, body {
     gap: 6px;
 }
 
+/* Nom du polluant (PM10, NO₂, Ambroisie…) */
 .res-label { color: #555; font-size: 0.82rem; }
 
 /* Conteneur valeur + badge alignés côte à côte                                            */
@@ -1317,8 +1392,11 @@ html, body {
 /* Pilule colorée indiquant le niveau : Bon / Modéré / Élevé selon les seuils de LAYER_META */
 .res-badge { font-size: 0.68rem; font-weight: 700; padding: 2px 7px; border-radius: 20px; }
 
+/* Badge vert "Bon" */
 .badge-low  { background: #e8f8ee; color: #27ae60; }
+/* Badge orange "Modéré" */
 .badge-mid  { background: #fff8e1; color: #f39c12; }
+/* Badge rouge "Élevé" */
 .badge-high { background: #fdecea; color: #e74c3c; }
 
 /* ========================================================================================= */
@@ -1359,11 +1437,14 @@ html, body {
     flex-shrink: 0;
 }
 
-/* Fond très léger vert pour A, rose pour B */
+/* Fond bleu clair Point A + bordure gauche bleue */
 .compare-point-a { background: #dceff2; border-left: 3px solid #2c426c; }
+/* Fond rose clair Point B + bordure gauche rose */
 .compare-point-b { background: #ffeded; border-left: 3px solid #e71d73; }
 
+/* Pastille bleue Point A */
 .compare-dot-a { background: #2c426c; color: white; }
+/* Pastille rose Point B */
 .compare-dot-b { background: #e71d73; color: white; }
 
 /* Adresse courte — prend l'espace disponible */
@@ -1455,6 +1536,7 @@ html, body {
 /*    → Changer la couleur activée  : background dans input:checked + .route-color-track    */
 /*    → Changer la taille           : width / height dans .route-color-track                */
 /* ========================================================================================= */
+/* Wrapper label cliquable — inline-flex pour s'intégrer dans .res-left-group */
 .route-color-toggle {
   display: inline-flex;
   align-items: center;
@@ -1462,6 +1544,7 @@ html, body {
   flex-shrink: 0;
 }
 
+/* Checkbox native masquée (accessible mais invisible) */
 .route-color-toggle input[type="checkbox"] {
   position: absolute;
   opacity: 0;
@@ -1470,6 +1553,7 @@ html, body {
   pointer-events: none;
 }
 
+/* Track pill gris (OFF) — 30×16px */
 .route-color-track {
   position: relative;
   width: 30px;
@@ -1480,6 +1564,7 @@ html, body {
   flex-shrink: 0;
 }
 
+/* Thumb rond blanc — 12×12px, position initiale à gauche */
 .route-color-thumb {
   position: absolute;
   top: 2px;
@@ -1492,22 +1577,27 @@ html, body {
   transition: transform 0.22s ease;
 }
 
+/* Track bleue quand cochée (ON) */
 .route-color-toggle input:checked + .route-color-track {
   background: #2c426c;
 }
 
+/* Thumb glisse de 14px vers la droite quand cochée */
 .route-color-toggle input:checked + .route-color-track .route-color-thumb {
   transform: translateX(14px);
 }
 
+/* Hover sur track non cochée — gris plus foncé */
 .route-color-toggle:hover .route-color-track {
   background: #bbb;
 }
 
+/* Hover sur track cochée — bleu plus foncé */
 .route-color-toggle input:checked:hover + .route-color-track {
   background: #1a2f50;
 }
 
+/* Équations MathML centrées (utilisé dans les popups d'information) */
 math {
   display: block;
   text-align: center;
@@ -1523,6 +1613,7 @@ math {
 /*    → Changer la taille de la boîte       : max-width dans .loading-modal-content         */
 /*    → Changer le texte affiché            : modifier .loading-text dans index.html        */
 /* ========================================================================================= */
+/* Fond semi-transparent plein écran — masqué par .hidden, z-index 2000 */
 .loading-modal {
     position: fixed;
     top: 0;
@@ -1537,6 +1628,7 @@ math {
     z-index: 2000;
 }
 
+/* Boîte blanche centrée — même style que les autres popups (trait bleu gauche) */
 .loading-modal-content {
     background: white;
     border-radius: 16px;
@@ -1550,6 +1642,7 @@ math {
     animation: slideIn 0.2s ease;
 }
 
+/* Roue animée — cercle de fond semi-transparent + arc coloré qui tourne */
 .loading-spinner {
     width: 48px;
     height: 48px;
@@ -1560,6 +1653,7 @@ math {
     animation: spin 1s linear infinite;
 }
 
+/* Texte sous la roue ("Calcul en cours…") */
 .loading-text {
     font-size: 0.95rem;
     color: #2c426c;
@@ -1567,11 +1661,13 @@ math {
     letter-spacing: 0.03em;
 }
 
+/* Animation de rotation de la roue */
 @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
 
+/* Redéfinition locale de .hidden pour la modale (même valeur que la règle globale) */
 .hidden {
     display: none;
 }
