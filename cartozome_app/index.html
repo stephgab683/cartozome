@@ -6,6 +6,9 @@
     <link rel="icon" type="image/png" href="./img/logo.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="./style.css" />
+    <!-- Responsive : Adaptations de l'interface pour tablette et mobile -->
+     <!-- Merci à Vincent PERON pour l'aide ! -->
+    <link rel="stylesheet" href="./responsive.css" />
   </head>
 
   <!-- ========================================================================================= -->
@@ -13,7 +16,7 @@
   <!-- Définis ici comme <template> pour être clonés dans main.js via markerIcon(templateId).    -->
   <!-- Chaque template contient un SVG : rectangle arrondi + pointe basse + lettre ou point.     -->
   <!-- tpl-marker-point    : pin bleu foncé (#2c426c) + rond blanc — mode point unique           -->
-  <!-- tpl-marker-compare-a: pin bleu foncé (#2c426c) + lettre A — mode comparaison, point A           -->
+  <!-- tpl-marker-compare-a: pin bleu foncé (#2c426c) + lettre A — mode comparaison, point A     -->
   <!-- tpl-marker-compare-b: pin rose (#e71d73) + lettre B — mode comparaison, point B          -->
   <!-- tpl-marker-depart   : pin bleu foncé (#2c426c) + lettre D — mode itinéraire, point de départ    -->
   <!-- tpl-marker-arrivee  : pin rose (#e71d73) + lettre A — mode itinéraire, point d'arrivée   -->
@@ -118,6 +121,8 @@
         </div>
         <!-- Titre "CARTOZOME" dans le bandeau -->
         <span id="pill-title">CARTOZOME</span>
+        <!-- Bouton info ? — ouvre la popup de bienvenue -->
+        <button id="pill-info" title="À propos de Cartozome">?</button>
         <div class="pill-sep"></div>
         <!-- Logo Centre Léon Bérard -->
         <div id="pill-clb">
@@ -674,6 +679,9 @@
           </mrow>
         </math>
         <p>Les unités sont spécifiques à chaque indicateur : nombre de jours/an avec un RAEP&gt;3 pour les pollens, valeur d'indice pour le bruit et pour les UV</p>
+      </div>
+    
+    </div>
 
      
 

@@ -157,18 +157,40 @@ html, body {
 /* Taille du logo Cartozome */
 #pill-logo img { width: 36px; height: 36px; object-fit: contain; }
 
-/* Titre "CARTOZOME" — clic ouvre la popup de bienvenue (géré dans popups.js)              */
+/* Titre "CARTOZOME" */
 #pill-title {
     font-size: 1.3rem;
     font-weight: 900;
     color: #2c426c;
     letter-spacing: 0.08em;
     padding: 0 16px 0 10px;
-    cursor: pointer;
 }
 
-/* Hover rose CLB sur le titre */
-#pill-title:hover { color: #e71d73; }
+/* Bouton ? dans la pill — ouvre la popup de bienvenue au clic (géré dans popups.js) */
+#pill-info {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 1.5px solid #2c426c;
+    background: white;
+    color: #2c426c;
+    font-family: 'Jost', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 12px;
+    flex-shrink: 0;
+    transition: border-color 0.2s, color 0.2s, background 0.2s;
+}
+
+#pill-info:hover {
+    border-color: #e71d73;
+    color: #e71d73;
+    background: #fff0f6;
+}
 
 /* Trait séparateur vertical entre le titre et le logo CLB */
 .pill-sep {
